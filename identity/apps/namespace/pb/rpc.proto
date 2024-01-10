@@ -1,0 +1,4 @@
+syntax = "proto3";
+
+package infraboard.modules.identity.namespace;
+option go_package = "github.com/infraboard/modules/identity/apps/namespace";

@@ -159,7 +159,10 @@ message CreateUserRequest {
     CREATE_FROM create_from = 3;
     // 创建类型
     // @gotags: json:"create_by" bson:"create_by"
-    string create_by = 4;
+    string create_by = 13;
+    // 域信息
+    // @gotags: json:"domain" bson:"domain" validate:"required"
+    string domain = 4;
     // 用户账号名称
     // @gotags: json:"username" bson:"username" validate:"required,lte=60"
     string username = 5;
@@ -171,22 +174,22 @@ message CreateUserRequest {
     string description = 7;
     // 用户标签, 用于过滤用户
     // @gotags: json:"labels" bson:"labels"
-    map<string,string> labels = 8;
+    map<string,string> labels = 11;
     // 用户飞书相关信息
     // @gotags: json:"feishu" bson:"feishu"
-    Feishu feishu = 9;
+    Feishu feishu = 8;
     // 用户钉钉相关信息
     // @gotags: json:"dingding" bson:"dingding"
-    DingDing dingding = 10;
+    DingDing dingding = 9;
     // 用户企业微信相关信息
     // @gotags: json:"wechatwork" bson:"wechatwork"
-    WechatWork wechatwork = 11;
+    WechatWork wechatwork = 10;
+    // 使用全名作为uid, 比如 admin@default, 默认使用uuid
+    // @gotags: json:"use_full_named_uid" bson:"use_full_named_uid"
+    bool use_full_named_uid = 12;
     // Profile信息
     // @gotags bson:"profile" json:"profile"
-    Profile profile = 12;
-    // 用户其他属性
-    // @gotags: json:"extras" bson:"extras"
-    map<string,string> extras = 15;
+    Profile profile = 14;
 }
 
 message Feishu {
