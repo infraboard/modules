@@ -8,6 +8,7 @@ import (
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
 	"github.com/infraboard/mcube/v2/ioc/server"
+	"github.com/infraboard/modules/identity/middleware"
 	"gorm.io/gorm"
 
 	// 引入模块
@@ -23,7 +24,10 @@ func main() {
 	server.DefaultConfig.ConfigFile.Path = "etc/application.toml"
 
 	// 启动应用
-	err := server.Run(context.Background())
+	err := server.SetUp(func() {
+		// 加载认证中间件
+		middleware.SetupAppHook()
+	}).Run(context.Background())
 	if err != nil {
 		panic(err)
 	}

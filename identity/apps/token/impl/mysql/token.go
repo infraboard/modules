@@ -81,6 +81,6 @@ func (i *TokenServiceImpl) ValiateToken(
 // 退出接口(销毁Token)
 func (i *TokenServiceImpl) Logout(
 	ctx context.Context,
-	req *token.LogoutRequest) error {
-	return nil
+	req *token.LogoutRequest) (*token.Token, error) {
+	return nil, nil
 }

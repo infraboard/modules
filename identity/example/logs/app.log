@@ -1,0 +1,8 @@
+{"level":"info","component":"server","time":"2024-01-12T07:30:17+08:00","caller":"ioc/server/server.go:74","message":"loaded configs: [app.v1 trace.v1 log.v1 datasource.v1 grpc.v1 http.v1]"}
+{"level":"info","component":"server","time":"2024-01-12T07:30:17+08:00","caller":"ioc/server/server.go:75","message":"loaded controllers: [token.v1 user.v1]"}
+{"level":"info","component":"server","time":"2024-01-12T07:30:17+08:00","caller":"ioc/server/server.go:76","message":"loaded apis: [token.v1 module_a.v1]"}
+{"level":"info","component":"http","time":"2024-01-12T07:30:17+08:00","caller":"config/http/http.go:211","message":"HTTP服务启动成功, 监听地址: 127.0.0.1:8020"}
+{"level":"info","component":"server","time":"2024-01-12T07:30:28+08:00","caller":"ioc/server/server.go:100","message":"receive signal 'interrupt', start graceful shutdown"}
+{"level":"info","component":"http","time":"2024-01-12T07:30:28+08:00","caller":"config/http/http.go:219","message":"start graceful shutdown"}
+{"level":"error","component":"http","time":"2024-01-12T07:30:28+08:00","caller":"config/http/http.go:213","message":"http: Server closed"}
+{"level":"info","component":"server","time":"2024-01-12T07:30:28+08:00","caller":"ioc/server/server.go:114","message":"http service stop complete"}

@@ -8,9 +8,21 @@ import (
 	"github.com/infraboard/mcube/v2/exception"
 	"github.com/infraboard/mcube/v2/http/response"
 	"github.com/infraboard/mcube/v2/ioc"
+	ioc_http "github.com/infraboard/mcube/v2/ioc/config/http"
 	"github.com/infraboard/modules/identity/apps/token"
 	"github.com/infraboard/modules/identity/apps/user"
 )
+
+func SetupAppHook() {
+	// HTTP业务路由加载之前
+	ioc_http.Get().GetRouterBuilder().BeforeLoadHooks(func(r http.Handler) {
+		// GoRestful 框架
+		if router, ok := r.(*gin.Engine); ok {
+			// Gin Engine对象
+			router.Use(NewTokenAuther().Auth)
+		}
+	})
+}
 
 func NewTokenAuther() *TokenAuther {
 	return &TokenAuther{
