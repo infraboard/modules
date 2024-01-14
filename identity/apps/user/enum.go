@@ -1,15 +1,17 @@
 package user
 
 // 使用这个ROLE类型来表现枚举类型
-type Role int
+type Role string
+
+func (r Role) String() string {
+	return string(r)
+}
 
 const (
-	// 创建者, 负责博客创作
-	ROLE_AUTHOR Role = iota
-	// 审核员
-	ROLE_AUDITOR
+	// 普通成员
+	ROLE_MEMBER Role = "member"
 	// 系统管理员
-	ROLE_ADMIN
+	ROLE_ADMIN Role = "admin"
 )
 
 type DescribeBy int

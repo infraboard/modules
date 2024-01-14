@@ -8,6 +8,7 @@ import (
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
 	"github.com/infraboard/mcube/v2/ioc/server"
+	"github.com/infraboard/modules/identity/apps/user"
 	"github.com/infraboard/modules/identity/middleware"
 	"gorm.io/gorm"
 
@@ -24,10 +25,7 @@ func main() {
 	server.DefaultConfig.ConfigFile.Path = "etc/application.toml"
 
 	// 启动应用
-	err := server.SetUp(func() {
-		// 加载认证中间件
-		middleware.SetupAppHook()
-	}).Run(context.Background())
+	err := server.Run(context.Background())
 	if err != nil {
 		panic(err)
 	}
@@ -57,10 +55,12 @@ func (h *ApiHandler) Init() error {
 
 // API路由
 func (h *ApiHandler) Registry(r gin.IRouter) {
-	r.GET("/db_stats", func(ctx *gin.Context) {
-		db, _ := h.db.DB()
-		ctx.JSON(http.StatusOK, gin.H{
-			"data": db.Stats(),
-		})
+	r.GET("/db_stats", middleware.Required(true, user.ROLE_MEMBER), h.DBStats)
+}
+
+func (h *ApiHandler) DBStats(ctx *gin.Context) {
+	db, _ := h.db.DB()
+	ctx.JSON(http.StatusOK, gin.H{
+		"data": db.Stats(),
 	})
 }

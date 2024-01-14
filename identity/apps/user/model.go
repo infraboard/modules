@@ -43,7 +43,7 @@ func (u *User) TableName() string {
 
 func NewCreateUserRequest() *CreateUserRequest {
 	return &CreateUserRequest{
-		Role:  ROLE_AUDITOR,
+		Role:  ROLE_MEMBER,
 		Label: map[string]string{},
 	}
 }
