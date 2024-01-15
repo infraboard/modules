@@ -7,10 +7,7 @@ import (
 	"github.com/infraboard/modules/identity/apps/token"
 )
 
-// 需要把HandleFunc 添加到Root路由，定义 API ---> HandleFunc
-// 可以选择把这个Handler上的HandleFunc都注册到路由上面
 func (h *TokenApiHandler) Registry(r gin.IRouter) {
-	// r 是Gin的路由器
 	r.POST("/", h.Login)
 	r.DELETE("/", h.Logout)
 }

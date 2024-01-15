@@ -76,6 +76,5 @@ func (i *UserServiceImpl) DescribeUserRequest(
 
 	// 数据库里面存储的就是Hash
 	ins.SetIsHashed()
-
 	return ins, nil
 }

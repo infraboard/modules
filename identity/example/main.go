@@ -55,7 +55,8 @@ func (h *ApiHandler) Init() error {
 
 // API路由
 func (h *ApiHandler) Registry(r gin.IRouter) {
-	r.GET("/db_stats", middleware.Required(true, user.ROLE_MEMBER), h.DBStats)
+	r.Use(middleware.Auth())
+	r.GET("/db_stats", middleware.Perm(user.ROLE_MEMBER), h.DBStats)
 }
 
 func (h *ApiHandler) DBStats(ctx *gin.Context) {

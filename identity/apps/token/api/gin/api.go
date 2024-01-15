@@ -9,12 +9,6 @@ func init() {
 	ioc.Api().Registry(&TokenApiHandler{})
 }
 
-// 不适用接口, 直接定义Gin的一个handlers
-// 什么是Gin的Handler  HandlerFunc
-// HandlerFunc defines the handler used by gin middleware as return value.
-// type HandlerFunc func(*Context)
-// HandleFunc 只是定义 如何处理 HTTP 的请求与响应
-
 type TokenApiHandler struct {
 	ioc.ObjectImpl
 

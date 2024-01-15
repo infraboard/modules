@@ -50,19 +50,19 @@ func NewCreateUserRequest() *CreateUserRequest {
 
 // VO
 type CreateUserRequest struct {
-	//
+	// 用户名
 	Username string `json:"username" gorm:"column:username"`
-	//
-	Password string `json:"password"`
+	// 密码(Hash过后的)
+	Password string `json:"password" gorm:"column:password"`
 	// 用户的角色(写死)，
 	// @Role("admin")
 	// CreateBlog( check user Role  )
-	Role Role `json:"role"`
+	Role Role `json:"role" gorm:"column:role"`
 	// 对象标签, Dep:部门A
 	// Label 没法存入数据库，不是一个结构化的数据
 	// 比如就存储在数据里面 ，存储为Json, 需要ORM来帮我们完成 json的序列化和存储
 	// 直接序列化为Json存储到 lable字段
-	Label map[string]string `json:"label" gorm:"serializer:json"`
+	Label map[string]string `json:"label" gorm:"column:label;serializer:json"`
 
 	isHashed bool
 }

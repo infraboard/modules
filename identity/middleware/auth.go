@@ -11,29 +11,25 @@ import (
 	"github.com/infraboard/modules/identity/apps/user"
 )
 
-func NewTokenAuther(auth bool, roles []user.Role) *TokenAuther {
-	return &TokenAuther{
-		tk:    ioc.Controller().Get(token.AppName).(token.Service),
-		auth:  auth,
-		roles: roles,
+func Auth() gin.HandlerFunc {
+	return NewAuther().Auth
+}
+
+func NewAuther() *Auther {
+	return &Auther{
+		tk: ioc.Controller().Get(token.AppName).(token.Service),
 	}
 }
 
 // 用于鉴权的中间件
 // 用于Token鉴权的中间件
-type TokenAuther struct {
-	tk    token.Service
-	auth  bool
-	roles []user.Role
+type Auther struct {
+	tk token.Service
 }
 
 // 怎么鉴权?
 // Gin中间件 func(*Context)
-func (a *TokenAuther) Auth(c *gin.Context) {
-	if !a.auth {
-		return
-	}
-
+func (a *Auther) Auth(c *gin.Context) {
 	// 1. 获取Token
 	at, err := c.Cookie(token.ACCESS_TOKEN_COOKIE_NAME)
 	if err != nil {
@@ -58,21 +54,43 @@ func (a *TokenAuther) Auth(c *gin.Context) {
 		c.Keys = map[string]any{}
 	}
 	c.Keys[token.ACCESS_TOKEN_GIN_KEY_NAME] = tk
-
-	// 权限鉴定, 鉴权是在用户已经认证的情况之下进行的
-	// 判断当前用户的角色
-	if tk.Role == user.ROLE_ADMIN || len(a.roles) == 0 {
-		return
-	}
-
-	err = a.HasPerm(tk.Role.String())
-	if err != nil {
-		response.Failed(c, err)
-		return
-	}
 }
 
-func (a *TokenAuther) HasPerm(role string) error {
+// 写带参数的 Gin中间件
+func Perm(roles ...user.Role) gin.HandlerFunc {
+	p := &Permissoner{
+		roles: roles,
+	}
+	return p.CheckPerm
+}
+
+type Permissoner struct {
+	roles []user.Role
+}
+
+func (p *Permissoner) CheckPerm(c *gin.Context) {
+	v := c.Keys[token.ACCESS_TOKEN_GIN_KEY_NAME]
+	if v == nil {
+		return
+	}
+
+	if tk, ok := v.(*token.Token); ok {
+		// 权限鉴定, 鉴权是在用户已经认证的情况之下进行的
+		// 判断当前用户的角色
+		if tk.Role == user.ROLE_ADMIN {
+			return
+		}
+
+		err := p.HasPerm(tk.Role.String())
+		if err != nil {
+			response.Failed(c, err)
+			return
+		}
+	}
+
+}
+
+func (a *Permissoner) HasPerm(role string) error {
 	if len(a.roles) == 0 {
 		return nil
 	}
@@ -84,10 +102,4 @@ func (a *TokenAuther) HasPerm(role string) error {
 	}
 
 	return exception.NewPermissionDeny("role %s not allow ", role)
-}
-
-// 写带参数的 Gin中间件
-func Required(auth bool, roles ...user.Role) gin.HandlerFunc {
-	a := NewTokenAuther(auth, roles)
-	return a.Auth
 }
