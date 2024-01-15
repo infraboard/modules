@@ -3,7 +3,7 @@ package token
 import "context"
 
 const (
-	AppName = "token"
+	AppName = "tokens"
 )
 
 type Service interface {
@@ -24,6 +24,13 @@ func NewLoginRequest() *LoginRequest {
 type LoginRequest struct {
 	Username string
 	Password string
+}
+
+func NewLogoutRequest(at, rk string) *LogoutRequest {
+	return &LogoutRequest{
+		AccessToken:  at,
+		RefreshToken: rk,
+	}
 }
 
 // 万一的Token泄露, 不知道refresh_token，也没法推出

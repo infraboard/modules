@@ -11,9 +11,8 @@ import (
 // 可以选择把这个Handler上的HandleFunc都注册到路由上面
 func (h *TokenApiHandler) Registry(r gin.IRouter) {
 	// r 是Gin的路由器
-	v1 := r.Group("v1")
-	v1.POST("/tokens/", h.Login)
-	v1.DELETE("/tokens/", h.Logout)
+	r.POST("/", h.Login)
+	r.DELETE("/", h.Logout)
 }
 
 func (h *TokenApiHandler) Login(c *gin.Context) {
@@ -27,20 +26,35 @@ func (h *TokenApiHandler) Login(c *gin.Context) {
 	}
 
 	// 2. 执行逻辑
-	ins, err := h.svc.Login(c.Request.Context(), req)
+	tk, err := h.svc.Login(c.Request.Context(), req)
 	if err != nil {
 		response.Failed(c.Writer, err)
 		return
 	}
 
 	// access_token 通过SetCookie 直接写到浏览器客户端(Web)
-	c.SetCookie(token.TOKEN_COOKIE_NAME, ins.AccessToken, 0, "/", application.Get().Domain, false, true)
+	c.SetCookie(token.ACCESS_TOKEN_COOKIE_NAME, tk.AccessToken, 0, "/", application.Get().Domain, false, true)
 
 	// 3. 返回响应
-	response.Success(c.Writer, ins)
+	response.Success(c.Writer, tk)
 }
 
 // Logout HandleFunc
-func (h *TokenApiHandler) Logout(*gin.Context) {
+func (h *TokenApiHandler) Logout(c *gin.Context) {
+	req := token.NewLogoutRequest(
+		token.GetAccessTokenFromHTTP(c.Request),
+		token.GetRefreshTokenFromHTTP(c.Request),
+	)
 
+	tk, err := h.svc.Logout(c.Request.Context(), req)
+	if err != nil {
+		response.Failed(c.Writer, err)
+		return
+	}
+
+	// access_token 通过SetCookie 直接写到浏览器客户端(Web)
+	c.SetCookie(token.ACCESS_TOKEN_COOKIE_NAME, "", 0, "/", application.Get().Domain, false, true)
+
+	// 3. 返回响应
+	response.Success(c.Writer, tk)
 }

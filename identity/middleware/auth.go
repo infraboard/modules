@@ -35,7 +35,7 @@ func (a *TokenAuther) Auth(c *gin.Context) {
 	}
 
 	// 1. 获取Token
-	at, err := c.Cookie(token.TOKEN_COOKIE_NAME)
+	at, err := c.Cookie(token.ACCESS_TOKEN_COOKIE_NAME)
 	if err != nil {
 		if err == http.ErrNoCookie {
 			response.Failed(c, token.CookieNotFound)
@@ -57,7 +57,7 @@ func (a *TokenAuther) Auth(c *gin.Context) {
 	if c.Keys == nil {
 		c.Keys = map[string]any{}
 	}
-	c.Keys[token.TOKEN_GIN_KEY_NAME] = tk
+	c.Keys[token.ACCESS_TOKEN_GIN_KEY_NAME] = tk
 
 	// 权限鉴定, 鉴权是在用户已经认证的情况之下进行的
 	// 判断当前用户的角色

@@ -2,11 +2,34 @@ package token
 
 import (
 	"encoding/json"
+	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/infraboard/modules/identity/apps/user"
 	"github.com/rs/xid"
 )
+
+func GetAccessTokenFromHTTP(r *http.Request) string {
+	// 先从Token中获取
+	tk := r.Header.Get(ACCESS_TOKEN_HEADER_NAME)
+
+	// 1. 获取Token
+	if tk == "" {
+		cookie, err := r.Cookie(ACCESS_TOKEN_COOKIE_NAME)
+		if err != nil {
+			return ""
+		}
+		tk, _ = url.QueryUnescape(cookie.Value)
+	}
+	return tk
+}
+
+func GetRefreshTokenFromHTTP(r *http.Request) string {
+	// 先从Token中获取
+	tk := r.Header.Get(REFRESH_TOKEN_HEADER_NAME)
+	return tk
+}
 
 func NewToken() *Token {
 	return &Token{
