@@ -3,6 +3,7 @@ package gin
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/infraboard/mcube/v2/http/response"
+	"github.com/infraboard/mcube/v2/ioc/config/application"
 	"github.com/infraboard/modules/identity/apps/token"
 )
 
@@ -15,14 +16,10 @@ func (h *TokenApiHandler) Registry(r gin.IRouter) {
 	v1.DELETE("/tokens/", h.Logout)
 }
 
-// Login HandleFunc
 func (h *TokenApiHandler) Login(c *gin.Context) {
 	// 1. 获取用户的请求参数， 参数在Body里面
-	// 一定要使用JSON
 	req := token.NewLoginRequest()
 
-	// json.unmarsal
-	// http boyd ---> LoginRequest Object
 	err := c.BindJSON(req)
 	if err != nil {
 		response.Failed(c.Writer, err)
@@ -30,7 +27,6 @@ func (h *TokenApiHandler) Login(c *gin.Context) {
 	}
 
 	// 2. 执行逻辑
-	// 把http 协议的请求 ---> 控制器的请求
 	ins, err := h.svc.Login(c.Request.Context(), req)
 	if err != nil {
 		response.Failed(c.Writer, err)
@@ -38,7 +34,7 @@ func (h *TokenApiHandler) Login(c *gin.Context) {
 	}
 
 	// access_token 通过SetCookie 直接写到浏览器客户端(Web)
-	c.SetCookie(token.TOKEN_COOKIE_NAME, ins.AccessToken, 0, "/", "localhost", false, true)
+	c.SetCookie(token.TOKEN_COOKIE_NAME, ins.AccessToken, 0, "/", application.Get().Domain, false, true)
 
 	// 3. 返回响应
 	response.Success(c.Writer, ins)

@@ -74,7 +74,6 @@ func (i *TokenServiceImpl) ValiateToken(
 		return nil, err
 	}
 	tk.Role = u.Role
-
 	return tk, nil
 }
 
@@ -82,5 +81,20 @@ func (i *TokenServiceImpl) ValiateToken(
 func (i *TokenServiceImpl) Logout(
 	ctx context.Context,
 	req *token.LogoutRequest) (*token.Token, error) {
-	return nil, nil
+	// 1. 查询Token (是不是我们这个系统颁发的)
+	tk := token.NewToken()
+	err := i.db.WithContext(ctx).
+		Where("access_token = ?", req.AccessToken).
+		First(tk).
+		Error
+	if err != nil {
+		return nil, err
+	}
+
+	err = i.db.WithContext(ctx).
+		Where("access_token = ?", req.AccessToken).
+		Where("refresh_token = ?", req.RefreshToken).
+		Delete(&token.Token{}).
+		Error
+	return tk, err
 }

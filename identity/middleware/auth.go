@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/infraboard/mcube/v2/exception"
-	"github.com/infraboard/mcube/v2/http/response"
+	"github.com/infraboard/mcube/v2/http/gin/response"
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/modules/identity/apps/token"
 	"github.com/infraboard/modules/identity/apps/user"
@@ -38,10 +38,10 @@ func (a *TokenAuther) Auth(c *gin.Context) {
 	at, err := c.Cookie(token.TOKEN_COOKIE_NAME)
 	if err != nil {
 		if err == http.ErrNoCookie {
-			response.Failed(c.Writer, token.CookieNotFound)
+			response.Failed(c, token.CookieNotFound)
 			return
 		}
-		response.Failed(c.Writer, err)
+		response.Failed(c, err)
 		return
 	}
 
@@ -49,7 +49,7 @@ func (a *TokenAuther) Auth(c *gin.Context) {
 	in := token.NewValiateToken(at)
 	tk, err := a.tk.ValiateToken(c.Request.Context(), in)
 	if err != nil {
-		response.Failed(c.Writer, err)
+		response.Failed(c, err)
 		return
 	}
 
@@ -67,7 +67,7 @@ func (a *TokenAuther) Auth(c *gin.Context) {
 
 	err = a.HasPerm(tk.Role.String())
 	if err != nil {
-		response.Failed(c.Writer, err)
+		response.Failed(c, err)
 		return
 	}
 }
