@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"net/http"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 	"github.com/infraboard/mcube/v2/exception"
@@ -31,18 +31,14 @@ type Auther struct {
 // Gin中间件 func(*Context)
 func (a *Auther) Auth(c *gin.Context) {
 	// 1. 获取Token
-	at, err := c.Cookie(token.ACCESS_TOKEN_COOKIE_NAME)
-	if err != nil {
-		if err == http.ErrNoCookie {
-			response.Failed(c, token.CookieNotFound)
-			return
-		}
-		response.Failed(c, err)
+	v := token.GetAccessTokenFromHTTP(c.Request)
+	if v == "" {
+		response.Failed(c, ErrUnauthorized)
 		return
 	}
 
 	// 2.调用Token模块来认证
-	in := token.NewValiateToken(at)
+	in := token.NewValiateToken(v)
 	tk, err := a.tk.ValiateToken(c.Request.Context(), in)
 	if err != nil {
 		response.Failed(c, err)
@@ -71,23 +67,27 @@ type Permissoner struct {
 func (p *Permissoner) CheckPerm(c *gin.Context) {
 	v := c.Keys[token.ACCESS_TOKEN_GIN_KEY_NAME]
 	if v == nil {
+		response.Failed(c, ErrUnauthorized)
 		return
 	}
 
-	if tk, ok := v.(*token.Token); ok {
-		// 权限鉴定, 鉴权是在用户已经认证的情况之下进行的
-		// 判断当前用户的角色
-		if tk.Role == user.ROLE_ADMIN {
-			return
-		}
-
-		err := p.HasPerm(tk.Role.String())
-		if err != nil {
-			response.Failed(c, err)
-			return
-		}
+	tk, ok := v.(*token.Token)
+	if !ok {
+		response.Failed(c, fmt.Errorf("tk not *token.Token"))
+		return
 	}
 
+	// 权限鉴定, 鉴权是在用户已经认证的情况之下进行的
+	// 判断当前用户的角色
+	if tk.Role == user.ROLE_ADMIN {
+		return
+	}
+
+	err := p.HasPerm(tk.Role.String())
+	if err != nil {
+		response.Failed(c, err)
+		return
+	}
 }
 
 func (a *Permissoner) HasPerm(role string) error {
