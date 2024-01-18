@@ -43,8 +43,8 @@ func TestCreateAuditorUser(t *testing.T) {
 }
 
 func TestDeleteUser(t *testing.T) {
-	err := impl.DeleteUser(ctx, &user.DeleteUserRequest{
-		Id: 9,
+	_, err := impl.DeleteUser(ctx, &user.DeleteUserRequest{
+		Id: "9",
 	})
 	if err != nil {
 		t.Fatal(err)

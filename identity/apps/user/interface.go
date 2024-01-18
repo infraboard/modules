@@ -2,11 +2,10 @@ package user
 
 import (
 	"context"
-	"fmt"
 )
 
 const (
-	AppName = "user"
+	AppName = "users"
 )
 
 // 定义User包的能力 就是接口定义
@@ -16,7 +15,7 @@ type Service interface {
 	// 创建用户
 	CreateUser(context.Context, *CreateUserRequest) (*User, error)
 	// 删除用户
-	DeleteUser(context.Context, *DeleteUserRequest) error
+	DeleteUser(context.Context, *DeleteUserRequest) (*User, error)
 
 	// 查询用户  User.CheckPassword(xxx)
 	DescribeUserRequest(context.Context, *DescribeUserRequest) (*User, error)
@@ -41,11 +40,13 @@ type DescribeUserRequest struct {
 	DescribeValue string     `json:"describe_value"`
 }
 
-// 删除用户的请求
-type DeleteUserRequest struct {
-	Id int `json:"id"`
+func NewDeleteUserRequest(id string) *DeleteUserRequest {
+	return &DeleteUserRequest{
+		Id: id,
+	}
 }
 
-func (req *DeleteUserRequest) IdString() string {
-	return fmt.Sprintf("%d", req.Id)
+// 删除用户的请求
+type DeleteUserRequest struct {
+	Id string `json:"id"`
 }

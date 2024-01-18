@@ -35,14 +35,15 @@ func (i *UserServiceImpl) CreateUser(
 // 删除用户
 func (i *UserServiceImpl) DeleteUser(
 	ctx context.Context,
-	req *user.DeleteUserRequest) error {
-	_, err := i.DescribeUserRequest(ctx,
-		user.NewDescribeUserRequestById(req.IdString()))
+	req *user.DeleteUserRequest,
+) (*user.User, error) {
+	u, err := i.DescribeUserRequest(ctx,
+		user.NewDescribeUserRequestById(req.Id))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return i.db.
+	return u, i.db.
 		WithContext(ctx).
 		Where("id = ?", req.Id).
 		Delete(&user.User{}).
