@@ -9,11 +9,11 @@ import (
 	"github.com/infraboard/modules/identity/apps/user"
 	"github.com/spf13/cobra"
 
-	"github.com/infraboard/mcube/v2/ioc/server"
+	"github.com/infraboard/mcube/v2/ioc/server/cmd"
 )
 
 func init() {
-	server.Root.AddCommand(initCmd)
+	cmd.Root.AddCommand(initCmd)
 }
 
 var initCmd = &cobra.Command{

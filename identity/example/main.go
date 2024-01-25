@@ -8,6 +8,7 @@ import (
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
 	"github.com/infraboard/mcube/v2/ioc/server"
+	"github.com/infraboard/mcube/v2/ioc/server/cmd"
 	"github.com/infraboard/modules/identity/apps/user"
 	"github.com/infraboard/modules/identity/middleware"
 	"github.com/spf13/cobra"
@@ -22,7 +23,7 @@ func main() {
 	// 注册HTTP接口类
 	ioc.Api().Registry(&ApiHandler{})
 
-	server.Root.AddCommand(
+	cmd.Root.AddCommand(
 		&cobra.Command{
 			Use:   "start",
 			Short: "example API服务",
@@ -33,7 +34,7 @@ func main() {
 	)
 
 	// 启动
-	server.RunCLI()
+	cmd.Execute()
 }
 
 type ApiHandler struct {
