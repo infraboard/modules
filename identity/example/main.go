@@ -4,12 +4,10 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/AlecAivazis/survey/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
 	"github.com/infraboard/mcube/v2/ioc/server"
-	"github.com/infraboard/mcube/v2/ioc/server/cmd"
 	"github.com/infraboard/modules/identity/apps/user"
 	"github.com/infraboard/modules/identity/middleware"
 	"github.com/spf13/cobra"
@@ -17,13 +15,14 @@ import (
 
 	// 引入模块
 	_ "github.com/infraboard/modules/identity"
+	_ "github.com/infraboard/modules/identity/cmd"
 )
 
 func main() {
 	// 注册HTTP接口类
 	ioc.Api().Registry(&ApiHandler{})
 
-	cmd.Root.AddCommand(
+	server.Root.AddCommand(
 		&cobra.Command{
 			Use:   "start",
 			Short: "example API服务",
@@ -31,37 +30,10 @@ func main() {
 				cobra.CheckErr(server.Run(context.Background()))
 			},
 		},
-		&cobra.Command{
-			Use:   "init",
-			Short: "初始化Admin用户名密码",
-			Run: func(cmd *cobra.Command, args []string) {
-				svc := ioc.Controller().Get(user.AppName).(user.Service)
-				req := user.NewCreateUserRequest()
-
-				cobra.CheckErr(survey.AskOne(
-					&survey.Input{
-						Message: "请输入管理员用户名称:",
-						Default: "admin",
-					},
-					&req.Username,
-					survey.WithValidator(survey.Required),
-				))
-				cobra.CheckErr(survey.AskOne(
-					&survey.Password{
-						Message: "请输入管理员密码:",
-					},
-					&req.Password,
-					survey.WithValidator(survey.Required),
-				))
-
-				req.Role = user.ROLE_ADMIN
-				svc.CreateUser(context.Background(), req)
-			},
-		},
 	)
 
 	// 启动
-	cmd.Execute()
+	server.RunCLI()
 }
 
 type ApiHandler struct {

@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"embed"
 	"fmt"
 
 	"github.com/AlecAivazis/survey/v2"
@@ -10,15 +9,12 @@ import (
 	"github.com/infraboard/modules/identity/apps/user"
 	"github.com/spf13/cobra"
 
-	"github.com/infraboard/mcube/v2/ioc/server/cmd"
+	"github.com/infraboard/mcube/v2/ioc/server"
 )
 
 func init() {
-	cmd.Root.AddCommand(initCmd)
+	server.Root.AddCommand(initCmd)
 }
-
-//go:embed table.sql
-var tableSQL embed.FS
 
 var initCmd = &cobra.Command{
 	Use:   "init",
