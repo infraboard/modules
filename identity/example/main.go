@@ -4,12 +4,15 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/AlecAivazis/survey/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
 	"github.com/infraboard/mcube/v2/ioc/server"
+	"github.com/infraboard/mcube/v2/ioc/server/cmd"
 	"github.com/infraboard/modules/identity/apps/user"
 	"github.com/infraboard/modules/identity/middleware"
+	"github.com/spf13/cobra"
 	"gorm.io/gorm"
 
 	// 引入模块
@@ -20,15 +23,45 @@ func main() {
 	// 注册HTTP接口类
 	ioc.Api().Registry(&ApiHandler{})
 
-	// 开启配置文件读取配置
-	server.DefaultConfig.ConfigFile.Enabled = true
-	server.DefaultConfig.ConfigFile.Path = "etc/application.toml"
+	cmd.Root.AddCommand(
+		&cobra.Command{
+			Use:   "start",
+			Short: "example API服务",
+			Run: func(cmd *cobra.Command, args []string) {
+				cobra.CheckErr(server.Run(context.Background()))
+			},
+		},
+		&cobra.Command{
+			Use:   "init",
+			Short: "初始化Admin用户名密码",
+			Run: func(cmd *cobra.Command, args []string) {
+				svc := ioc.Controller().Get(user.AppName).(user.Service)
+				req := user.NewCreateUserRequest()
 
-	// 启动应用
-	err := server.Run(context.Background())
-	if err != nil {
-		panic(err)
-	}
+				cobra.CheckErr(survey.AskOne(
+					&survey.Input{
+						Message: "请输入管理员用户名称:",
+						Default: "admin",
+					},
+					&req.Username,
+					survey.WithValidator(survey.Required),
+				))
+				cobra.CheckErr(survey.AskOne(
+					&survey.Password{
+						Message: "请输入管理员密码:",
+					},
+					&req.Password,
+					survey.WithValidator(survey.Required),
+				))
+
+				req.Role = user.ROLE_ADMIN
+				svc.CreateUser(context.Background(), req)
+			},
+		},
+	)
+
+	// 启动
+	cmd.Execute()
 }
 
 type ApiHandler struct {

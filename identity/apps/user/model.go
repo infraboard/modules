@@ -3,8 +3,8 @@ package user
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
-	"github.com/infraboard/mcube/v2/pb/resource"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -12,15 +12,19 @@ func NewUser(req *CreateUserRequest) *User {
 	req.PasswordHash()
 
 	return &User{
-		Meta:              resource.NewMeta(),
+		CreatedAt:         time.Now().Unix(),
 		CreateUserRequest: req,
 	}
 }
 
 // 用于存放 存入数据库的对象(PO)
 type User struct {
-	// 通用信息
-	*resource.Meta
+	// 在添加数据需要村的定义
+	Id int64 `json:"id" gorm:"column:id"`
+	// 创建时间
+	CreatedAt int64 `json:"created_at" gorm:"column:created_at"`
+	// 更新时间
+	UpdatedAt int64 `json:"updated_at" gorm:"column:updated_at"`
 	// 用户传递过来的请求
 	*CreateUserRequest
 }

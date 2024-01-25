@@ -1,9 +1,3 @@
-# 身份管理模块
-
-## 快速使用
-
-初始化SQL
-```sql
 CREATE TABLE `users` (
 	`id` int unsigned NOT NULL AUTO_INCREMENT,
 	`created_at` int NOT NULL COMMENT '创建时间',
@@ -15,7 +9,7 @@ CREATE TABLE `users` (
 	PRIMARY KEY (`id`) USING BTREE,
 	UNIQUE KEY `idx_user` (`username`)
   ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
+  
 CREATE TABLE `tokens` (
 	`created_at` int NOT NULL COMMENT '创建时间',
 	`updated_at` int NOT NULL COMMENT '更新时间',
@@ -28,7 +22,3 @@ CREATE TABLE `tokens` (
 	PRIMARY KEY (`access_token`) USING BTREE,
 	UNIQUE KEY `idx_token` (`access_token`) USING BTREE
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-```
-
-
-

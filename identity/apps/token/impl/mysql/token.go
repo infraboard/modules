@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/infraboard/mcube/v2/exception"
 	"github.com/infraboard/modules/identity/apps/token"
@@ -30,7 +31,7 @@ func (i *TokenServiceImpl) Login(
 
 	// 3. 颁发token
 	tk := token.NewToken()
-	tk.UserId = u.Id
+	tk.UserId = fmt.Sprintf("%d", u.Id)
 	tk.UserName = u.Username
 
 	// 4. 保存Token
