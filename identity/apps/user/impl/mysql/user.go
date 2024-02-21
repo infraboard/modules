@@ -57,7 +57,7 @@ func (i *UserServiceImpl) QueryUser(
 	*user.UserSet, error) {
 	set := user.NewUserSet()
 
-	query := i.db.WithContext(ctx)
+	query := i.db.WithContext(ctx).Model(&user.User{})
 
 	// 查询总量
 	err := query.Count(&set.Total).Error

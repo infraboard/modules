@@ -2,6 +2,7 @@ package impl_test
 
 import (
 	"context"
+	"os"
 
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/modules/identity/apps/user"
@@ -16,6 +17,10 @@ var (
 )
 
 func init() {
+	os.Setenv("DATASOURCE_DB", "test")
+	os.Setenv("DATASOURCE_USERNAME", "root")
+	os.Setenv("DATASOURCE_PASSWORD", "123456")
+
 	ioc.DevelopmentSetup()
 	impl = ioc.Controller().Get(user.AppName).(user.Service)
 }
