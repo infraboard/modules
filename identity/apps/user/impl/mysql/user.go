@@ -37,7 +37,7 @@ func (i *UserServiceImpl) DeleteUser(
 	ctx context.Context,
 	req *user.DeleteUserRequest,
 ) (*user.User, error) {
-	u, err := i.DescribeUserRequest(ctx,
+	u, err := i.DescribeUser(ctx,
 		user.NewDescribeUserRequestById(req.Id))
 	if err != nil {
 		return nil, err
@@ -50,8 +50,35 @@ func (i *UserServiceImpl) DeleteUser(
 		Error
 }
 
-// 怎么查询一个用户
-func (i *UserServiceImpl) DescribeUserRequest(
+// 查询用户列表
+func (i *UserServiceImpl) QueryUser(
+	ctx context.Context,
+	req *user.QueryUserRequest) (
+	*user.UserSet, error) {
+	set := user.NewUserSet()
+
+	query := i.db.WithContext(ctx)
+
+	// 查询总量
+	err := query.Count(&set.Total).Error
+	if err != nil {
+		return nil, err
+	}
+
+	err = query.
+		Offset(int(req.ComputeOffset())).
+		Limit(int(req.PageSize)).
+		Find(&set.Items).
+		Error
+	if err != nil {
+		return nil, err
+	}
+
+	return set, nil
+}
+
+// 查询用户详情
+func (i *UserServiceImpl) DescribeUser(
 	ctx context.Context,
 	req *user.DescribeUserRequest) (
 	*user.User, error) {

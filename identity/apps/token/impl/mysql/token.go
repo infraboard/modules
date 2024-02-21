@@ -15,7 +15,7 @@ func (i *TokenServiceImpl) Login(
 	*token.Token, error) {
 	// 1. 查询用户
 	uReq := user.NewDescribeUserRequestByUsername(req.Username)
-	u, err := i.user.DescribeUserRequest(ctx, uReq)
+	u, err := i.user.DescribeUser(ctx, uReq)
 	if err != nil {
 		if exception.IsNotFoundError(err) {
 			return nil, token.NewAuthFailed("%s", err)
@@ -70,7 +70,7 @@ func (i *TokenServiceImpl) ValiateToken(
 
 	// 补充用户信息, 只补充了用户的角色
 	uDesc := user.NewDescribeUserRequestById(tk.UserId)
-	u, err := i.user.DescribeUserRequest(ctx, uDesc)
+	u, err := i.user.DescribeUser(ctx, uDesc)
 	if err != nil {
 		return nil, err
 	}

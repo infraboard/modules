@@ -4,9 +4,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/infraboard/mcube/v2/http/response"
 	"github.com/infraboard/modules/identity/apps/user"
+	"github.com/infraboard/modules/identity/middleware"
 )
 
 func (h *UserApiHandler) Registry(r gin.IRouter) {
+	r.Use(middleware.Auth(), middleware.Perm(user.ROLE_ADMIN))
 	r.POST("/", h.CreateUser)
 	r.DELETE("/:id", h.DeleteUser)
 }

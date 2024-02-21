@@ -2,6 +2,8 @@ package user
 
 import (
 	"context"
+
+	"github.com/infraboard/mcube/v2/http/request"
 )
 
 const (
@@ -17,8 +19,20 @@ type Service interface {
 	// 删除用户
 	DeleteUser(context.Context, *DeleteUserRequest) (*User, error)
 
-	// 查询用户  User.CheckPassword(xxx)
-	DescribeUserRequest(context.Context, *DescribeUserRequest) (*User, error)
+	// 查询用户详情
+	DescribeUser(context.Context, *DescribeUserRequest) (*User, error)
+	// 查询用户列表
+	QueryUser(context.Context, *QueryUserRequest) (*UserSet, error)
+}
+
+func NewQueryUserRequest() *QueryUserRequest {
+	return &QueryUserRequest{
+		PageRequest: request.NewDefaultPageRequest(),
+	}
+}
+
+type QueryUserRequest struct {
+	*request.PageRequest
 }
 
 func NewDescribeUserRequestById(id string) *DescribeUserRequest {

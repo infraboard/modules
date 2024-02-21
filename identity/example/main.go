@@ -16,6 +16,7 @@ import (
 
 	// 引入模块
 	_ "github.com/infraboard/modules/identity"
+	// 引入CLI工具
 	_ "github.com/infraboard/modules/identity/cmd"
 )
 
@@ -62,7 +63,7 @@ func (h *ApiHandler) Init() error {
 // API路由
 func (h *ApiHandler) Registry(r gin.IRouter) {
 	r.Use(middleware.Auth())
-	r.GET("/db_stats", middleware.Perm(user.ROLE_MEMBER), h.DBStats)
+	r.GET("/db_stats", middleware.Perm(user.ROLE_ADMIN), h.DBStats)
 }
 
 func (h *ApiHandler) DBStats(ctx *gin.Context) {

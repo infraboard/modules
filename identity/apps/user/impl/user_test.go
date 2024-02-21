@@ -6,6 +6,15 @@ import (
 	"github.com/infraboard/modules/identity/apps/user"
 )
 
+func TestQueryUser(t *testing.T) {
+	req := user.NewQueryUserRequest()
+	set, err := impl.QueryUser(ctx, req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(set)
+}
+
 func TestCreateAuth1(t *testing.T) {
 	req := user.NewCreateUserRequest()
 	req.Username = "admin"
@@ -53,7 +62,7 @@ func TestDeleteUser(t *testing.T) {
 
 func TestDescribeUserRequestById(t *testing.T) {
 	req := user.NewDescribeUserRequestById("9")
-	ins, err := impl.DescribeUserRequest(ctx, req)
+	ins, err := impl.DescribeUser(ctx, req)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -63,7 +72,7 @@ func TestDescribeUserRequestById(t *testing.T) {
 // SELECT * FROM `users` WHERE username = 'admin' ORDER BY `users`.`id` LIMIT 1
 func TestDescribeUserRequestByName(t *testing.T) {
 	req := user.NewDescribeUserRequestByUsername("admin")
-	ins, err := impl.DescribeUserRequest(ctx, req)
+	ins, err := impl.DescribeUser(ctx, req)
 	if err != nil {
 		t.Fatal(err)
 	}
