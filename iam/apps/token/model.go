@@ -62,7 +62,7 @@ type Token struct {
 	UpdatedAt int64 `json:"updated_at"`
 
 	// 额外补充信息, gorm忽略处理
-	Role user.Role `gorm:"-"`
+	Role user.Role `json:"role" gorm:"-"`
 }
 
 func (t *Token) TableName() string {

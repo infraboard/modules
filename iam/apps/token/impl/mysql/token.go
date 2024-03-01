@@ -42,6 +42,14 @@ func (i *TokenServiceImpl) Login(
 		return nil, err
 	}
 
+	// 补充用户信息, 只补充了用户的角色
+	uDesc := user.NewDescribeUserRequestById(tk.UserId)
+	_, err = i.user.DescribeUser(ctx, uDesc)
+	if err != nil {
+		return nil, err
+	}
+	tk.Role = u.Role
+
 	// 避免同一个用户多次登录
 	// 4. 颁发成功后  把之前的Token标记为失效,作业
 	return tk, nil
