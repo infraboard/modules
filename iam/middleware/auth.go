@@ -46,10 +46,7 @@ func (a *Auther) Auth(c *gin.Context) {
 	}
 
 	// 把鉴权后的 结果: tk, 放到请求的上下文, 方便后面的业务逻辑使用
-	if c.Keys == nil {
-		c.Keys = map[string]any{}
-	}
-	c.Keys[token.ACCESS_TOKEN_GIN_KEY_NAME] = tk
+	c.Set(token.ACCESS_TOKEN_GIN_KEY_NAME, tk)
 }
 
 // 写带参数的 Gin中间件
