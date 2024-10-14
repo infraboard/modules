@@ -1,4 +1,4 @@
-package middleware
+package permission
 
 import "github.com/infraboard/mcube/v2/exception"
 

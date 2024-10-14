@@ -7,12 +7,7 @@ import (
 	"github.com/infraboard/modules/iam/apps/token"
 )
 
-func (h *TokenApiHandler) Registry(r gin.IRouter) {
-	r.POST("/", h.Login)
-	r.DELETE("/", h.Logout)
-}
-
-func (h *TokenApiHandler) Login(c *gin.Context) {
+func (h *TokenGinApiHandler) Login(c *gin.Context) {
 	// 1. 获取用户的请求参数， 参数在Body里面
 	req := token.NewLoginRequest()
 
@@ -31,7 +26,7 @@ func (h *TokenApiHandler) Login(c *gin.Context) {
 
 	// access_token 通过SetCookie 直接写到浏览器客户端(Web)
 	c.SetCookie(token.ACCESS_TOKEN_COOKIE_NAME, tk.AccessToken,
-		tk.AccessTokenExpiredAt, "/", application.Get().Domain, false, true)
+		tk.AccessTokenExpiredAt, "/", application.Get().Domain(), false, true)
 	// 在Header头中也添加Token
 	c.Header(token.ACCESS_TOKEN_RESPONSE_HEADER_NAME, tk.AccessToken)
 
@@ -40,7 +35,7 @@ func (h *TokenApiHandler) Login(c *gin.Context) {
 }
 
 // Logout HandleFunc
-func (h *TokenApiHandler) Logout(c *gin.Context) {
+func (h *TokenGinApiHandler) Logout(c *gin.Context) {
 	req := token.NewLogoutRequest(
 		token.GetAccessTokenFromHTTP(c.Request),
 		token.GetRefreshTokenFromHTTP(c.Request),
@@ -53,7 +48,7 @@ func (h *TokenApiHandler) Logout(c *gin.Context) {
 	}
 
 	// access_token 通过SetCookie 直接写到浏览器客户端(Web)
-	c.SetCookie(token.ACCESS_TOKEN_COOKIE_NAME, "", 0, "/", application.Get().Domain, false, true)
+	c.SetCookie(token.ACCESS_TOKEN_COOKIE_NAME, "", 0, "/", application.Get().Domain(), false, true)
 
 	// 3. 返回响应
 	response.Success(c.Writer, tk)

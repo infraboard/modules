@@ -5,24 +5,9 @@ import (
 	"github.com/infraboard/mcube/v2/http/request"
 	"github.com/infraboard/mcube/v2/http/response"
 	"github.com/infraboard/modules/iam/apps/user"
-	"github.com/infraboard/modules/iam/middleware"
 )
 
-func (h *UserApiHandler) Registry(r gin.IRouter) {
-	r.Use(
-		// 认证
-		middleware.Auth(),
-		// 鉴权
-		middleware.Perm(user.ROLE_ADMIN),
-	)
-
-	r.GET("/", h.QueryUser)
-	r.GET("/:id", h.DescribeUser)
-	r.POST("/", h.CreateUser)
-	r.DELETE("/:id", h.DeleteUser)
-}
-
-func (h *UserApiHandler) QueryUser(c *gin.Context) {
+func (h *UserGinApiHandler) QueryUser(c *gin.Context) {
 	// 1. 获取用户的请求参数， 参数在Body里面
 	req := user.NewQueryUserRequest()
 	req.PageRequest = request.NewPageRequestFromHTTP(c.Request)
@@ -38,7 +23,7 @@ func (h *UserApiHandler) QueryUser(c *gin.Context) {
 	response.Success(c.Writer, tk)
 }
 
-func (h *UserApiHandler) DescribeUser(c *gin.Context) {
+func (h *UserGinApiHandler) DescribeUser(c *gin.Context) {
 	// 1. 获取用户的请求参数， 参数在Body里面
 	req := user.NewDescribeUserRequestById(c.Param("id"))
 
@@ -53,7 +38,7 @@ func (h *UserApiHandler) DescribeUser(c *gin.Context) {
 	response.Success(c.Writer, tk)
 }
 
-func (h *UserApiHandler) CreateUser(c *gin.Context) {
+func (h *UserGinApiHandler) CreateUser(c *gin.Context) {
 	// 1. 获取用户的请求参数， 参数在Body里面
 	req := user.NewCreateUserRequest()
 
@@ -74,7 +59,7 @@ func (h *UserApiHandler) CreateUser(c *gin.Context) {
 	response.Success(c.Writer, tk)
 }
 
-func (h *UserApiHandler) DeleteUser(c *gin.Context) {
+func (h *UserGinApiHandler) DeleteUser(c *gin.Context) {
 	req := user.NewDeleteUserRequest(c.Param("id"))
 	u, err := h.svc.DeleteUser(c.Request.Context(), req)
 	if err != nil {

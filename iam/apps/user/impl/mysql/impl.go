@@ -19,6 +19,14 @@ type UserServiceImpl struct {
 
 func (i *UserServiceImpl) Init() error {
 	i.db = datasource.DB().Debug()
+
+	// 自动创建表
+	if datasource.Get().AutoMigrate {
+		err := i.db.AutoMigrate(&user.User{})
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

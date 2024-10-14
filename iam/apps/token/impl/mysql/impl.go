@@ -29,6 +29,14 @@ func (i *TokenServiceImpl) Init() error {
 
 	// 拿到的对象 在main 进行初始化好了
 	i.user = ioc.Controller().Get(user.AppName).(user.Service)
+
+	// 自动创建表
+	if datasource.Get().AutoMigrate {
+		err := i.db.AutoMigrate(&token.Token{})
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

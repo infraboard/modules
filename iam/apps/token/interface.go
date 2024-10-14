@@ -1,10 +1,18 @@
 package token
 
-import "context"
+import (
+	"context"
+
+	"github.com/infraboard/mcube/v2/ioc"
+)
 
 const (
 	AppName = "tokens"
 )
+
+func GetService() Service {
+	return ioc.Controller().Get(AppName).(Service)
+}
 
 type Service interface {
 	// 登录接口(颁发Token)

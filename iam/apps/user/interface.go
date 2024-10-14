@@ -4,11 +4,16 @@ import (
 	"context"
 
 	"github.com/infraboard/mcube/v2/http/request"
+	"github.com/infraboard/mcube/v2/ioc"
 )
 
 const (
 	AppName = "users"
 )
+
+func GetService() Service {
+	return ioc.Controller().Get(AppName).(Service)
+}
 
 // 定义User包的能力 就是接口定义
 // 站在使用放的角度来定义的   userSvc.Create(ctx, req), userSvc.DeleteUser(id)

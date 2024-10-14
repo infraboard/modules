@@ -1,4 +1,4 @@
-package middleware
+package permission
 
 import (
 	"fmt"
@@ -9,6 +9,7 @@ import (
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/modules/iam/apps/token"
 	"github.com/infraboard/modules/iam/apps/user"
+	"github.com/infraboard/modules/iam/permission"
 )
 
 func Auth() gin.HandlerFunc {
@@ -33,7 +34,7 @@ func (a *Auther) Auth(c *gin.Context) {
 	// 1. 获取Token
 	v := token.GetAccessTokenFromHTTP(c.Request)
 	if v == "" {
-		response.Failed(c, ErrUnauthorized)
+		response.Failed(c, permission.ErrUnauthorized)
 		return
 	}
 
@@ -50,7 +51,7 @@ func (a *Auther) Auth(c *gin.Context) {
 }
 
 // 写带参数的 Gin中间件
-func Perm(roles ...user.Role) gin.HandlerFunc {
+func Required(roles ...user.Role) gin.HandlerFunc {
 	p := &Permissoner{
 		roles: roles,
 	}
@@ -64,7 +65,7 @@ type Permissoner struct {
 func (p *Permissoner) CheckPerm(c *gin.Context) {
 	v := c.Keys[token.ACCESS_TOKEN_GIN_KEY_NAME]
 	if v == nil {
-		response.Failed(c, ErrUnauthorized)
+		response.Failed(c, permission.ErrUnauthorized)
 		return
 	}
 

@@ -10,12 +10,12 @@ import (
 	"github.com/infraboard/mcube/v2/ioc/server"
 	"github.com/infraboard/mcube/v2/ioc/server/cmd"
 	"github.com/infraboard/modules/iam/apps/user"
-	"github.com/infraboard/modules/iam/middleware"
+	permission "github.com/infraboard/modules/iam/permission/gin"
 	"github.com/spf13/cobra"
 	"gorm.io/gorm"
 
 	// 引入模块
-	_ "github.com/infraboard/modules/iam"
+	_ "github.com/infraboard/modules/iam/init"
 	// 引入CLI工具
 	_ "github.com/infraboard/modules/iam/cmd"
 )
@@ -62,8 +62,8 @@ func (h *ApiHandler) Init() error {
 
 // API路由
 func (h *ApiHandler) Registry(r gin.IRouter) {
-	r.Use(middleware.Auth())
-	r.GET("/db_stats", middleware.Perm(user.ROLE_ADMIN), h.DBStats)
+	r.Use(permission.Auth())
+	r.GET("/db_stats", permission.Required(user.ROLE_ADMIN), h.DBStats)
 }
 
 func (h *ApiHandler) DBStats(ctx *gin.Context) {
