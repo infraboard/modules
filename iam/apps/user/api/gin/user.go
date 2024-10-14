@@ -13,14 +13,14 @@ func (h *UserGinApiHandler) QueryUser(c *gin.Context) {
 	req.PageRequest = request.NewPageRequestFromHTTP(c.Request)
 
 	// 2. 执行逻辑
-	tk, err := h.svc.QueryUser(c.Request.Context(), req)
+	set, err := h.svc.QueryUser(c.Request.Context(), req)
 	if err != nil {
 		response.Failed(c.Writer, err)
 		return
 	}
 
 	// 3. 返回响应
-	response.Success(c.Writer, tk)
+	response.Success(c.Writer, set)
 }
 
 func (h *UserGinApiHandler) DescribeUser(c *gin.Context) {

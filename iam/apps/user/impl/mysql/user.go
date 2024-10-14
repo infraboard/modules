@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/infraboard/mcube/v2/exception"
+	"github.com/infraboard/mcube/v2/types"
 	"github.com/infraboard/modules/iam/apps/user"
 	"gorm.io/gorm"
 )
@@ -54,8 +55,8 @@ func (i *UserServiceImpl) DeleteUser(
 func (i *UserServiceImpl) QueryUser(
 	ctx context.Context,
 	req *user.QueryUserRequest) (
-	*user.UserSet, error) {
-	set := user.NewUserSet()
+	*types.Set[*user.User], error) {
+	set := types.New[*user.User]()
 
 	query := i.db.WithContext(ctx).Model(&user.User{})
 

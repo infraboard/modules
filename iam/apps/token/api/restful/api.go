@@ -29,14 +29,14 @@ func (h *TokenRestulApiHandler) Init() error {
 
 	tags := []string{"登录"}
 	ws := gorestful.ObjectRouter(h)
-	ws.Route(ws.POST("/").To(h.Login).
+	ws.Route(ws.POST("").To(h.Login).
 		Doc("颁发令牌").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Reads(token.LoginRequest{}).
 		Writes(token.Token{}).
 		Returns(200, "OK", token.Token{}))
 
-	ws.Route(ws.DELETE("/").To(h.Logout).
+	ws.Route(ws.DELETE("").To(h.Logout).
 		Doc("验证令牌").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(label.Auth, label.Enable).

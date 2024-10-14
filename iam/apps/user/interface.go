@@ -5,6 +5,7 @@ import (
 
 	"github.com/infraboard/mcube/v2/http/request"
 	"github.com/infraboard/mcube/v2/ioc"
+	"github.com/infraboard/mcube/v2/types"
 )
 
 const (
@@ -27,7 +28,7 @@ type Service interface {
 	// 查询用户详情
 	DescribeUser(context.Context, *DescribeUserRequest) (*User, error)
 	// 查询用户列表
-	QueryUser(context.Context, *QueryUserRequest) (*UserSet, error)
+	QueryUser(context.Context, *QueryUserRequest) (*types.Set[*User], error)
 }
 
 func NewQueryUserRequest() *QueryUserRequest {

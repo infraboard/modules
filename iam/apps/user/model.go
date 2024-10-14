@@ -8,19 +8,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func NewUserSet() *UserSet {
-	return &UserSet{
-		Items: []*User{},
-	}
-}
-
-type UserSet struct {
-	// 总数量
-	Total int64 `json:"total"`
-	// 当前页数据
-	Items []*User `json:"items"`
-}
-
 func NewUser(req *CreateUserRequest) *User {
 	req.PasswordHash()
 
