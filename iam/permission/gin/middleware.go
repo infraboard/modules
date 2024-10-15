@@ -77,15 +77,15 @@ func (p *Permissoner) CheckPerm(c *gin.Context) {
 
 	// 权限鉴定, 鉴权是在用户已经认证的情况之下进行的
 	// 判断当前用户的角色
-	if tk.Role == user.ROLE_ADMIN {
+	if tk.IsAdmin {
 		return
 	}
 
-	err := p.HasPerm(tk.Role.String())
-	if err != nil {
-		response.Failed(c, err)
-		return
-	}
+	// err := p.HasPerm(tk.Role.String())
+	// if err != nil {
+	// 	response.Failed(c, err)
+	// 	return
+	// }
 }
 
 func (a *Permissoner) HasPerm(role string) error {

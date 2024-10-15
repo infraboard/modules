@@ -12,7 +12,7 @@ import (
 
 func (h *TokenRestulApiHandler) Login(r *restful.Request, w *restful.Response) {
 	// 1. 获取用户的请求参数， 参数在Body里面
-	req := token.NewLoginRequest()
+	req := token.NewIssueTokenRequest()
 
 	err := r.ReadEntity(req)
 	if err != nil {
@@ -21,7 +21,7 @@ func (h *TokenRestulApiHandler) Login(r *restful.Request, w *restful.Response) {
 	}
 
 	// 2. 执行逻辑
-	tk, err := h.svc.Login(r.Request.Context(), req)
+	tk, err := h.svc.IssueToken(r.Request.Context(), req)
 	if err != nil {
 		response.Failed(w, err)
 		return
@@ -47,12 +47,12 @@ func (h *TokenRestulApiHandler) Login(r *restful.Request, w *restful.Response) {
 
 // Logout HandleFunc
 func (h *TokenRestulApiHandler) Logout(r *restful.Request, w *restful.Response) {
-	req := token.NewLogoutRequest(
+	req := token.NewRevolkTokenRequest(
 		token.GetAccessTokenFromHTTP(r.Request),
 		token.GetRefreshTokenFromHTTP(r.Request),
 	)
 
-	tk, err := h.svc.Logout(r.Request.Context(), req)
+	tk, err := h.svc.RevolkToken(r.Request.Context(), req)
 	if err != nil {
 		response.Failed(w, err)
 		return

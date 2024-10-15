@@ -9,7 +9,7 @@ import (
 
 func (h *TokenGinApiHandler) Login(c *gin.Context) {
 	// 1. 获取用户的请求参数， 参数在Body里面
-	req := token.NewLoginRequest()
+	req := token.NewIssueTokenRequest()
 
 	err := c.BindJSON(req)
 	if err != nil {
@@ -18,7 +18,7 @@ func (h *TokenGinApiHandler) Login(c *gin.Context) {
 	}
 
 	// 2. 执行逻辑
-	tk, err := h.svc.Login(c.Request.Context(), req)
+	tk, err := h.svc.IssueToken(c.Request.Context(), req)
 	if err != nil {
 		response.Failed(c.Writer, err)
 		return
@@ -36,12 +36,12 @@ func (h *TokenGinApiHandler) Login(c *gin.Context) {
 
 // Logout HandleFunc
 func (h *TokenGinApiHandler) Logout(c *gin.Context) {
-	req := token.NewLogoutRequest(
+	req := token.NewRevolkTokenRequest(
 		token.GetAccessTokenFromHTTP(c.Request),
 		token.GetRefreshTokenFromHTTP(c.Request),
 	)
 
-	tk, err := h.svc.Logout(c.Request.Context(), req)
+	tk, err := h.svc.RevolkToken(c.Request.Context(), req)
 	if err != nil {
 		response.Failed(c.Writer, err)
 		return

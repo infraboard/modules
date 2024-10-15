@@ -32,7 +32,7 @@ func (h *TokenRestulApiHandler) Init() error {
 	ws.Route(ws.POST("").To(h.Login).
 		Doc("颁发令牌").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
-		Reads(token.LoginRequest{}).
+		Reads(token.IssueTokenRequest{}).
 		Writes(token.Token{}).
 		Returns(200, "OK", token.Token{}))
 
@@ -41,7 +41,7 @@ func (h *TokenRestulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(label.Auth, label.Enable).
 		Metadata(label.PERMISSION_MODE, label.PERMISSION_MODE_ACL.Value()).
-		Reads(token.LoginRequest{}).
+		Reads(token.IssueTokenRequest{}).
 		Writes(token.Token{}).
 		Returns(200, "OK", token.Token{}).
 		Returns(404, "Not Found", nil))

@@ -6,7 +6,6 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/infraboard/modules/iam/apps/user"
 	"github.com/rs/xid"
 )
 
@@ -39,6 +38,7 @@ func NewToken() *Token {
 		RefreshToken:          xid.New().String(),
 		RefreshTokenExpiredAt: 3600 * 24 * 7,
 		CreatedAt:             time.Now().Unix(),
+		Extras:                map[string]string{},
 	}
 }
 
@@ -47,6 +47,8 @@ type Token struct {
 	UserId string `json:"user_id"`
 	// 人的名称， user_name
 	UserName string `json:"username" gorm:"column:username"`
+	// 是不是管理员
+	IsAdmin bool `json:"is_admin" gorm:"column:is_admin"`
 	// 办法给用户的访问令牌(用户需要携带Token来访问接口)
 	AccessToken string `json:"access_token"`
 	// 过期时间(2h), 单位是秒
@@ -55,14 +57,12 @@ type Token struct {
 	RefreshToken string `json:"refresh_token"`
 	// 刷新Token过期时间(7d)
 	RefreshTokenExpiredAt int `json:"refresh_token_expired_at"`
-
 	// 创建时间
 	CreatedAt int64 `json:"created_at"`
 	// 更新实现
 	UpdatedAt int64 `json:"updated_at"`
-
-	// 额外补充信息, gorm忽略处理
-	Role user.Role `json:"role" gorm:"-"`
+	// 扩展信息
+	Extras map[string]string `json:"extras" gorm:"column:extras;serializer:json"`
 }
 
 func (t *Token) TableName() string {

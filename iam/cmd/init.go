@@ -54,7 +54,6 @@ var initCmd = &cobra.Command{
 			}),
 		))
 
-		req.Role = user.ROLE_ADMIN
 		u, err := svc.CreateUser(context.Background(), req)
 		cobra.CheckErr(err)
 		fmt.Println(u)

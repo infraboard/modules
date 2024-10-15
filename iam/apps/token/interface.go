@@ -16,33 +16,47 @@ func GetService() Service {
 
 type Service interface {
 	// 登录接口(颁发Token)
-	Login(context.Context, *LoginRequest) (*Token, error)
+	IssueToken(context.Context, *IssueTokenRequest) (*Token, error)
 	// 退出接口(销毁Token)
-	Logout(context.Context, *LogoutRequest) (*Token, error)
+	RevolkToken(context.Context, *RevolkTokenRequest) (*Token, error)
 
 	// 校验Token 是给内部中间层使用 身份校验层
 	// 校验完后返回Token, 通过Token获取 用户信息
 	ValiateToken(context.Context, *ValiateToken) (*Token, error)
 }
 
-func NewLoginRequest() *LoginRequest {
-	return &LoginRequest{}
+func NewIssueTokenRequest() *IssueTokenRequest {
+	return &IssueTokenRequest{
+		Parameter: make(ProviderParameter),
+	}
 }
 
-type LoginRequest struct {
-	Username string
-	Password string
+type IssueTokenRequest struct {
+	// 认证方式
+	Provider string `json:"provider"`
+	// 参数
+	Parameter ProviderParameter `json:"parameter"`
 }
 
-func NewLogoutRequest(at, rk string) *LogoutRequest {
-	return &LogoutRequest{
+type ProviderParameter map[string]string
+
+func (p ProviderParameter) Username() string {
+	return p["username"]
+}
+
+func (p ProviderParameter) Password() string {
+	return p["password"]
+}
+
+func NewRevolkTokenRequest(at, rk string) *RevolkTokenRequest {
+	return &RevolkTokenRequest{
 		AccessToken:  at,
 		RefreshToken: rk,
 	}
 }
 
 // 万一的Token泄露, 不知道refresh_token，也没法推出
-type LogoutRequest struct {
+type RevolkTokenRequest struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 }

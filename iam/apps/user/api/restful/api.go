@@ -62,17 +62,7 @@ func (h *UserRestfulApiHandler) Init() error {
 		Metadata(permission.Required(user.ROLE_ADMIN)).
 		Reads(user.DeleteUserRequest{}).
 		Writes(user.User{}).
-		Returns(200, "OK", user.User{}))
-
-	// ws.Route(ws.DELETE("/").To(h.Logout).
-	// 	Doc("验证令牌").
-	// 	Metadata(restfulspec.KeyOpenAPITags, tags).
-	// 	Metadata(label.Auth, label.Enable).
-	// 	Metadata(label.PERMISSION_MODE, label.PERMISSION_MODE_ACL.Value()).
-	// 	Reads(token.LoginRequest{}).
-	// 	Writes(token.Token{}).
-	// 	Returns(200, "OK", token.Token{}).
-	// 	Returns(404, "Not Found", nil))
-
+		Returns(200, "OK", user.User{}).
+		Returns(404, "Not Found", nil))
 	return nil
 }

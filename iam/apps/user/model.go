@@ -47,7 +47,6 @@ func (u *User) TableName() string {
 
 func NewCreateUserRequest() *CreateUserRequest {
 	return &CreateUserRequest{
-		Role:  ROLE_MEMBER,
 		Label: map[string]string{},
 	}
 }
@@ -58,10 +57,8 @@ type CreateUserRequest struct {
 	Username string `json:"username" gorm:"column:username"`
 	// 密码(Hash过后的)
 	Password string `json:"password" gorm:"column:password"`
-	// 用户的角色(写死)，
-	// @Role("admin")
-	// CreateBlog( check user Role  )
-	Role Role `json:"role" gorm:"column:role"`
+	// 是不是管理员
+	IsAdmin bool `json:"is_admin" gorm:"column:is_admin"`
 	// 对象标签, Dep:部门A
 	// Label 没法存入数据库，不是一个结构化的数据
 	// 比如就存储在数据里面 ，存储为Json, 需要ORM来帮我们完成 json的序列化和存储

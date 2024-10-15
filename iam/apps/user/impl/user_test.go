@@ -19,7 +19,6 @@ func TestCreateAuth1(t *testing.T) {
 	req := user.NewCreateUserRequest()
 	req.Username = "admin"
 	req.Password = "123456"
-	req.Role = user.ROLE_MEMBER
 	u, err := impl.CreateUser(ctx, req)
 	if err != nil {
 		t.Fatal(err)
@@ -31,7 +30,6 @@ func TestCreateAuthor2(t *testing.T) {
 	req := user.NewCreateUserRequest()
 	req.Username = "张三"
 	req.Password = "123456"
-	req.Role = user.ROLE_MEMBER
 	u, err := impl.CreateUser(ctx, req)
 	if err != nil {
 		t.Fatal(err)
@@ -43,7 +41,6 @@ func TestCreateAuditorUser(t *testing.T) {
 	req := user.NewCreateUserRequest()
 	req.Username = "auditor"
 	req.Password = "123456"
-	req.Role = user.ROLE_MEMBER
 	u, err := impl.CreateUser(ctx, req)
 	if err != nil {
 		t.Fatal(err)
