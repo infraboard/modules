@@ -36,6 +36,7 @@ func NewToken() *Token {
 		AccessToken:  MakeBearer(24),
 		RefreshToken: MakeBearer(32),
 		IssueAt:      time.Now(),
+		Status:       NewStatus(),
 		Extras:       map[string]string{},
 	}
 
@@ -64,9 +65,11 @@ type Token struct {
 	// 刷新Token过期时间
 	RefreshTokenExpiredAt *time.Time `json:"refresh_token_expired_at" gorm:"column:refresh_token_expired_at;type:timestamp;index"`
 	// 创建时间
-	IssueAt time.Time `json:"issue_at" gorm:"column:issue_at;type:timestamp;default:current_timestamp;not null;index;"`
+	IssueAt time.Time `json:"issue_at" gorm:"column:issue_at;type:timestamp;default:current_timestamp;not null;index"`
 	// 更新时间
-	RefreshAt *time.Time `json:"refresh_at" gorm:"column:refresh_at;type:timestamp;"`
+	RefreshAt *time.Time `json:"refresh_at" gorm:"column:refresh_at;type:timestamp"`
+	// 令牌状态
+	Status *Status `json:"status" gorm:"embedded"`
 	// 其他扩展信息
 	Extras map[string]string `json:"extras" gorm:"column:extras;serializer:json;type:json"`
 }
@@ -127,6 +130,52 @@ func (t *Token) String() string {
 	return pretty.ToJSON(t)
 }
 
+func (t *Token) SetIssuer(issuer string) *Token {
+	t.Issuer = issuer
+	return t
+}
+
 func (t *Token) UserIdString() string {
 	return fmt.Sprintf("%d", t.UserId)
+}
+
+func (t *Token) CheckRefreshToken(refreshToken string) error {
+	if t.RefreshToken != refreshToken {
+		return NewPermissionDeny("refresh token not conrect")
+	}
+	return nil
+}
+
+func (t *Token) Lock(l LOCK_TYPE, reason string) {
+	if t.Status == nil {
+		t.Status = NewStatus()
+	}
+	t.Status.LockType = l
+	t.Status.LockReason = reason
+	t.Status.SetLockAt(time.Now())
+}
+
+func NewStatus() *Status {
+	return &Status{}
+}
+
+type Status struct {
+	// 冻结时间
+	LockAt *time.Time `json:"lock_at" bson:"lock_at" gorm:"column:lock_at;type:timestamp;index"`
+	// 冻结类型
+	LockType LOCK_TYPE `json:"lock_type" bson:"lock_type" gorm:"column:lock_type;type:tinyint(1)"`
+	// 冻结原因
+	LockReason string `json:"lock_reason" bson:"lock_reason" gorm:"column:lock_reason;type:text"`
+}
+
+func (s *Status) SetLockAt(v time.Time) {
+	s.LockAt = &v
+}
+
+func (s *Status) ToMap() map[string]any {
+	return map[string]any{
+		"lock_at":     s.LockAt,
+		"lock_type":   s.LockType,
+		"lock_reason": s.LockReason,
+	}
 }

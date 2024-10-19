@@ -13,7 +13,8 @@ import (
 
 // 登录接口(颁发Token)
 func (i *TokenServiceImpl) IssueToken(ctx context.Context, req *token.IssueTokenRequest) (*token.Token, error) {
-	// 判断用户
+	// 避免同一个用户多次登录
+	// 颁发成功后  把之前的Token标记为失效,作业
 
 	issuer := token.GetIssue(req.Issuer)
 	if issuer == nil {
@@ -24,6 +25,7 @@ func (i *TokenServiceImpl) IssueToken(ctx context.Context, req *token.IssueToken
 		return nil, err
 	}
 
+	tk.SetIssuer(req.Issuer)
 	if err := datasource.DBFromCtx(ctx).
 		Create(tk).
 		Error; err != nil {
@@ -37,8 +39,6 @@ func (i *TokenServiceImpl) IssueToken(ctx context.Context, req *token.IssueToken
 		return nil, err
 	}
 
-	// 避免同一个用户多次登录
-	// 4. 颁发成功后  把之前的Token标记为失效,作业
 	return tk, nil
 }
 
@@ -76,30 +76,47 @@ func (i *TokenServiceImpl) ValiateToken(ctx context.Context, req *token.ValiateT
 	return tk, nil
 }
 
-// 退出接口(销毁Token)
-func (i *TokenServiceImpl) RevolkToken(ctx context.Context, req *token.RevolkTokenRequest) (*token.Token, error) {
-	// 1. 查询Token (是不是我们这个系统颁发的)
+func (i *TokenServiceImpl) DescribeToken(ctx context.Context, in *token.DescribeTokenRequest) (*token.Token, error) {
+	query := datasource.DBFromCtx(ctx)
+	switch in.DescribeBy {
+	case token.DESCRIBE_BY_ACCESS_TOKEN:
+		query = query.Where("access_token = ?", in.DescribeValue)
+	default:
+		return nil, exception.NewBadRequest("unspport describe type %s", in.DescribeValue)
+	}
+
 	tk := token.NewToken()
-	err := datasource.DBFromCtx(ctx).
-		Where("access_token = ?", req.AccessToken).
-		First(tk).
+	if err := query.First(tk).Error; err != nil {
+		return nil, err
+	}
+	return tk, nil
+}
+
+// 退出接口(销毁Token)
+func (i *TokenServiceImpl) RevolkToken(ctx context.Context, in *token.RevolkTokenRequest) (*token.Token, error) {
+	tk, err := i.DescribeToken(ctx, token.NewDescribeTokenRequest(in.AccessToken))
+	if err != nil {
+		return nil, err
+	}
+	if err := tk.CheckRefreshToken(in.RefreshToken); err != nil {
+		return nil, err
+	}
+
+	tk.Lock(token.LOCK_TYPE_REVOLK, "user revolk token")
+	err = datasource.DBFromCtx(ctx).Model(&token.Token{}).
+		Where("access_token = ?", in.AccessToken).
+		Where("refresh_token = ?", in.RefreshToken).
+		Updates(tk.Status.ToMap()).
 		Error
 	if err != nil {
 		return nil, err
 	}
-
-	err = datasource.DBFromCtx(ctx).
-		Where("access_token = ?", req.AccessToken).
-		Where("refresh_token = ?", req.RefreshToken).
-		Delete(&token.Token{}).
-		Error
 	return tk, err
 }
 
 // 查询已经颁发出去的Token
 func (i *TokenServiceImpl) QueryToken(ctx context.Context, in *token.QueryTokenRequest) (*types.Set[*token.Token], error) {
 	set := types.New[*token.Token]()
-
 	query := datasource.DBFromCtx(ctx).Model(&token.Token{})
 
 	// 查询总量

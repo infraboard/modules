@@ -22,6 +22,8 @@ type Service interface {
 	IssueToken(context.Context, *IssueTokenRequest) (*Token, error)
 	// 退出接口(销毁Token)
 	RevolkToken(context.Context, *RevolkTokenRequest) (*Token, error)
+	// 查询Token详情
+	DescribeToken(context.Context, *DescribeTokenRequest) (*Token, error)
 
 	// 校验Token 是给内部中间层使用 身份校验层
 	// 校验完后返回Token, 通过Token获取 用户信息
@@ -29,6 +31,18 @@ type Service interface {
 
 	// 查询已经颁发出去的Token
 	QueryToken(context.Context, *QueryTokenRequest) (*types.Set[*Token], error)
+}
+
+func NewDescribeTokenRequest(accessToken string) *DescribeTokenRequest {
+	return &DescribeTokenRequest{
+		DescribeBy:    DESCRIBE_BY_ACCESS_TOKEN,
+		DescribeValue: accessToken,
+	}
+}
+
+type DescribeTokenRequest struct {
+	DescribeBy    DESCRIBE_BY `json:"describe_by"`
+	DescribeValue string      `json:"describe_value"`
 }
 
 func NewQueryTokenRequest() *QueryTokenRequest {

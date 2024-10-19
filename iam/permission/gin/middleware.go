@@ -38,7 +38,7 @@ func (a *Auther) Auth(c *gin.Context) {
 	}
 
 	// 2.调用Token模块来认证
-	in := token.NewValiateToken(v)
+	in := token.NewValiateTokenRequest(v)
 	tk, err := a.tk.ValiateToken(c.Request.Context(), in)
 	if err != nil {
 		response.Failed(c, err)

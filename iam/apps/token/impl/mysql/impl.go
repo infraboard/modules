@@ -18,6 +18,8 @@ func init() {
 	})
 }
 
+var _ token.Service = (*TokenServiceImpl)(nil)
+
 type TokenServiceImpl struct {
 	ioc.ObjectImpl
 	user user.Service

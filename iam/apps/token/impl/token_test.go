@@ -24,3 +24,12 @@ func TestQueryToken(t *testing.T) {
 	}
 	t.Log(set)
 }
+
+func TestRevolkToken(t *testing.T) {
+	req := token.NewRevolkTokenRequest("ZEC4VeI3dtJX9Q5Kysovaxht", "c7vJ66XYHtJ0KxhgNX4iHR8wLbGLLNtL")
+	set, err := impl.RevolkToken(ctx, req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(set)
+}
