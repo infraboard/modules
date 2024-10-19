@@ -15,10 +15,11 @@ func TestQueryUser(t *testing.T) {
 	t.Log(set)
 }
 
-func TestCreateAuth1(t *testing.T) {
+func TestCreateAdminUser(t *testing.T) {
 	req := user.NewCreateUserRequest()
 	req.UserName = "admin"
 	req.Password = "123456"
+	req.IsAdmin = true
 	u, err := impl.CreateUser(ctx, req)
 	if err != nil {
 		t.Fatal(err)
@@ -58,7 +59,7 @@ func TestDeleteUser(t *testing.T) {
 }
 
 func TestDescribeUserRequestById(t *testing.T) {
-	req := user.NewDescribeUserRequestById("9")
+	req := user.NewDescribeUserRequestById("0192a3ca-08a9-76d6-8ceb-ab89087eaf6c")
 	ins, err := impl.DescribeUser(ctx, req)
 	if err != nil {
 		t.Fatal(err)
@@ -79,4 +80,9 @@ func TestDescribeUserRequestByName(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+func TestUserJson(t *testing.T) {
+	u := user.NewUser(user.NewCreateUserRequest())
+	t.Log(u)
 }

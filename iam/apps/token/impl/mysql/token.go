@@ -2,34 +2,36 @@ package mysql
 
 import (
 	"context"
+	"time"
 
 	"github.com/infraboard/mcube/v2/exception"
+	"github.com/infraboard/mcube/v2/ioc/config/datasource"
+	"github.com/infraboard/mcube/v2/types"
 	"github.com/infraboard/modules/iam/apps/token"
 	"github.com/infraboard/modules/iam/apps/user"
 )
 
 // 登录接口(颁发Token)
-func (i *TokenServiceImpl) Login(
-	ctx context.Context, req *token.IssueTokenRequest) (
-	*token.Token, error) {
-	provider := token.GetIssue(req.Issuer)
-	if provider == nil {
+func (i *TokenServiceImpl) IssueToken(ctx context.Context, req *token.IssueTokenRequest) (*token.Token, error) {
+	// 判断用户
+
+	issuer := token.GetIssue(req.Issuer)
+	if issuer == nil {
 		return nil, exception.NewBadRequest("provider %s no support", req.Issuer)
 	}
-	tk, err := provider.IssueToken(ctx, req.Parameter)
+	tk, err := issuer.IssueToken(ctx, req.Parameter)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := i.db.
-		WithContext(ctx).
+	if err := datasource.DBFromCtx(ctx).
 		Create(tk).
 		Error; err != nil {
 		return nil, err
 	}
 
 	// 补充用户信息, 只补充了用户的角色
-	uDesc := user.NewDescribeUserRequestById(tk.UserId.String())
+	uDesc := user.NewDescribeUserRequestById(tk.UserIdString())
 	_, err = i.user.DescribeUser(ctx, uDesc)
 	if err != nil {
 		return nil, err
@@ -41,13 +43,10 @@ func (i *TokenServiceImpl) Login(
 }
 
 // 校验Token 是给内部中间层使用 身份校验层
-func (i *TokenServiceImpl) ValiateToken(
-	ctx context.Context,
-	req *token.ValiateToken) (*token.Token, error) {
+func (i *TokenServiceImpl) ValiateToken(ctx context.Context, req *token.ValiateTokenRequest) (*token.Token, error) {
 	// 1. 查询Token (是不是我们这个系统颁发的)
-	tk := token.NewToken(0)
-	err := i.db.
-		WithContext(ctx).
+	tk := token.NewToken()
+	err := datasource.DBFromCtx(ctx).
 		Where("access_token = ?", req.AccessToken).
 		First(tk).
 		Error
@@ -55,21 +54,33 @@ func (i *TokenServiceImpl) ValiateToken(
 		return nil, err
 	}
 
-	// 2. 判断Token的合法性:
 	// 2.1 判断Ak是否过期
-	if err := tk.IsExpired(); err != nil {
+	if err := tk.IsAccessTokenExpired(); err != nil {
+		// 判断刷新Token是否过期
+		if err := tk.IsRreshTokenExpired(); err != nil {
+			return nil, err
+		}
+
+		// 如果开启了自动刷新
+		if i.AutoRefresh {
+			tk.SetRefreshAt(time.Now())
+			tk.SetExpiredAtByDuration(i.refreshDuration, 4)
+			if err := datasource.DBFromCtx(ctx).Save(tk); err != nil {
+				i.log.Error().Msgf("auto refresh token error, %s", err.Error)
+			}
+		}
+
 		return nil, err
 	}
+
 	return tk, nil
 }
 
 // 退出接口(销毁Token)
-func (i *TokenServiceImpl) Logout(
-	ctx context.Context,
-	req *token.RevolkTokenRequest) (*token.Token, error) {
+func (i *TokenServiceImpl) RevolkToken(ctx context.Context, req *token.RevolkTokenRequest) (*token.Token, error) {
 	// 1. 查询Token (是不是我们这个系统颁发的)
-	tk := token.NewToken(0)
-	err := i.db.WithContext(ctx).
+	tk := token.NewToken()
+	err := datasource.DBFromCtx(ctx).
 		Where("access_token = ?", req.AccessToken).
 		First(tk).
 		Error
@@ -77,10 +88,35 @@ func (i *TokenServiceImpl) Logout(
 		return nil, err
 	}
 
-	err = i.db.WithContext(ctx).
+	err = datasource.DBFromCtx(ctx).
 		Where("access_token = ?", req.AccessToken).
 		Where("refresh_token = ?", req.RefreshToken).
 		Delete(&token.Token{}).
 		Error
 	return tk, err
+}
+
+// 查询已经颁发出去的Token
+func (i *TokenServiceImpl) QueryToken(ctx context.Context, in *token.QueryTokenRequest) (*types.Set[*token.Token], error) {
+	set := types.New[*token.Token]()
+
+	query := datasource.DBFromCtx(ctx).Model(&token.Token{})
+
+	// 查询总量
+	err := query.Count(&set.Total).Error
+	if err != nil {
+		return nil, err
+	}
+
+	err = query.
+		Order("created_at desc").
+		Offset(int(in.ComputeOffset())).
+		Limit(int(in.PageSize)).
+		Find(&set.Items).
+		Error
+	if err != nil {
+		return nil, err
+	}
+
+	return set, nil
 }

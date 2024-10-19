@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/infraboard/mcube/v2/exception"
+	"github.com/infraboard/mcube/v2/ioc/config/datasource"
 	"github.com/infraboard/mcube/v2/types"
 	"github.com/infraboard/modules/iam/apps/user"
 	"gorm.io/gorm"
@@ -22,8 +23,7 @@ func (i *UserServiceImpl) CreateUser(
 	// 2. 生成一个User对象(ORM对象)
 	ins := user.NewUser(req)
 
-	if err := i.db.
-		WithContext(ctx).
+	if err := datasource.DBFromCtx(ctx).
 		Create(ins).
 		Error; err != nil {
 		return nil, err
@@ -44,8 +44,7 @@ func (i *UserServiceImpl) DeleteUser(
 		return nil, err
 	}
 
-	return u, i.db.
-		WithContext(ctx).
+	return u, datasource.DBFromCtx(ctx).
 		Where("id = ?", req.Id).
 		Delete(&user.User{}).
 		Error
@@ -58,7 +57,7 @@ func (i *UserServiceImpl) QueryUser(
 	*types.Set[*user.User], error) {
 	set := types.New[*user.User]()
 
-	query := i.db.WithContext(ctx).Model(&user.User{})
+	query := datasource.DBFromCtx(ctx).Model(&user.User{})
 
 	// 查询总量
 	err := query.Count(&set.Total).Error
@@ -67,6 +66,7 @@ func (i *UserServiceImpl) QueryUser(
 	}
 
 	err = query.
+		Order("created_at desc").
 		Offset(int(req.ComputeOffset())).
 		Limit(int(req.PageSize)).
 		Find(&set.Items).
@@ -84,18 +84,18 @@ func (i *UserServiceImpl) DescribeUser(
 	req *user.DescribeUserRequest) (
 	*user.User, error) {
 
-	query := i.db.WithContext(ctx)
+	query := datasource.DBFromCtx(ctx)
 
 	// 1. 构造我们的查询条件
 	switch req.DescribeBy {
 	case user.DESCRIBE_BY_ID:
 		query = query.Where("id = ?", req.DescribeValue)
 	case user.DESCRIBE_BY_USERNAME:
-		query = query.Where("username = ?", req.DescribeValue)
+		query = query.Where("user_name = ?", req.DescribeValue)
 	}
 
 	// SELECT * FROM `users` WHERE username = 'admin' ORDER BY `users`.`id` LIMIT 1
-	ins := user.NewUser(user.NewCreateUserRequest())
+	ins := &user.User{}
 	if err := query.First(ins).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, exception.NewNotFound("user %s not found", req.DescribeValue)

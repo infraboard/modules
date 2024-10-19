@@ -9,10 +9,6 @@ import (
 	"github.com/infraboard/modules/iam/apps/user"
 )
 
-const (
-	PRIVATE_TOKEN_ISSUER = "private_token"
-)
-
 func init() {
 	ioc.Config().Registry(&PrivateTokenIssuer{})
 }
@@ -32,7 +28,7 @@ func (p *PrivateTokenIssuer) Init() error {
 	p.user = user.GetService()
 	p.token = token.GetService()
 
-	token.RegistryIssuer(PRIVATE_TOKEN_ISSUER, p)
+	token.RegistryIssuer(token.ISSUER_PRIVATE_TOKEN, p)
 	return nil
 }
 
@@ -52,15 +48,20 @@ func (p *PrivateTokenIssuer) IssueToken(ctx context.Context, parameter token.Iss
 	}
 
 	// 2. 校验Token合法
-	_, err = p.token.ValiateToken(ctx, token.NewValiateToken(parameter.AccessToken()))
+	_, err = p.token.ValiateToken(ctx, token.NewValiateTokenRequest(parameter.AccessToken()))
 	if err != nil {
 		return nil, err
 	}
 
 	// 3. 颁发token
-	tk := token.NewToken(parameter.ExpireTTL())
+	tk := token.NewToken()
 	tk.UserId = u.Id
 	tk.UserName = u.UserName
 	tk.IsAdmin = u.IsAdmin
+
+	expiredTTL := parameter.ExpireTTL()
+	if expiredTTL > 0 {
+		tk.SetExpiredAtByDuration(expiredTTL, 4)
+	}
 	return tk, nil
 }

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -13,7 +12,6 @@ func NewUser(req *CreateUserRequest) *User {
 	req.PasswordHash()
 
 	return &User{
-		Id:                uuid.Must(uuid.NewV7()),
 		CreatedAt:         time.Now(),
 		CreateUserRequest: req,
 	}
@@ -22,7 +20,7 @@ func NewUser(req *CreateUserRequest) *User {
 // 用于存放 存入数据库的对象(PO)
 type User struct {
 	// 在添加数据需要村的定义
-	Id uuid.UUID `json:"id" gorm:"column:id;type:uuid;primary_key;"`
+	Id uint64 `json:"id" gorm:"column:id;type:uint;primary_key;"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at" gorm:"column:created_at;type:timestamp;default:current_timestamp;not null;index;"`
 	// 更新时间
@@ -60,11 +58,11 @@ type CreateUserRequest struct {
 	// 创建方式
 	CreateType CEATE_TYPE `json:"create_type" gorm:"column:create_type;type:tinyint(1);not null;index"`
 	// 用户名
-	UserName string `json:"user_name" gorm:"column:user_name;type:varchar(100);not null;index"`
+	UserName string `json:"user_name" gorm:"column:user_name;type:varchar(100);not null;uniqueIndex"`
 	// 密码(Hash过后的)
 	Password string `json:"password" gorm:"column:password;type:varchar(200);not null"`
 	// 密码强度
-	PwdIntensity int8 `json:"pwd_intensity" gorm:"column:pwd_intensity;type:tiny(1);not null"`
+	PwdIntensity int8 `json:"pwd_intensity" gorm:"column:pwd_intensity;type:tinyint(1);not null"`
 
 	// 支持接口调用
 	EnabledApi bool `json:"enabled_api" gorm:"column:enabled_api;type:tinyint(1)"`
@@ -84,11 +82,11 @@ type CreateUserRequest struct {
 	Sex SEX `json:"sex" gorm:"column:sex;type:tinyint(1)"`
 
 	// 邮箱
-	Email string `json:"email" gorm:"column:email;type:varchar(200);index"`
+	Email string `json:"email" gorm:"column:email;type:varchar(200);uniqueIndex"`
 	// 邮箱是否验证ok
 	IsEmailConfirmed bool `json:"is_email_confirmed" gorm:"column:is_email_confirmed;type:tinyint(1)"`
 	// 手机
-	Mobile string `json:"mobile" gorm:"column:mobile;type:varchar(200);index"`
+	Mobile string `json:"mobile" gorm:"column:mobile;type:varchar(200);uniqueIndex"`
 	// 手机释放验证ok
 	IsMobileConfirmed bool `json:"is_mobile_confirmed" gorm:"column:is_mobile_confirmed;type:tinyint(1)"`
 	// 手机登录标识

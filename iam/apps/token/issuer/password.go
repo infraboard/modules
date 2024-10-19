@@ -10,10 +10,6 @@ import (
 	"github.com/infraboard/modules/iam/apps/user"
 )
 
-const (
-	PASSWORD_TOKEN_ISSUER = "password"
-)
-
 func init() {
 	ioc.Config().Registry(&PasswordTokenIssuer{
 		ExpiredTTLSecond: 1 * 60 * 60,
@@ -38,7 +34,7 @@ func (p *PasswordTokenIssuer) Init() error {
 	p.user = user.GetService()
 	p.expiredDuration = time.Duration(p.ExpiredTTLSecond) * time.Second
 
-	token.RegistryIssuer(PASSWORD_TOKEN_ISSUER, p)
+	token.RegistryIssuer(token.ISSUER_PASSWORD, p)
 	return nil
 }
 
@@ -60,9 +56,11 @@ func (p *PasswordTokenIssuer) IssueToken(ctx context.Context, parameter token.Is
 	}
 
 	// 3. 颁发token
-	tk := token.NewToken(p.expiredDuration)
+	tk := token.NewToken()
 	tk.UserId = u.Id
 	tk.UserName = u.UserName
 	tk.IsAdmin = u.IsAdmin
+
+	tk.SetExpiredAtByDuration(p.expiredDuration, 4)
 	return tk, nil
 }

@@ -4,11 +4,10 @@ go 1.22.0
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.7
-	github.com/emicklei/go-restful-openapi/v2 v2.9.1
-	github.com/emicklei/go-restful/v3 v3.12.0
+	github.com/emicklei/go-restful-openapi/v2 v2.10.2
+	github.com/emicklei/go-restful/v3 v3.12.1
 	github.com/gin-gonic/gin v1.10.0
-	github.com/google/uuid v1.6.0
-	github.com/infraboard/mcube/v2 v2.0.40
+	github.com/infraboard/mcube/v2 v2.0.42
 	github.com/rs/xid v1.6.0
 	github.com/spf13/cobra v1.8.1
 	golang.org/x/crypto v0.28.0
@@ -39,6 +38,7 @@ require (
 	github.com/go-playground/validator/v10 v10.20.0 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect

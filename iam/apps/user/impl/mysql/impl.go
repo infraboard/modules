@@ -4,7 +4,6 @@ import (
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
 	"github.com/infraboard/modules/iam/apps/user"
-	"gorm.io/gorm"
 )
 
 func init() {
@@ -13,16 +12,13 @@ func init() {
 
 // 他是user service 服务的控制器
 type UserServiceImpl struct {
-	db *gorm.DB
 	ioc.ObjectImpl
 }
 
 func (i *UserServiceImpl) Init() error {
-	i.db = datasource.DB().Debug()
-
 	// 自动创建表
 	if datasource.Get().AutoMigrate {
-		err := i.db.AutoMigrate(&user.User{})
+		err := datasource.DB().AutoMigrate(&user.User{})
 		if err != nil {
 			return err
 		}

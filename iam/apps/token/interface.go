@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/infraboard/mcube/v2/http/request"
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/types"
 )
@@ -24,7 +25,20 @@ type Service interface {
 
 	// 校验Token 是给内部中间层使用 身份校验层
 	// 校验完后返回Token, 通过Token获取 用户信息
-	ValiateToken(context.Context, *ValiateToken) (*Token, error)
+	ValiateToken(context.Context, *ValiateTokenRequest) (*Token, error)
+
+	// 查询已经颁发出去的Token
+	QueryToken(context.Context, *QueryTokenRequest) (*types.Set[*Token], error)
+}
+
+func NewQueryTokenRequest() *QueryTokenRequest {
+	return &QueryTokenRequest{
+		PageRequest: request.NewDefaultPageRequest(),
+	}
+}
+
+type QueryTokenRequest struct {
+	*request.PageRequest
 }
 
 func NewIssueTokenRequest() *IssueTokenRequest {
@@ -38,6 +52,12 @@ type IssueTokenRequest struct {
 	Issuer string `json:"issuer"`
 	// 参数
 	Parameter IssueParameter `json:"parameter"`
+}
+
+func (i *IssueTokenRequest) IssueByPassword(username, password string) {
+	i.Issuer = ISSUER_PASSWORD
+	i.Parameter.SetUsername(username)
+	i.Parameter.SetPassword(password)
 }
 
 func GetIssueParameterValue[T any](p IssueParameter, key string) T {
@@ -60,11 +80,18 @@ password issuer parameter
 
 func (p IssueParameter) Username() string {
 	return GetIssueParameterValue[string](p, "username")
-
 }
 
 func (p IssueParameter) Password() string {
 	return GetIssueParameterValue[string](p, "password")
+}
+
+func (p IssueParameter) SetUsername(v string) {
+	p["username"] = v
+}
+
+func (p IssueParameter) SetPassword(v string) {
+	p["password"] = v
 }
 
 /*
@@ -92,12 +119,12 @@ type RevolkTokenRequest struct {
 	RefreshToken string `json:"refresh_token"`
 }
 
-func NewValiateToken(at string) *ValiateToken {
-	return &ValiateToken{
-		AccessToken: at,
+func NewValiateTokenRequest(accessToken string) *ValiateTokenRequest {
+	return &ValiateTokenRequest{
+		AccessToken: accessToken,
 	}
 }
 
-type ValiateToken struct {
+type ValiateTokenRequest struct {
 	AccessToken string `json:"access_token"`
 }

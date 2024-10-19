@@ -1,38 +1,43 @@
 package mysql
 
 import (
+	"time"
+
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
+	"github.com/infraboard/mcube/v2/ioc/config/log"
 	"github.com/infraboard/modules/iam/apps/token"
 	"github.com/infraboard/modules/iam/apps/user"
-	"gorm.io/gorm"
+	"github.com/rs/zerolog"
 )
 
 func init() {
-	ioc.Controller().Registry(&TokenServiceImpl{})
+	ioc.Controller().Registry(&TokenServiceImpl{
+		AutoRefresh:     true,
+		RereshTTLSecond: 1 * 60 * 60,
+	})
 }
 
 type TokenServiceImpl struct {
 	ioc.ObjectImpl
-
-	// db
-	db *gorm.DB
-
-	// 依赖User模块, 直接操作user模块的数据库(users)?
-	// 这里需要依赖另一个业务领域: 用户管理领域
 	user user.Service
+	log  *zerolog.Logger
+
+	// 自动刷新, 直接刷新Token的过期时间，而不是生成一个新Token
+	AutoRefresh bool `json:"auto_refresh" toml:"auto_refresh" yaml:"auto_refresh" env:"AUTO_REFRESH"`
+	// 刷新TTL
+	RereshTTLSecond uint64 `json:"refresh_ttl" toml:"refresh_ttl" yaml:"refresh_ttl" env:"REFRESH_TTL"`
+
+	refreshDuration time.Duration
 }
 
 func (i *TokenServiceImpl) Init() error {
-	// db ioc
-	i.db = datasource.DB().Debug()
-
-	// 拿到的对象 在main 进行初始化好了
+	i.log = log.Sub(i.Name())
 	i.user = ioc.Controller().Get(user.AppName).(user.Service)
+	i.refreshDuration = time.Duration(i.RereshTTLSecond) * time.Second
 
-	// 自动创建表
 	if datasource.Get().AutoMigrate {
-		err := i.db.AutoMigrate(&token.Token{})
+		err := datasource.DB().AutoMigrate(&token.Token{})
 		if err != nil {
 			return err
 		}
