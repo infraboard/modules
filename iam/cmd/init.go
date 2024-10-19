@@ -28,7 +28,7 @@ var initCmd = &cobra.Command{
 				Message: "请输入管理员用户名称:",
 				Default: "admin",
 			},
-			&req.Username,
+			&req.UserName,
 			survey.WithValidator(survey.Required),
 		))
 		cobra.CheckErr(survey.AskOne(

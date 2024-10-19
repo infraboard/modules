@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	AppName = "roles"
+	AppName = "role"
 )
 
 func GetService() Service {

@@ -8,7 +8,6 @@ import (
 	"github.com/infraboard/mcube/v2/http/gin/response"
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/modules/iam/apps/token"
-	"github.com/infraboard/modules/iam/apps/user"
 	"github.com/infraboard/modules/iam/permission"
 )
 
@@ -22,7 +21,7 @@ func Auth(v bool) (string, bool) {
 }
 
 // 写带参数的 Gin中间件
-func Required(roles ...user.Role) (string, []user.Role) {
+func Required(roles ...string) (string, []string) {
 	return META_REQUIRED_KEY, roles
 }
 
@@ -61,7 +60,7 @@ func (a *Auther) Auth(c *gin.Context) {
 }
 
 type Permissoner struct {
-	roles []user.Role
+	roles []string
 }
 
 func (p *Permissoner) CheckPerm(c *gin.Context) {
@@ -96,7 +95,7 @@ func (a *Permissoner) HasPerm(role string) error {
 	}
 
 	for _, r := range a.roles {
-		if r.String() == role {
+		if r == role {
 			return nil
 		}
 	}

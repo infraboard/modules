@@ -26,7 +26,7 @@ func (h *TokenGinApiHandler) Login(c *gin.Context) {
 
 	// access_token 通过SetCookie 直接写到浏览器客户端(Web)
 	c.SetCookie(token.ACCESS_TOKEN_COOKIE_NAME, tk.AccessToken,
-		tk.AccessTokenExpiredAt, "/", application.Get().Domain(), false, true)
+		tk.AccessTokenExpiredTTL(), "/", application.Get().Domain(), false, true)
 	// 在Header头中也添加Token
 	c.Header(token.ACCESS_TOKEN_RESPONSE_HEADER_NAME, tk.AccessToken)
 

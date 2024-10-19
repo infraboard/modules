@@ -12,9 +12,9 @@ import (
 func (i *TokenServiceImpl) Login(
 	ctx context.Context, req *token.IssueTokenRequest) (
 	*token.Token, error) {
-	provider := token.GetProvider(req.Provider)
+	provider := token.GetIssue(req.Issuer)
 	if provider == nil {
-		return nil, exception.NewBadRequest("provider %s no support", req.Provider)
+		return nil, exception.NewBadRequest("provider %s no support", req.Issuer)
 	}
 	tk, err := provider.IssueToken(ctx, req.Parameter)
 	if err != nil {
@@ -29,7 +29,7 @@ func (i *TokenServiceImpl) Login(
 	}
 
 	// 补充用户信息, 只补充了用户的角色
-	uDesc := user.NewDescribeUserRequestById(tk.UserId)
+	uDesc := user.NewDescribeUserRequestById(tk.UserId.String())
 	_, err = i.user.DescribeUser(ctx, uDesc)
 	if err != nil {
 		return nil, err
@@ -45,7 +45,7 @@ func (i *TokenServiceImpl) ValiateToken(
 	ctx context.Context,
 	req *token.ValiateToken) (*token.Token, error) {
 	// 1. 查询Token (是不是我们这个系统颁发的)
-	tk := token.NewToken()
+	tk := token.NewToken(0)
 	err := i.db.
 		WithContext(ctx).
 		Where("access_token = ?", req.AccessToken).
@@ -68,7 +68,7 @@ func (i *TokenServiceImpl) Logout(
 	ctx context.Context,
 	req *token.RevolkTokenRequest) (*token.Token, error) {
 	// 1. 查询Token (是不是我们这个系统颁发的)
-	tk := token.NewToken()
+	tk := token.NewToken(0)
 	err := i.db.WithContext(ctx).
 		Where("access_token = ?", req.AccessToken).
 		First(tk).

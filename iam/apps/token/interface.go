@@ -2,12 +2,14 @@ package token
 
 import (
 	"context"
+	"time"
 
 	"github.com/infraboard/mcube/v2/ioc"
+	"github.com/infraboard/mcube/v2/types"
 )
 
 const (
-	AppName = "tokens"
+	AppName = "token"
 )
 
 func GetService() Service {
@@ -27,25 +29,54 @@ type Service interface {
 
 func NewIssueTokenRequest() *IssueTokenRequest {
 	return &IssueTokenRequest{
-		Parameter: make(ProviderParameter),
+		Parameter: make(IssueParameter),
 	}
 }
 
 type IssueTokenRequest struct {
 	// 认证方式
-	Provider string `json:"provider"`
+	Issuer string `json:"issuer"`
 	// 参数
-	Parameter ProviderParameter `json:"parameter"`
+	Parameter IssueParameter `json:"parameter"`
 }
 
-type ProviderParameter map[string]string
-
-func (p ProviderParameter) Username() string {
-	return p["username"]
+func GetIssueParameterValue[T any](p IssueParameter, key string) T {
+	types.New[*Token]()
+	v := p[key]
+	if v != nil {
+		if value, ok := v.(T); ok {
+			return value
+		}
+	}
+	var zero T
+	return zero
 }
 
-func (p ProviderParameter) Password() string {
-	return p["password"]
+type IssueParameter map[string]any
+
+/*
+password issuer parameter
+*/
+
+func (p IssueParameter) Username() string {
+	return GetIssueParameterValue[string](p, "username")
+
+}
+
+func (p IssueParameter) Password() string {
+	return GetIssueParameterValue[string](p, "password")
+}
+
+/*
+private token issuer parameter
+*/
+
+func (p IssueParameter) AccessToken() string {
+	return GetIssueParameterValue[string](p, "access_token")
+}
+
+func (p IssueParameter) ExpireTTL() time.Duration {
+	return time.Second * time.Duration(GetIssueParameterValue[int64](p, "expired_ttl"))
 }
 
 func NewRevolkTokenRequest(at, rk string) *RevolkTokenRequest {

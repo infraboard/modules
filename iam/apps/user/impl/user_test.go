@@ -17,7 +17,7 @@ func TestQueryUser(t *testing.T) {
 
 func TestCreateAuth1(t *testing.T) {
 	req := user.NewCreateUserRequest()
-	req.Username = "admin"
+	req.UserName = "admin"
 	req.Password = "123456"
 	u, err := impl.CreateUser(ctx, req)
 	if err != nil {
@@ -28,7 +28,7 @@ func TestCreateAuth1(t *testing.T) {
 
 func TestCreateAuthor2(t *testing.T) {
 	req := user.NewCreateUserRequest()
-	req.Username = "张三"
+	req.UserName = "张三"
 	req.Password = "123456"
 	u, err := impl.CreateUser(ctx, req)
 	if err != nil {
@@ -39,7 +39,7 @@ func TestCreateAuthor2(t *testing.T) {
 
 func TestCreateAuditorUser(t *testing.T) {
 	req := user.NewCreateUserRequest()
-	req.Username = "auditor"
+	req.UserName = "auditor"
 	req.Password = "123456"
 	u, err := impl.CreateUser(ctx, req)
 	if err != nil {

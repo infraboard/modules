@@ -1,22 +1,42 @@
 package user
 
-// 使用这个ROLE类型来表现枚举类型
-type Role string
-
-func (r Role) String() string {
-	return string(r)
-}
+type SEX int
 
 const (
-	// 普通成员
-	ROLE_MEMBER Role = "member"
-	// 系统管理员
-	ROLE_ADMIN Role = "admin"
+	SEX_UNKNOWN = iota
+	SEX_MALE
+	SEX_FEMALE
 )
 
-type DescribeBy int
+type CEATE_TYPE int
 
 const (
-	DESCRIBE_BY_ID DescribeBy = iota
+	// 系统初始化
+	CREATE_TYPE_INIT = iota
+	// 管理员创建
+	CREATE_TYPE_ADMIN
+	// 用户自己注册
+	CREATE_TYPE_REGISTRY
+)
+
+type SOURCE int
+
+const (
+	// 未知
+	SOURCE_UNKNOWN = iota
+	// Web
+	SOURCE_WEB
+	// IOS
+	SOURCE_IOS
+	// ANDROID
+	SOURCE_ANDROID
+	// PC
+	SOURCE_PC
+)
+
+type DESCRIBE_BY int
+
+const (
+	DESCRIBE_BY_ID DESCRIBE_BY = iota
 	DESCRIBE_BY_USERNAME
 )

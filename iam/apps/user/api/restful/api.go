@@ -4,6 +4,7 @@ import (
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/gorestful"
 	"github.com/infraboard/mcube/v2/types"
+	"github.com/infraboard/modules/iam/apps/role"
 	"github.com/infraboard/modules/iam/apps/user"
 	permission "github.com/infraboard/modules/iam/permission/restful"
 
@@ -59,7 +60,7 @@ func (h *UserRestfulApiHandler) Init() error {
 		Doc("删除用户").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
-		Metadata(permission.Required(user.ROLE_ADMIN)).
+		Metadata(permission.Required(role.ADMIN)).
 		Reads(user.DeleteUserRequest{}).
 		Writes(user.User{}).
 		Returns(200, "OK", user.User{}).

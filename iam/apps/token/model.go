@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/rs/xid"
 )
 
@@ -30,39 +31,47 @@ func GetRefreshTokenFromHTTP(r *http.Request) string {
 	return tk
 }
 
-func NewToken() *Token {
-	return &Token{
+func NewToken(exipredDuration time.Duration) *Token {
+	tk := &Token{
 		// 生产一个UUID的字符串
-		AccessToken:           xid.New().String(),
-		AccessTokenExpiredAt:  7200,
-		RefreshToken:          xid.New().String(),
-		RefreshTokenExpiredAt: 3600 * 24 * 7,
-		CreatedAt:             time.Now().Unix(),
-		Extras:                map[string]string{},
+		AccessToken:  xid.New().String(),
+		RefreshToken: xid.New().String(),
+		CreatedAt:    time.Now(),
+		Extras:       map[string]string{},
 	}
+	if exipredDuration != 0 {
+		tk.SetAccessTokenExpiredAt(time.Now().Add(exipredDuration))
+		tk.SetRefreshTokenExpiredAt(time.Now().Add(exipredDuration * 4))
+	}
+
+	return tk
 }
 
 type Token struct {
+	// 用户来源
+	Source SOURCE `json:"source" gorm:"column:source;type:tinyint(1);index"`
+	// 颁发器
+	Issuer string `json:"issuer" gorm:"column:issuer;type:varchar(100);index"`
 	// 该Token是颁发
-	UserId string `json:"user_id"`
-	// 人的名称， user_name
-	UserName string `json:"username" gorm:"column:username"`
+	UserId uuid.UUID `json:"user_id" gorm:"column:user_id;type:uuid;index"`
+	// 用户名
+	UserName string `json:"user_name" gorm:"column:user_name;type:varchar(100);not null;index"`
 	// 是不是管理员
-	IsAdmin bool `json:"is_admin" gorm:"column:is_admin"`
+	IsAdmin bool `json:"is_admin" gorm:"column:is_admin;type:tinyint(1)"`
 	// 办法给用户的访问令牌(用户需要携带Token来访问接口)
-	AccessToken string `json:"access_token"`
-	// 过期时间(2h), 单位是秒
-	AccessTokenExpiredAt int `json:"access_token_expired_at"`
+	AccessToken string `json:"access_token" gorm:"column:access_token;type:varchar(100);not null;index"`
+	// 访问令牌过期时间
+	AccessTokenExpiredAt *time.Time `json:"access_token_expired_at" gorm:"column:access_token_expired_at;type:timestamp;index"`
 	// 刷新Token
-	RefreshToken string `json:"refresh_token"`
-	// 刷新Token过期时间(7d)
-	RefreshTokenExpiredAt int `json:"refresh_token_expired_at"`
+	RefreshToken string `json:"refresh_token" gorm:"column:refresh_token;type:varchar(100);not null;index"`
+	// 刷新Token过期时间
+	RefreshTokenExpiredAt *time.Time `json:"refresh_token_expired_at" gorm:"column:refresh_token_expired_at;type:timestamp;index"`
 	// 创建时间
-	CreatedAt int64 `json:"created_at"`
-	// 更新实现
-	UpdatedAt int64 `json:"updated_at"`
-	// 扩展信息
-	Extras map[string]string `json:"extras" gorm:"column:extras;serializer:json"`
+	CreatedAt time.Time `json:"created_at" gorm:"column:created_at;type:timestamp;default:current_timestamp;not null;index;"`
+	// 更新时间
+	UpdatedAt *time.Time `json:"updated_at" gorm:"column:updated_at;type:timestamp;"`
+	// 其他扩展信息
+	Extras map[string]string `json:"extras" gorm:"column:extras;serializer:json;type:json"`
 }
 
 func (t *Token) TableName() string {
@@ -70,21 +79,30 @@ func (t *Token) TableName() string {
 }
 
 func (t *Token) IsExpired() error {
-	duration := time.Since(t.ExpiredTime())
-
-	expiredSeconds := duration.Seconds()
-	if expiredSeconds > 0 {
-		return NewTokenExpired("token %s 过期了 %f秒",
-			t.AccessToken, expiredSeconds)
+	if t.AccessTokenExpiredAt != nil {
+		expiredSeconds := time.Since(*t.AccessTokenExpiredAt).Seconds()
+		if expiredSeconds > 0 {
+			return NewTokenExpired("token %s 过期了 %f秒",
+				t.AccessToken, expiredSeconds)
+		}
 	}
 
 	return nil
 }
 
-// 计算Token的过期时间
-func (t *Token) ExpiredTime() time.Time {
-	return time.Unix(t.CreatedAt, 0).
-		Add(time.Duration(t.AccessTokenExpiredAt) * time.Second)
+func (t *Token) SetAccessTokenExpiredAt(v time.Time) {
+	t.AccessTokenExpiredAt = &v
+}
+
+func (t *Token) AccessTokenExpiredTTL() int {
+	if t.AccessTokenExpiredAt != nil {
+		return int(t.AccessTokenExpiredAt.Sub(t.CreatedAt).Seconds())
+	}
+	return 0
+}
+
+func (t *Token) SetRefreshTokenExpiredAt(v time.Time) {
+	t.RefreshTokenExpiredAt = &v
 }
 
 func (u *Token) String() string {

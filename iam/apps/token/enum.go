@@ -11,3 +11,20 @@ const (
 var (
 	CookieNotFound = NewAuthFailed("cookie %s not found", ACCESS_TOKEN_COOKIE_NAME)
 )
+
+type SOURCE int
+
+const (
+	// 未知
+	SOURCE_UNKNOWN SOURCE = iota
+	// Web
+	SOURCE_WEB
+	// IOS
+	SOURCE_IOS
+	// ANDROID
+	SOURCE_ANDROID
+	// PC
+	SOURCE_PC
+	// API 调用
+	SOURCE_API SOURCE = 10
+)
