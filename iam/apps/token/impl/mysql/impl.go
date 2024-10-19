@@ -29,6 +29,8 @@ type TokenServiceImpl struct {
 	AutoRefresh bool `json:"auto_refresh" toml:"auto_refresh" yaml:"auto_refresh" env:"AUTO_REFRESH"`
 	// 刷新TTL
 	RereshTTLSecond uint64 `json:"refresh_ttl" toml:"refresh_ttl" yaml:"refresh_ttl" env:"REFRESH_TTL"`
+	// Api最多多少个
+	MaxActiveApiToken uint8 `json:"max_active_api_token" toml:"max_active_api_token" yaml:"max_active_api_token" env:"MAX_ACTIVE_API_TOKEN"`
 
 	refreshDuration time.Duration
 }

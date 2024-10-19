@@ -48,11 +48,33 @@ type DescribeTokenRequest struct {
 func NewQueryTokenRequest() *QueryTokenRequest {
 	return &QueryTokenRequest{
 		PageRequest: request.NewDefaultPageRequest(),
+		UserIds:     []uint64{},
 	}
 }
 
 type QueryTokenRequest struct {
 	*request.PageRequest
+	// 当前可用的没过期的Token
+	Active *bool `json:"active"`
+	// 用户来源
+	Source *SOURCE `json:"source"`
+	// Uids
+	UserIds []uint64 `json:"user_ids"`
+}
+
+func (r *QueryTokenRequest) SetActive(v bool) *QueryTokenRequest {
+	r.Active = &v
+	return r
+}
+
+func (r *QueryTokenRequest) SetSource(v SOURCE) *QueryTokenRequest {
+	r.Source = &v
+	return r
+}
+
+func (r *QueryTokenRequest) AddUserId(uids ...uint64) *QueryTokenRequest {
+	r.UserIds = append(r.UserIds, uids...)
+	return r
 }
 
 func NewIssueTokenRequest() *IssueTokenRequest {
@@ -64,6 +86,8 @@ func NewIssueTokenRequest() *IssueTokenRequest {
 type IssueTokenRequest struct {
 	// 认证方式
 	Issuer string `json:"issuer"`
+	// 端类型
+	Source SOURCE `json:"source"`
 	// 参数
 	Parameter IssueParameter `json:"parameter"`
 }

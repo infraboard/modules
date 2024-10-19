@@ -9,6 +9,7 @@ import (
 func TestIssueToken(t *testing.T) {
 	req := token.NewIssueTokenRequest()
 	req.IssueByPassword("admin", "123456")
+	req.Source = token.SOURCE_WEB
 	set, err := impl.IssueToken(ctx, req)
 	if err != nil {
 		t.Fatal(err)
@@ -18,6 +19,7 @@ func TestIssueToken(t *testing.T) {
 
 func TestQueryToken(t *testing.T) {
 	req := token.NewQueryTokenRequest()
+	req.SetActive(true).AddUserId(1)
 	set, err := impl.QueryToken(ctx, req)
 	if err != nil {
 		t.Fatal(err)

@@ -135,6 +135,11 @@ func (t *Token) SetIssuer(issuer string) *Token {
 	return t
 }
 
+func (t *Token) SetSource(source SOURCE) *Token {
+	t.Source = source
+	return t
+}
+
 func (t *Token) UserIdString() string {
 	return fmt.Sprintf("%d", t.UserId)
 }

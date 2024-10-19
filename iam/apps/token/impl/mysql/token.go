@@ -4,38 +4,52 @@ import (
 	"context"
 	"time"
 
+	"github.com/infraboard/mcube/v2/desense"
 	"github.com/infraboard/mcube/v2/exception"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
 	"github.com/infraboard/mcube/v2/types"
 	"github.com/infraboard/modules/iam/apps/token"
-	"github.com/infraboard/modules/iam/apps/user"
 )
 
 // 登录接口(颁发Token)
-func (i *TokenServiceImpl) IssueToken(ctx context.Context, req *token.IssueTokenRequest) (*token.Token, error) {
-	// 避免同一个用户多次登录
-	// 颁发成功后  把之前的Token标记为失效,作业
-
-	issuer := token.GetIssue(req.Issuer)
+func (i *TokenServiceImpl) IssueToken(ctx context.Context, in *token.IssueTokenRequest) (*token.Token, error) {
+	// 颁发Token
+	issuer := token.GetIssue(in.Issuer)
 	if issuer == nil {
-		return nil, exception.NewBadRequest("provider %s no support", req.Issuer)
+		return nil, exception.NewBadRequest("provider %s no support", in.Issuer)
 	}
-	tk, err := issuer.IssueToken(ctx, req.Parameter)
+	tk, err := issuer.IssueToken(ctx, in.Parameter)
 	if err != nil {
 		return nil, err
 	}
+	tk.SetIssuer(in.Issuer).SetSource(in.Source)
 
-	tk.SetIssuer(req.Issuer)
+	// 判断当前数据库有没有已经存在的Token
+	activeTokenQueryReq := token.NewQueryTokenRequest().
+		AddUserId(tk.UserId).
+		SetSource(in.Source).
+		SetActive(true)
+	tks, err := i.QueryToken(ctx, activeTokenQueryReq)
+	if err != nil {
+		return nil, err
+	}
+	switch in.Source {
+	// 每个端只能有1个活跃登录
+	case token.SOURCE_WEB, token.SOURCE_IOS, token.SOURCE_ANDROID, token.SOURCE_PC:
+		if tks.Len() > 0 {
+			i.log.Debug().Msgf("use exist active token: %s", desense.Default().DeSense(tk.AccessToken, "4", "3"))
+			return tks.Items[0], nil
+		}
+	case token.SOURCE_API:
+		if tks.Len() > int(i.MaxActiveApiToken) {
+			return nil, exception.NewBadRequest("max active api token overflow")
+		}
+	}
+
+	// 保持Token
 	if err := datasource.DBFromCtx(ctx).
 		Create(tk).
 		Error; err != nil {
-		return nil, err
-	}
-
-	// 补充用户信息, 只补充了用户的角色
-	uDesc := user.NewDescribeUserRequestById(tk.UserIdString())
-	_, err = i.user.DescribeUser(ctx, uDesc)
-	if err != nil {
 		return nil, err
 	}
 
@@ -118,6 +132,22 @@ func (i *TokenServiceImpl) RevolkToken(ctx context.Context, in *token.RevolkToke
 func (i *TokenServiceImpl) QueryToken(ctx context.Context, in *token.QueryTokenRequest) (*types.Set[*token.Token], error) {
 	set := types.New[*token.Token]()
 	query := datasource.DBFromCtx(ctx).Model(&token.Token{})
+
+	if in.Active != nil {
+		if *in.Active {
+			query = query.
+				Where("lock_at IS NULL AND refresh_token_expired_at > ?", time.Now())
+		} else {
+			query = query.
+				Where("lock_at IS NOT NULL OR refresh_token_expired_at <= ?", time.Now())
+		}
+	}
+	if in.Source != nil {
+		query = query.Where("source = ?", *in.Source)
+	}
+	if len(in.UserIds) > 0 {
+		query = query.Where("user_id IN ?", in.UserIds)
+	}
 
 	// 查询总量
 	err := query.Count(&set.Total).Error
