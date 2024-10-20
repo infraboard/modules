@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/infraboard/modules/iam/apps"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -12,21 +13,15 @@ func NewUser(req *CreateUserRequest) *User {
 	req.PasswordHash()
 
 	return &User{
-		CreatedAt:         time.Now(),
+		Meta:              apps.NewMeta().WithUUID(),
 		CreateUserRequest: req,
 	}
 }
 
 // 用于存放 存入数据库的对象(PO)
 type User struct {
-	// 在添加数据需要村的定义
-	Id uint64 `json:"id" gorm:"column:id;type:uint;primary_key;"`
-	// 创建时间
-	CreatedAt time.Time `json:"created_at" gorm:"column:created_at;type:timestamp;default:current_timestamp;not null;index;"`
-	// 更新时间
-	UpdatedAt *time.Time `json:"updated_at" gorm:"column:updated_at;type:timestamp;"`
-	// 删除时间
-	DeletedAt *time.Time `json:"deleted_at" gorm:"column:deleted_at;type:timestamp;index"`
+	// 基础数据
+	*apps.Meta
 	// 用户传递过来的请求
 	*CreateUserRequest
 }
@@ -91,7 +86,7 @@ type CreateUserRequest struct {
 	IsMobileConfirmed bool `json:"is_mobile_confirmed" gorm:"column:is_mobile_confirmed;type:tinyint(1)"`
 	// 手机登录标识
 	MobileTGC string `json:"mobile_tgc" gorm:"column:mobile_tgc;type:char(64)"`
-	// 用户标签
+	// 标签
 	Label string `json:"label" gorm:"column:label;type:varchar(200);index"`
 	// 其他扩展信息
 	Extras map[string]string `json:"extras" gorm:"column:extras;serializer:json;type:json"`

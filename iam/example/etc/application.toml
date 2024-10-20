@@ -12,6 +12,8 @@ port = 3306
 username = "root"
 password = "123456"
 database = "test"
+debug = true
+auto_migrate = true
 
 [log]
 level = "debug"

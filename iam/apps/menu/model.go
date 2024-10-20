@@ -1,25 +1,35 @@
 package menu
 
+import "github.com/infraboard/modules/iam/apps"
+
 type Menu struct {
-	// 端点名称
-	Id string `json:"id" bson:"_id" validate:"required,lte=64" gorm:"column:id"`
-	// 创建时间
-	CreateAt int64 `json:"create_at" bson:"create_at" gorm:"column:create_at"`
-	// 更新时间
-	UpdateAt int64 `json:"update_at" bson:"update_at" gorm:"column:update_at"`
+	// 基础数据
+	*apps.Meta
 	// 菜单定义
 	*CreateMenuRequest
 }
 
+func (u *Menu) TableName() string {
+	return "menus"
+}
+
+func NewCreateMenuRequest() *CreateMenuRequest {
+	return &CreateMenuRequest{
+		Extras: map[string]string{},
+	}
+}
+
 type CreateMenuRequest struct {
+	// 父Namespace Id
+	ParentId uint64 `json:"parent_id" bson:"parent_id" gorm:"column:parent_id;type:uint;index"`
 	// 菜单路径
 	Path string `json:"path" bson:"path" gorm:"column:path"`
 	// 菜单名称
 	Name string `json:"name" bson:"name" gorm:"column:name"`
 	// 图标
 	Icon string `json:"icon" bson:"icon" gorm:"column:icon"`
-	// 策略标签
-	Label map[string]string `json:"label" bson:"label" gorm:"column:label;serializer:json"`
-	// 扩展信息
-	Extras map[string]string `json:"extras" bson:"extras" gorm:"column:extras;serializer:json"`
+	// 标签
+	Label string `json:"label" gorm:"column:label;type:varchar(200);index"`
+	// 其他扩展信息
+	Extras map[string]string `json:"extras" gorm:"column:extras;serializer:json;type:json"`
 }

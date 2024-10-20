@@ -1,35 +1,45 @@
 package namespace
 
+import "github.com/infraboard/modules/iam/apps"
+
+func NewNmespace() *Nmespace {
+	return &Nmespace{
+		Meta: apps.NewMeta().WithUUID(),
+	}
+}
+
 type Nmespace struct {
-	// 对象Id
-	Id string `json:"id" bson:"_id"`
-	// 创建时间
-	CreateAt int64 `json:"create_at" bson:"create_at"`
-	// 更新时间
-	UpdateAt int64 `json:"update_at" bson:"update_at"`
-	// 更新人
-	UpdateBy string `json:"update_by" bson:"update_by"`
+	// 基础数据
+	*apps.Meta
 	// 空间属性
 	*CreateNamespaceRequest
 }
 
+func (u *Nmespace) TableName() string {
+	return "namespaces"
+}
+
+func NewCreateNamespaceRequest() *CreateNamespaceRequest {
+	return &CreateNamespaceRequest{
+		Extras: map[string]string{},
+	}
+}
+
 type CreateNamespaceRequest struct {
 	// 父Namespace Id
-	ParentId string `json:"parent_id" bson:"parent_id" gorm:"column:parent_id"`
-	// 空间名称, 不允许修改
-	Name string `json:"name" bson:"name" validate:"required" gorm:"column:name"`
+	ParentId uint64 `json:"parent_id" bson:"parent_id" gorm:"column:parent_id;type:uint;index"`
+	// 全局唯一
+	Name string `json:"name" bson:"name" validate:"required" gorm:"column:name;type:varchar(200);not null;uniqueIndex"`
 	// 空间负责人
-	Owner string `json:"owner" bson:"owner" gorm:"column:owner"`
-	// 空间负责人助理
-	Assistants []string `json:"assistants" bson:"assistants" gorm:"column:assistants"`
+	Owner uint64 `json:"owner" bson:"owner" gorm:"column:owner;type:uint;index;not null"`
 	// 禁用项目, 该项目所有人暂时都无法访问
-	Enabled bool `json:"enabled" bson:"enabled" gorm:"column:enabled"`
+	Enabled bool `json:"enabled" bson:"enabled" gorm:"column:enabled;type:tinyint(1)"`
 	// 项目描述图片
-	Picture string `json:"picture" bson:"picture" gorm:"column:picture"`
+	Picture string `json:"picture" bson:"picture" gorm:"column:picture;type:varchar(200)"`
 	// 项目描述
-	Description string `json:"description" bson:"description" gorm:"column:description"`
-	// 空间标签
-	Label map[string]string `json:"label" bson:"label" gorm:"column:label;serializer:json"`
+	Description string `json:"description" bson:"description" gorm:"column:description;type:text"`
+	// 标签
+	Label string `json:"label" gorm:"column:label;type:varchar(200);index"`
 	// 扩展信息
-	Extras map[string]string `json:"extras" bson:"extras" gorm:"column:extras;serializer:json"`
+	Extras map[string]string `json:"extras" bson:"extras" gorm:"column:extras;serializer:json;type:json"`
 }

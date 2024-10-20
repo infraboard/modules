@@ -1,0 +1,29 @@
+package mysql
+
+import (
+	"github.com/infraboard/mcube/v2/ioc"
+	"github.com/infraboard/mcube/v2/ioc/config/datasource"
+	"github.com/infraboard/modules/iam/apps/namespace"
+)
+
+func init() {
+	ioc.Controller().Registry(&NameSpaceServiceImpl{})
+}
+
+type NameSpaceServiceImpl struct {
+	ioc.ObjectImpl
+}
+
+func (i *NameSpaceServiceImpl) Init() error {
+	if datasource.Get().AutoMigrate {
+		err := datasource.DB().AutoMigrate(&namespace.Nmespace{})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (i *NameSpaceServiceImpl) Name() string {
+	return namespace.AppName
+}
