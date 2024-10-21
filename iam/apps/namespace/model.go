@@ -4,15 +4,15 @@ import "github.com/infraboard/modules/iam/apps"
 
 func NewNmespace() *Nmespace {
 	return &Nmespace{
-		Meta: apps.NewMeta().WithUUID(),
+		Meta: *apps.NewMeta().WithUUID(),
 	}
 }
 
 type Nmespace struct {
 	// 基础数据
-	*apps.Meta
+	apps.Meta
 	// 空间属性
-	*CreateNamespaceRequest
+	CreateNamespaceRequest
 }
 
 func (u *Nmespace) TableName() string {

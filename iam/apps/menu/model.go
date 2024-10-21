@@ -2,11 +2,17 @@ package menu
 
 import "github.com/infraboard/modules/iam/apps"
 
+func NewMenu() *Menu {
+	return &Menu{
+		Meta: *apps.NewMeta().WithUUID(),
+	}
+}
+
 type Menu struct {
 	// 基础数据
-	*apps.Meta
+	apps.Meta
 	// 菜单定义
-	*CreateMenuRequest
+	CreateMenuRequest
 }
 
 func (u *Menu) TableName() string {

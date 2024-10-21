@@ -3,12 +3,12 @@ package restful
 import (
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/gorestful"
-	"github.com/infraboard/mcube/v2/types"
 	"github.com/infraboard/modules/iam/apps/role"
 	"github.com/infraboard/modules/iam/apps/user"
 	permission "github.com/infraboard/modules/iam/permission/restful"
 
 	restfulspec "github.com/emicklei/go-restful-openapi/v2"
+	"github.com/emicklei/go-restful/v3"
 )
 
 func init() {
@@ -36,15 +36,16 @@ func (h *UserRestfulApiHandler) Init() error {
 		Doc("用户列表查询").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
-		Reads(user.QueryUserRequest{}).
+		Param(restful.QueryParameter("page_size", "页大小").DataType("integer")).
+		Param(restful.QueryParameter("page_number", "页码").DataType("integer")).
 		Writes(user.User{}).
-		Returns(200, "OK", types.New[*user.User]()))
+		Returns(200, "OK", UserSet{}))
 
 	ws.Route(ws.GET("/:id").To(h.DescribeUser).
 		Doc("用户详情查询").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
-		Reads(user.DescribeUserRequest{}).
+		Param(restful.PathParameter("id", "用户Id")).
 		Writes(user.User{}).
 		Returns(200, "OK", user.User{}))
 
@@ -66,4 +67,9 @@ func (h *UserRestfulApiHandler) Init() error {
 		Returns(200, "OK", user.User{}).
 		Returns(404, "Not Found", nil))
 	return nil
+}
+
+type UserSet struct {
+	Total int64        `json:"total"`
+	Items []*user.User `json:"items"`
 }

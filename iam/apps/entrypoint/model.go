@@ -2,12 +2,18 @@ package entrypoint
 
 import "github.com/infraboard/modules/iam/apps"
 
+func NewEndpoint() *Endpoint {
+	return &Endpoint{
+		Meta: *apps.NewMeta().WithUUID(),
+	}
+}
+
 // Endpoint Service's features
 type Endpoint struct {
 	// 基础数据
-	*apps.Meta
+	apps.Meta
 	// 路由条目信息
-	*RouteEntry `json:"route_entry" bson:",inline" validate:"required"`
+	RouteEntry `json:"route_entry" bson:",inline" validate:"required"`
 }
 
 func (u *Endpoint) TableName() string {

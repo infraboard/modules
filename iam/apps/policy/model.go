@@ -8,15 +8,15 @@ import (
 
 func NewPolicy() *Policy {
 	return &Policy{
-		Meta: apps.NewMeta().WithUUID(),
+		Meta: *apps.NewMeta().WithUUID(),
 	}
 }
 
 type Policy struct {
 	// 基础数据
-	*apps.Meta
+	apps.Meta
 	// 策略定义
-	*CreatePolicyRequest
+	CreatePolicyRequest
 }
 
 func (u *Policy) TableName() string {

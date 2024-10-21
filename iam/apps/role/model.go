@@ -4,15 +4,15 @@ import "github.com/infraboard/modules/iam/apps"
 
 func NewRole() *Role {
 	return &Role{
-		Meta: apps.NewMeta().WithUUID(),
+		Meta: *apps.NewMeta().WithUUID(),
 	}
 }
 
 type Role struct {
 	// 基础数据
-	*apps.Meta
+	apps.Meta
 	// 角色创建信息
-	*CreateRoleRequest
+	CreateRoleRequest
 }
 
 func (u *Role) TableName() string {
