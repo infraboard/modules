@@ -4,7 +4,7 @@ import "github.com/infraboard/modules/iam/apps"
 
 func NewEndpoint() *Endpoint {
 	return &Endpoint{
-		Meta: *apps.NewMeta().WithUUID(),
+		Meta: *apps.NewMeta(),
 	}
 }
 

@@ -13,7 +13,7 @@ func NewUser(req *CreateUserRequest) *User {
 	req.PasswordHash()
 
 	return &User{
-		Meta:              *apps.NewMeta().WithUUID(),
+		Meta:              *apps.NewMeta(),
 		CreateUserRequest: *req,
 	}
 }

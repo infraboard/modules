@@ -4,7 +4,7 @@ import "github.com/infraboard/modules/iam/apps"
 
 func NewNmespace() *Nmespace {
 	return &Nmespace{
-		Meta: *apps.NewMeta().WithUUID(),
+		Meta: *apps.NewMeta(),
 	}
 }
 

@@ -4,7 +4,7 @@ import "github.com/infraboard/modules/iam/apps"
 
 func NewRole() *Role {
 	return &Role{
-		Meta: *apps.NewMeta().WithUUID(),
+		Meta: *apps.NewMeta(),
 	}
 }
 

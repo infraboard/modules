@@ -4,7 +4,7 @@ import "github.com/infraboard/modules/iam/apps"
 
 func NewMenu() *Menu {
 	return &Menu{
-		Meta: *apps.NewMeta().WithUUID(),
+		Meta: *apps.NewMeta(),
 	}
 }
 

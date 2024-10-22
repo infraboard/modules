@@ -8,7 +8,7 @@ import (
 
 func NewPolicy() *Policy {
 	return &Policy{
-		Meta: *apps.NewMeta().WithUUID(),
+		Meta: *apps.NewMeta(),
 	}
 }
 
