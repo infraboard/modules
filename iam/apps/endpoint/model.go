@@ -1,4 +1,4 @@
-package entrypoint
+package endpoint
 
 import "github.com/infraboard/modules/iam/apps"
 
@@ -34,7 +34,13 @@ type RouteEntry struct {
 	// 服务那个版本的功能
 	Version string `json:"version" bson:"version" validate:"required,lte=64" gorm:"column:version;type:varchar(100)"`
 	// 资源名称
-	Resource string `json:"resource" bson:"resource" gorm:"column:resource;type:varchar(100)"`
+	Resource string `json:"resource" bson:"resource" gorm:"column:resource;type:varchar(100);index"`
+	// 资源操作
+	Action string `json:"action" bson:"action" gorm:"column:action;type:varchar(100);index"`
+	// 读或者写
+	ActionType ACTION_TYPE `json:"action_type" bson:"action_type" gorm:"column:action_type;type:tinyint(1);index"`
+	// 操作标签
+	ActionLabel string `json:"action_label" gorm:"column:action_label;type:varchar(200);index"`
 	// 函数名称
 	FunctionName string `json:"function_name" bson:"function_name" gorm:"column:function_name;type:varchar(100)"`
 	// HTTP path 用于自动生成http api
@@ -55,8 +61,6 @@ type RouteEntry struct {
 	AuditLog bool `json:"audit_log" bson:"audit_log" gorm:"column:audit_log;type:tinyint(1)"`
 	// 名称空间不能为空
 	RequiredNamespace bool `json:"required_namespace" bson:"required_namespace" gorm:"column:required_namespace;type:tinyint(1)"`
-	// 标签
-	Label string `json:"label" gorm:"column:label;type:varchar(200);index"`
 	// 扩展信息
 	Extras map[string]string `json:"extras" bson:"extras" gorm:"column:extras;serializer:json;type:json"`
 }

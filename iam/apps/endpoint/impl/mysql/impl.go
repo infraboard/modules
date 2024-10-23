@@ -3,7 +3,7 @@ package mysql
 import (
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
-	"github.com/infraboard/modules/iam/apps/entrypoint"
+	"github.com/infraboard/modules/iam/apps/endpoint"
 )
 
 func init() {
@@ -18,7 +18,7 @@ type EntryPointServiceImpl struct {
 func (i *EntryPointServiceImpl) Init() error {
 	// 自动创建表
 	if datasource.Get().AutoMigrate {
-		err := datasource.DB().AutoMigrate(&entrypoint.Endpoint{})
+		err := datasource.DB().AutoMigrate(&endpoint.Endpoint{})
 		if err != nil {
 			return err
 		}
@@ -28,5 +28,5 @@ func (i *EntryPointServiceImpl) Init() error {
 
 // 定义托管到Ioc里面的名称
 func (i *EntryPointServiceImpl) Name() string {
-	return entrypoint.AppName
+	return endpoint.AppName
 }

@@ -1,9 +1,9 @@
-package entrypoint
+package endpoint
 
 import "github.com/infraboard/mcube/v2/ioc"
 
 const (
-	AppName = "entrypoint"
+	AppName = "endpoint"
 )
 
 func GetService() Service {
