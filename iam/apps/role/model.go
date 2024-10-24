@@ -20,9 +20,9 @@ type Role struct {
 	// 角色创建信息
 	CreateRoleRequest
 	// 菜单
-	Menus []*menu.Menu `json:"menus" gorm:"-" description:"角色关联的菜单"`
+	Menus []*menu.Menu `json:"menus,omitempty" gorm:"-" description:"角色关联的菜单"`
 	// API
-	Endpoints []*endpoint.Endpoint `json:"endpoints" gorm:"-" description:"角色关联的API"`
+	Endpoints []*endpoint.Endpoint `json:"endpoints,omitempty" gorm:"-" description:"角色关联的API"`
 }
 
 func (u *Role) TableName() string {

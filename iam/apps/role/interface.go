@@ -3,6 +3,7 @@ package role
 import (
 	"context"
 
+	"github.com/infraboard/mcube/v2/http/request"
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/types"
 )
@@ -57,7 +58,16 @@ type RemoveMenuFromRoleRequest struct {
 	RecordIds []uint64 `json:"record_ids"`
 }
 
+func NewQueryRoleRequest() *QueryRoleRequest {
+	return &QueryRoleRequest{
+		PageRequest: request.NewDefaultPageRequest(),
+	}
+}
+
 type QueryRoleRequest struct {
+	*request.PageRequest
+	WithMenu     bool `json:"with_menu"`
+	WithEndpoint bool `json:"with_endpoint"`
 }
 
 type DescribeRoleRequest struct {

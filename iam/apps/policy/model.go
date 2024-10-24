@@ -21,11 +21,11 @@ type Policy struct {
 	// 策略定义
 	CreatePolicyRequest
 	// 关联空间
-	Namespace *namespace.Namespace `json:"namespace" gorm:"-"`
+	Namespace *namespace.Namespace `json:"namespace,omitempty" gorm:"-"`
 	// 关联用户
-	User *user.User `json:"user" gorm:"-"`
+	User *user.User `json:"user,omitempty" gorm:"-"`
 	// 关联角色
-	Role *role.Role `json:"role" gorm:"-"`
+	Role *role.Role `json:"role,omitempty" gorm:"-"`
 }
 
 func (u *Policy) TableName() string {

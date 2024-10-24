@@ -1,7 +1,7 @@
 package permission
 
 import (
-	"fmt"
+	"context"
 
 	"github.com/gin-gonic/gin"
 	"github.com/infraboard/mcube/v2/exception"
@@ -21,32 +21,29 @@ func NewAuther() *Auther {
 	}
 }
 
-// 用于鉴权的中间件
-// 用于Token鉴权的中间件
 type Auther struct {
 	tk token.Service
 }
 
-// 怎么鉴权?
-// Gin中间件 func(*Context)
 func (a *Auther) Auth(c *gin.Context) {
-	// 1. 获取Token
 	v := token.GetAccessTokenFromHTTP(c.Request)
 	if v == "" {
 		response.Failed(c, permission.ErrUnauthorized)
+		c.Abort()
 		return
 	}
 
-	// 2.调用Token模块来认证
 	in := token.NewValiateTokenRequest(v)
 	tk, err := a.tk.ValiateToken(c.Request.Context(), in)
 	if err != nil {
 		response.Failed(c, err)
+		c.Abort()
 		return
 	}
 
-	// 把鉴权后的 结果: tk, 放到请求的上下文, 方便后面的业务逻辑使用
-	c.Set(token.ACCESS_TOKEN_GIN_KEY_NAME, tk)
+	ctx := context.WithValue(c.Request.Context(), token.CTX_TOKEN_KEY, tk)
+	c.Request = c.Request.WithContext(ctx)
+	c.Next()
 }
 
 // 写带参数的 Gin中间件
@@ -62,20 +59,12 @@ type Permissoner struct {
 }
 
 func (p *Permissoner) CheckPerm(c *gin.Context) {
-	v := c.Keys[token.ACCESS_TOKEN_GIN_KEY_NAME]
-	if v == nil {
+	tk := token.GetTokenFromCtx(c.Request.Context())
+	if tk == nil {
 		response.Failed(c, permission.ErrUnauthorized)
 		return
 	}
 
-	tk, ok := v.(*token.Token)
-	if !ok {
-		response.Failed(c, fmt.Errorf("tk not *token.Token"))
-		return
-	}
-
-	// 权限鉴定, 鉴权是在用户已经认证的情况之下进行的
-	// 判断当前用户的角色
 	if tk.IsAdmin {
 		return
 	}

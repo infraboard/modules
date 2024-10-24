@@ -1,6 +1,7 @@
 package token
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -22,6 +23,13 @@ func GetAccessTokenFromHTTP(r *http.Request) string {
 		tk, _ = url.QueryUnescape(cookie.Value)
 	}
 	return tk
+}
+
+func GetTokenFromCtx(ctx context.Context) *Token {
+	if v := ctx.Value(CTX_TOKEN_KEY); v != nil {
+		return v.(*Token)
+	}
+	return nil
 }
 
 func GetRefreshTokenFromHTTP(r *http.Request) string {
@@ -56,6 +64,10 @@ type Token struct {
 	UserName string `json:"user_name" gorm:"column:user_name;type:varchar(100);not null;index" description:"持有该Token的用户名称"`
 	// 是不是管理员
 	IsAdmin bool `json:"is_admin" gorm:"column:is_admin;type:tinyint(1)" description:"是不是管理员"`
+	// 令牌生效空间Id
+	NamespaceId uint64 `json:"namespace_id" gorm:"column:namespace_id;type:uint;index" description:"令牌所属空间Id"`
+	//  令牌生效空间名称
+	NamespaceName string `json:"namespace_name" gorm:"column:namespace_name;type:varchar(100);index" description:"令牌所属空间"`
 	// 颁发给用户的访问令牌(用户需要携带Token来访问接口)
 	AccessToken string `json:"access_token" gorm:"column:access_token;type:varchar(100);not null;uniqueIndex" description:"访问令牌"`
 	// 访问令牌过期时间

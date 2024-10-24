@@ -1,6 +1,11 @@
 package endpoint
 
-import "github.com/infraboard/modules/iam/apps"
+import (
+	"fmt"
+
+	"github.com/emicklei/go-restful/v3"
+	"github.com/infraboard/modules/iam/apps"
+)
 
 func NewEndpoint() *Endpoint {
 	return &Endpoint{
@@ -50,17 +55,114 @@ type RouteEntry struct {
 	// 接口说明
 	Description string `json:"description" bson:"description" gorm:"column:description;type:text"`
 	// 是否校验用户身份 (acccess_token 校验)
-	AuthEnable bool `json:"auth_enable" bson:"auth_enable" gorm:"column:auth_enable;type:tinyint(1)"`
+	RequiredAuth bool `json:"required_auth" bson:"required_auth" gorm:"column:required_auth;type:tinyint(1)"`
 	// 验证码校验(开启双因子认证需要) (code 校验)
-	CodeEnable bool `json:"code_enable" bson:"code_enable" gorm:"column:code_enable;type:tinyint(1)"`
+	RequiredCode bool `json:"required_code" bson:"required_code" gorm:"column:required_code;type:tinyint(1)"`
 	// 开启鉴权
-	PermEnable bool `json:"perm_enable" bson:"perm_enable" gorm:"column:perm_enable;type:tinyint(1)"`
+	RequiredPerm bool `json:"required_perm" bson:"required_perm" gorm:"column:required_perm;type:tinyint(1)"`
 	// ACL模式下, 允许的通过的身份标识符, 比如角色, 用户类型之类
 	RequiredRole []string `json:"required_role" bson:"required_role" gorm:"column:required_role;serializer:json;type:json"`
 	// 是否开启操作审计, 开启后这次操作将被记录
-	AuditLog bool `json:"audit_log" bson:"audit_log" gorm:"column:audit_log;type:tinyint(1)"`
+	RequiredAudit bool `json:"required_audit" bson:"required_audit" gorm:"column:required_audit;type:tinyint(1)"`
 	// 名称空间不能为空
 	RequiredNamespace bool `json:"required_namespace" bson:"required_namespace" gorm:"column:required_namespace;type:tinyint(1)"`
 	// 扩展信息
 	Extras map[string]string `json:"extras" bson:"extras" gorm:"column:extras;serializer:json;type:json"`
+}
+
+func (e *RouteEntry) LoadMeta(meta map[string]any) {
+	e.Resource = GetRouteMeta[string](meta, META_RESOURCE_KEY)
+	e.RequiredAuth = GetRouteMeta[bool](meta, META_REQUIRED_AUTH_KEY)
+	e.RequiredCode = GetRouteMeta[bool](meta, META_REQUIRED_CODE_KEY)
+	e.RequiredPerm = GetRouteMeta[bool](meta, META_REQUIRED_PERM_KEY)
+	e.RequiredRole = GetRouteMeta[[]string](meta, META_REQUIRED_ROLE_KEY)
+	e.RequiredAudit = GetRouteMeta[bool](meta, META_REQUIRED_AUDIT_KEY)
+	e.RequiredNamespace = GetRouteMeta[bool](meta, META_REQUIRED_NAMESPACE_KEY)
+}
+
+// UniquePath todo
+func (e *RouteEntry) HasRequiredRole() bool {
+	return len(e.RequiredRole) > 0
+}
+
+// UniquePath todo
+func (e *RouteEntry) UniquePath() string {
+	return fmt.Sprintf("%s.%s", e.Method, e.Path)
+}
+
+func (e *RouteEntry) IsRequireRole(target string) bool {
+	for i := range e.RequiredRole {
+		if e.RequiredRole[i] == "*" {
+			return true
+		}
+
+		if e.RequiredRole[i] == target {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (e *RouteEntry) SetRequiredAuth(v bool) *RouteEntry {
+	e.RequiredAuth = v
+	return e
+}
+
+func (e *RouteEntry) AddRequiredRole(roles ...string) *RouteEntry {
+	e.RequiredRole = append(e.RequiredRole, roles...)
+	return e
+}
+
+func (e *RouteEntry) SetRequiredPerm(v bool) *RouteEntry {
+	e.RequiredPerm = v
+	return e
+}
+
+func (e *RouteEntry) SetLabel(value string) *RouteEntry {
+	e.ActionLabel = value
+	return e
+}
+
+func (e *RouteEntry) SetExtensionFromMap(m map[string]string) *RouteEntry {
+	if e.Extras == nil {
+		e.Extras = map[string]string{}
+	}
+
+	for k, v := range m {
+		e.Extras[k] = v
+	}
+	return e
+}
+
+func (e *RouteEntry) SetRequiredCode(v bool) *RouteEntry {
+	e.RequiredCode = v
+	return e
+}
+
+func NewEntryFromRestRequest(req *restful.Request) *RouteEntry {
+	entry := NewRouteEntry()
+
+	// 请求拦截
+	route := req.SelectedRoute()
+	if route == nil {
+		return nil
+	}
+
+	entry.FunctionName = route.Operation()
+	entry.Method = route.Method()
+	entry.LoadMeta(route.Metadata())
+	entry.Path = route.Path()
+	return entry
+}
+
+func NewEntryFromRestRoute(route restful.RouteReader) *RouteEntry {
+	entry := NewRouteEntry()
+	entry.FunctionName = route.Operation()
+	entry.Method = route.Method()
+	entry.LoadMeta(route.Metadata())
+	entry.Path = route.Path()
+
+	entry.Path = entry.UniquePath()
+	return entry
 }
