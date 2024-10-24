@@ -16,7 +16,7 @@ type NameSpaceServiceImpl struct {
 
 func (i *NameSpaceServiceImpl) Init() error {
 	if datasource.Get().AutoMigrate {
-		err := datasource.DB().AutoMigrate(&namespace.Nmespace{})
+		err := datasource.DB().AutoMigrate(&namespace.Namespace{})
 		if err != nil {
 			return err
 		}

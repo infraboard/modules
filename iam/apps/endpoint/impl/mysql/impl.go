@@ -7,15 +7,15 @@ import (
 )
 
 func init() {
-	ioc.Controller().Registry(&EntryPointServiceImpl{})
+	ioc.Controller().Registry(&EndpointServiceImpl{})
 }
 
 // 他是user service 服务的控制器
-type EntryPointServiceImpl struct {
+type EndpointServiceImpl struct {
 	ioc.ObjectImpl
 }
 
-func (i *EntryPointServiceImpl) Init() error {
+func (i *EndpointServiceImpl) Init() error {
 	// 自动创建表
 	if datasource.Get().AutoMigrate {
 		err := datasource.DB().AutoMigrate(&endpoint.Endpoint{})
@@ -27,6 +27,6 @@ func (i *EntryPointServiceImpl) Init() error {
 }
 
 // 定义托管到Ioc里面的名称
-func (i *EntryPointServiceImpl) Name() string {
+func (i *EndpointServiceImpl) Name() string {
 	return endpoint.AppName
 }

@@ -2,20 +2,20 @@ package namespace
 
 import "github.com/infraboard/modules/iam/apps"
 
-func NewNmespace() *Nmespace {
-	return &Nmespace{
+func NewNamespace() *Namespace {
+	return &Namespace{
 		Meta: *apps.NewMeta(),
 	}
 }
 
-type Nmespace struct {
+type Namespace struct {
 	// 基础数据
 	apps.Meta
 	// 空间属性
 	CreateNamespaceRequest
 }
 
-func (u *Nmespace) TableName() string {
+func (u *Namespace) TableName() string {
 	return "namespaces"
 }
 

@@ -21,7 +21,7 @@ type Policy struct {
 	// 策略定义
 	CreatePolicyRequest
 	// 关联空间
-	Namespace *namespace.Nmespace `json:"namespace" gorm:"-"`
+	Namespace *namespace.Namespace `json:"namespace" gorm:"-"`
 	// 关联用户
 	User *user.User `json:"user" gorm:"-"`
 	// 关联角色
