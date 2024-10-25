@@ -1,17 +1,15 @@
 package main
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
-	"github.com/infraboard/mcube/v2/ioc/server"
+	ioc_gin "github.com/infraboard/mcube/v2/ioc/config/gin"
 	"github.com/infraboard/mcube/v2/ioc/server/cmd"
 	"github.com/infraboard/modules/iam/apps/role"
 	permission "github.com/infraboard/modules/iam/permission/gin"
-	"github.com/spf13/cobra"
 	"gorm.io/gorm"
 
 	// 引入模块
@@ -26,18 +24,8 @@ func main() {
 	// 注册HTTP接口类
 	ioc.Api().Registry(&ApiHandler{})
 
-	cmd.Root.AddCommand(
-		&cobra.Command{
-			Use:   "start",
-			Short: "example API服务",
-			Run: func(cmd *cobra.Command, args []string) {
-				cobra.CheckErr(server.Run(context.Background()))
-			},
-		},
-	)
-
 	// 启动
-	cmd.Execute()
+	cmd.Start()
 }
 
 type ApiHandler struct {
@@ -59,13 +47,11 @@ func (h *ApiHandler) Name() string {
 // 初始化db属性, 从ioc的配置区域获取共用工具 gorm db对象
 func (h *ApiHandler) Init() error {
 	h.db = datasource.DB()
-	return nil
-}
 
-// API路由
-func (h *ApiHandler) Registry(r gin.IRouter) {
+	r := ioc_gin.ObjectRouter(h)
 	r.Use(permission.Auth())
 	r.GET("/db_stats", permission.Required(role.ADMIN), h.DBStats)
+	return nil
 }
 
 func (h *ApiHandler) DBStats(ctx *gin.Context) {

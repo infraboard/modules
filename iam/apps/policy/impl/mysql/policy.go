@@ -8,12 +8,12 @@ import (
 )
 
 // 创建策略
-func (i *PolicyServiceImpl) CreatePolicy(ctx context.Context, in policy.CreatePolicyRequest) (*policy.Policy, error) {
+func (i *PolicyServiceImpl) CreatePolicy(ctx context.Context, in *policy.CreatePolicyRequest) (*policy.Policy, error) {
 	return nil, nil
 }
 
 // 查询策略列表
-func (i *PolicyServiceImpl) QueryPolicy(ctx context.Context, in policy.QueryPolicyRequest) (*types.Set[*policy.Policy], error) {
+func (i *PolicyServiceImpl) QueryPolicy(ctx context.Context, in *policy.QueryPolicyRequest) (*types.Set[*policy.Policy], error) {
 	return nil, nil
 }
 

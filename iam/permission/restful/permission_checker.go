@@ -4,9 +4,13 @@ import (
 	"github.com/emicklei/go-restful/v3"
 	"github.com/infraboard/mcube/v2/exception"
 	"github.com/infraboard/mcube/v2/http/restful/response"
+	"github.com/infraboard/mcube/v2/ioc"
+	"github.com/infraboard/mcube/v2/ioc/config/gorestful"
+	"github.com/infraboard/mcube/v2/ioc/config/log"
 	"github.com/infraboard/modules/iam/apps/endpoint"
 	"github.com/infraboard/modules/iam/apps/policy"
 	"github.com/infraboard/modules/iam/apps/token"
+	"github.com/rs/zerolog"
 )
 
 func Permission(v bool) (string, bool) {
@@ -17,17 +21,35 @@ func Required(roles ...string) (string, []string) {
 	return endpoint.META_REQUIRED_ROLE_KEY, roles
 }
 
-func NewPermissoner() *Permissoner {
-	return &Permissoner{
-		policy: policy.GetService(),
-	}
+func init() {
+	ioc.Config().Registry(&PermissonChecker{})
 }
 
-type Permissoner struct {
+type PermissonChecker struct {
+	ioc.ObjectImpl
+	log *zerolog.Logger
+
 	policy policy.Service
 }
 
-func (p *Permissoner) CheckPerm(r *restful.Request, w *restful.Response, next *restful.FilterChain) {
+func (p *PermissonChecker) Name() string {
+	return "permission_checker"
+}
+
+func (m *PermissonChecker) Priority() int {
+	return gorestful.Priority() - 2
+}
+
+func (p *PermissonChecker) Init() error {
+	p.log = log.Sub(p.Name())
+	p.policy = policy.GetService()
+
+	// 注册认证中间件
+	gorestful.RootRouter().Filter(p.CheckPerm)
+	return nil
+}
+
+func (p *PermissonChecker) CheckPerm(r *restful.Request, w *restful.Response, next *restful.FilterChain) {
 	tk := token.GetTokenFromCtx(r.Request.Context())
 	if tk == nil {
 		response.Failed(w, exception.NewUnauthorized("请先登录"))
