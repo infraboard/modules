@@ -2,6 +2,7 @@ package role
 
 import (
 	"github.com/infraboard/modules/iam/apps"
+	"github.com/infraboard/modules/iam/apps/view"
 )
 
 type ViewPermission struct {
@@ -30,9 +31,10 @@ type ViewPermissionSpec struct {
 	Service string `json:"service" gorm:"column:service;type:varchar(100);index" bson:"service" description:"服务名称"`
 	// 页面标签
 	Label string `json:"label" gorm:"column:label;type:varchar(200);index" description:"页面标签"`
-	// 页面路径
-	Path string `json:"path" gorm:"column:path;type:varchar(200);index" bson:"path" description:"页面路径(可以通配)"`
-
+	// 视图类型
+	ViewType view.TYPE `json:"view_type" gorm:"column:view_type;type:tinyint(1);index" description:"视图类型"`
+	// 视图路径, 如果是Menu就是Menu路径，如果是Page就是Page路径
+	ViewPath string `json:"view_path" gorm:"column:view_path;type:varchar(200);index" bson:"view_path" description:"视图路径(可以通配)"`
 	// 其他扩展信息
 	Extras map[string]string `json:"extras" gorm:"column:extras;serializer:json;type:json" description:"其他扩展信息" optional:"true"`
 }

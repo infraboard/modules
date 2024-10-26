@@ -43,7 +43,7 @@ type RouteEntry struct {
 	// 资源操作
 	Action string `json:"action" bson:"action" gorm:"column:action;type:varchar(100);index"`
 	// 读或者写
-	ActionType ACTION_TYPE `json:"action_type" bson:"action_type" gorm:"column:action_type;type:tinyint(1);index"`
+	AccessMode ACCESS_MODE `json:"access_mode" bson:"access_mode" gorm:"column:access_mode;type:tinyint(1);index"`
 	// 操作标签
 	ActionLabel string `json:"action_label" gorm:"column:action_label;type:varchar(200);index"`
 	// 函数名称

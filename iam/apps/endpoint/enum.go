@@ -1,10 +1,10 @@
 package endpoint
 
-type ACTION_TYPE int8
+type ACCESS_MODE uint8
 
 const (
-	ACTION_TYPE_READ = iota
-	ACTION_TYPE_WRITE
+	ACCESS_MODE_READ = iota
+	ACCESS_MODE_READ_WRITE
 )
 
 const (
