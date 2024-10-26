@@ -16,7 +16,7 @@ type RoleServiceImpl struct {
 
 func (i *RoleServiceImpl) Init() error {
 	if datasource.Get().AutoMigrate {
-		err := datasource.DB().AutoMigrate(&role.Role{})
+		err := datasource.DB().AutoMigrate(&role.Role{}, &role.ApiPermission{}, &role.MenuPermission{})
 		if err != nil {
 			return err
 		}

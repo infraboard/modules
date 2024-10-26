@@ -31,31 +31,43 @@ type Service interface {
 
 	// 角色菜单管理
 	// 添加角色关联菜单
-	AddMenuToRole(context.Context, *AddMenuToRoleRequest) ([]*RoleAssociateMenuRecord, error)
+	AddMenuPermission(context.Context, *AddMenuPermissionRequest) ([]*MenuPermission, error)
 	// 移除角色关联菜单
-	RemoveMenuFromRole(context.Context, *RemoveMenuFromRoleRequest) ([]*RoleAssociateMenuRecord, error)
+	RemoveMenuPermission(context.Context, *RemoveMenuPermissionRequest) ([]*MenuPermission, error)
+	// 更新角色权限
+	UpdateMenuPermission(context.Context, *UpdateMenuPermission) ([]*MenuPermission, error)
 
 	// 角色API接口管理
 	// 添加角色关联API
-	AddEndpiontToRole(context.Context, *AddEndpintToRoleRequest) ([]*RoleAssociateEndpointRecord, error)
+	AddApiPermission(context.Context, *AddApiPermissionRequest) ([]*ApiPermission, error)
 	// 移除角色关联API
-	RemoveEndpointFromRole(context.Context, *RemoveEndpointFromRole) ([]*RoleAssociateEndpointRecord, error)
+	RemoveApiPermission(context.Context, *RemoveApiPermissionRequest) ([]*ApiPermission, error)
+	// 更新Api权限
+	UpdateApiPermission(context.Context, *UpdateApiPermissionRequest) ([]*ApiPermission, error)
 }
 
-type AddEndpintToRoleRequest struct {
-	Items []*RoleAssociateEndpointRecord `json:"items"`
+type AddApiPermissionRequest struct {
+	Items []*ApiPermissionSpec `json:"items"`
 }
 
-type RemoveEndpointFromRole struct {
-	RecordIds []uint64 `json:"record_ids"`
+type RemoveApiPermissionRequest struct {
+	ApiPermissionIds []uint64 `json:"api_permission_ids"`
 }
 
-type AddMenuToRoleRequest struct {
-	Items []*RoleAssociateMenuRecord `json:"items"`
+type UpdateApiPermissionRequest struct {
+	Items []*ApiPermission `json:"items"`
 }
 
-type RemoveMenuFromRoleRequest struct {
-	RecordIds []uint64 `json:"record_ids"`
+type AddMenuPermissionRequest struct {
+	Items []*MenuPermissionSpec `json:"items"`
+}
+
+type UpdateMenuPermission struct {
+	Items []MenuPermission `json:"items"`
+}
+
+type RemoveMenuPermissionRequest struct {
+	MenuPermissionIds []uint64 `json:"menu_permission_ids"`
 }
 
 func NewQueryRoleRequest() *QueryRoleRequest {
@@ -66,8 +78,8 @@ func NewQueryRoleRequest() *QueryRoleRequest {
 
 type QueryRoleRequest struct {
 	*request.PageRequest
-	WithMenu     bool `json:"with_menu"`
-	WithEndpoint bool `json:"with_endpoint"`
+	WithMenuPermission bool `json:"with_menu_permission"`
+	WithApiPermission  bool `json:"with_api_permission"`
 }
 
 type DescribeRoleRequest struct {

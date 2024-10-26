@@ -3,14 +3,13 @@ package role
 import (
 	"github.com/infraboard/modules/iam/apps"
 	"github.com/infraboard/modules/iam/apps/endpoint"
-	"github.com/infraboard/modules/iam/apps/menu"
 )
 
 func NewRole() *Role {
 	return &Role{
-		Meta:      *apps.NewMeta(),
-		Menus:     []*menu.Menu{},
-		Endpoints: []*endpoint.Endpoint{},
+		Meta:            *apps.NewMeta(),
+		MenuPermissions: []*MenuPermission{},
+		ApiPermissions:  []*ApiPermission{},
 	}
 }
 
@@ -19,14 +18,19 @@ type Role struct {
 	apps.Meta
 	// 角色创建信息
 	CreateRoleRequest
-	// 菜单
-	Menus []*menu.Menu `json:"menus,omitempty" gorm:"-" description:"角色关联的菜单"`
-	// API
-	Endpoints []*endpoint.Endpoint `json:"endpoints,omitempty" gorm:"-" description:"角色关联的API"`
+	// 菜单权限
+	MenuPermissions []*MenuPermission `json:"menu_permissions,omitempty" gorm:"-" description:"角色关联的菜单权限"`
+	// API权限
+	ApiPermissions []*ApiPermission `json:"api_permissions,omitempty" gorm:"-" description:"角色关联的API权限"`
 }
 
-func (u *Role) TableName() string {
+func (r *Role) TableName() string {
 	return "roles"
+}
+
+// 该角色是否允许该API访问
+func (r *Role) CheckPerm(re *endpoint.RouteEntry) error {
+	return nil
 }
 
 func NewCreateRoleRequest() *CreateRoleRequest {
@@ -48,26 +52,4 @@ type CreateRoleRequest struct {
 	Label string `json:"label" gorm:"column:label;type:varchar(200);index" description:"标签" optional:"true"`
 	// 其他扩展信息
 	Extras map[string]string `json:"extras" gorm:"column:extras;serializer:json;type:json" description:"其他扩展信息" optional:"true"`
-}
-
-type RoleAssociateMenuRecord struct {
-	// 基础数据
-	apps.Meta
-	// 角色Id
-	RoleId uint64 `json:"role_id" gorm:"column:role_id;index"`
-	// 菜单Id
-	MenuId uint64 `json:"menu_id" gorm:"column:menu_id;index"`
-	// 关联Menu
-	Menu *menu.Menu `json:"menu" gorm:"-"`
-}
-
-type RoleAssociateEndpointRecord struct {
-	// 基础数据
-	apps.Meta
-	// 角色Id
-	RoleId uint64 `json:"role_id" gorm:"column:role_id;index"`
-	// 菜单Id
-	EndpointId uint64 `json:"endpoint_id" gorm:"column:endpoint_id;index"`
-	// 关联API
-	Endpoint *endpoint.Endpoint `json:"endpoint" gorm:"-"`
 }
