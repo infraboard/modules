@@ -8,7 +8,7 @@ import (
 func NewRole() *Role {
 	return &Role{
 		Meta:            *apps.NewMeta(),
-		MenuPermissions: []*MenuPermission{},
+		MenuPermissions: []*ViewPermission{},
 		ApiPermissions:  []*ApiPermission{},
 	}
 }
@@ -19,7 +19,7 @@ type Role struct {
 	// 角色创建信息
 	CreateRoleRequest
 	// 菜单权限
-	MenuPermissions []*MenuPermission `json:"menu_permissions,omitempty" gorm:"-" description:"角色关联的菜单权限"`
+	MenuPermissions []*ViewPermission `json:"menu_permissions,omitempty" gorm:"-" description:"角色关联的菜单权限"`
 	// API权限
 	ApiPermissions []*ApiPermission `json:"api_permissions,omitempty" gorm:"-" description:"角色关联的API权限"`
 }

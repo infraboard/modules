@@ -17,7 +17,13 @@ func GetService() Service {
 }
 
 type Service interface {
-	// 角色管理
+	RoleService
+	ApiPermissionService
+	ViewPermissionService
+}
+
+// 角色管理
+type RoleService interface {
 	// 创建角色
 	CreateRole(context.Context, *CreateRoleRequest) (*Role, error)
 	// 列表查询
@@ -28,46 +34,6 @@ type Service interface {
 	UpdateRole(context.Context, *UpdateRoleRequest) (*Role, error)
 	// 删除角色
 	DeleteRole(context.Context, *DeleteRoleRequest) (*Role, error)
-
-	// 角色菜单管理
-	// 添加角色关联菜单
-	AddMenuPermission(context.Context, *AddMenuPermissionRequest) ([]*MenuPermission, error)
-	// 移除角色关联菜单
-	RemoveMenuPermission(context.Context, *RemoveMenuPermissionRequest) ([]*MenuPermission, error)
-	// 更新角色权限
-	UpdateMenuPermission(context.Context, *UpdateMenuPermission) ([]*MenuPermission, error)
-
-	// 角色API接口管理
-	// 添加角色关联API
-	AddApiPermission(context.Context, *AddApiPermissionRequest) ([]*ApiPermission, error)
-	// 移除角色关联API
-	RemoveApiPermission(context.Context, *RemoveApiPermissionRequest) ([]*ApiPermission, error)
-	// 更新Api权限
-	UpdateApiPermission(context.Context, *UpdateApiPermissionRequest) ([]*ApiPermission, error)
-}
-
-type AddApiPermissionRequest struct {
-	Items []*ApiPermissionSpec `json:"items"`
-}
-
-type RemoveApiPermissionRequest struct {
-	ApiPermissionIds []uint64 `json:"api_permission_ids"`
-}
-
-type UpdateApiPermissionRequest struct {
-	Items []*ApiPermission `json:"items"`
-}
-
-type AddMenuPermissionRequest struct {
-	Items []*MenuPermissionSpec `json:"items"`
-}
-
-type UpdateMenuPermission struct {
-	Items []MenuPermission `json:"items"`
-}
-
-type RemoveMenuPermissionRequest struct {
-	MenuPermissionIds []uint64 `json:"menu_permission_ids"`
 }
 
 func NewQueryRoleRequest() *QueryRoleRequest {
@@ -89,4 +55,48 @@ type UpdateRoleRequest struct {
 }
 
 type DeleteRoleRequest struct {
+}
+
+// 角色API接口管理
+type ApiPermissionService interface {
+	// 添加角色关联API
+	AddApiPermission(context.Context, *AddApiPermissionRequest) ([]*ApiPermission, error)
+	// 移除角色关联API
+	RemoveApiPermission(context.Context, *RemoveApiPermissionRequest) ([]*ApiPermission, error)
+	// 更新Api权限
+	UpdateApiPermission(context.Context, *UpdateApiPermissionRequest) ([]*ApiPermission, error)
+}
+
+type AddApiPermissionRequest struct {
+	Items []*ApiPermissionSpec `json:"items"`
+}
+
+type RemoveApiPermissionRequest struct {
+	ApiPermissionIds []uint64 `json:"api_permission_ids"`
+}
+
+type UpdateApiPermissionRequest struct {
+	Items []*ApiPermission `json:"items"`
+}
+
+// 角色菜单管理
+type ViewPermissionService interface {
+	// 添加角色关联菜单
+	AddMViewPermission(context.Context, *AddViewPermissionRequest) ([]*ViewPermission, error)
+	// 移除角色关联菜单
+	RemoveViewPermission(context.Context, *RemoveViewPermissionRequest) ([]*ViewPermission, error)
+	// 更新角色权限
+	UpdateViewPermission(context.Context, *UpdateViewPermission) ([]*ViewPermission, error)
+}
+
+type AddViewPermissionRequest struct {
+	Items []*ViewPermissionSpec `json:"items"`
+}
+
+type UpdateViewPermission struct {
+	Items []ViewPermission `json:"items"`
+}
+
+type RemoveViewPermissionRequest struct {
+	ViewPermissionIds []uint64 `json:"menu_permission_ids"`
 }

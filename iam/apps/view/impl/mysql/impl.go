@@ -3,7 +3,7 @@ package mysql
 import (
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
-	"github.com/infraboard/modules/iam/apps/menu"
+	"github.com/infraboard/modules/iam/apps/view"
 )
 
 func init() {
@@ -16,7 +16,7 @@ type MenuServiceImpl struct {
 
 func (i *MenuServiceImpl) Init() error {
 	if datasource.Get().AutoMigrate {
-		err := datasource.DB().AutoMigrate(&menu.Menu{})
+		err := datasource.DB().AutoMigrate(&view.Menu{})
 		if err != nil {
 			return err
 		}
@@ -25,5 +25,5 @@ func (i *MenuServiceImpl) Init() error {
 }
 
 func (i *MenuServiceImpl) Name() string {
-	return menu.AppName
+	return view.AppName
 }

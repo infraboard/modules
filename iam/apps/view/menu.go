@@ -1,4 +1,4 @@
-package menu
+package view
 
 import "github.com/infraboard/modules/iam/apps"
 
@@ -26,6 +26,8 @@ func NewCreateMenuRequest() *CreateMenuRequest {
 }
 
 type CreateMenuRequest struct {
+	// 服务
+	Service string `json:"service" gorm:"column:service;type:varchar(100);index" bson:"service" description:"服务名称"`
 	// 父Menu Id
 	ParentId uint64 `json:"parent_id" bson:"parent_id" gorm:"column:parent_id;type:uint;index" description:"父Menu Id" optional:"true"`
 	// 菜单路径
