@@ -1,5 +1,7 @@
 package token
 
+import "github.com/infraboard/mcube/v2/exception"
+
 const (
 	ACCESS_TOKEN_HEADER_NAME          = "Authorization"
 	ACCESS_TOKEN_COOKIE_NAME          = "access_token"
@@ -12,7 +14,7 @@ var (
 )
 
 var (
-	CookieNotFound = NewAuthFailed("cookie %s not found", ACCESS_TOKEN_COOKIE_NAME)
+	CookieNotFound = exception.NewUnauthorized("cookie %s not found", ACCESS_TOKEN_COOKIE_NAME)
 )
 
 type SOURCE int

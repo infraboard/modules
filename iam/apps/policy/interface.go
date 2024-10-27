@@ -6,6 +6,10 @@ import (
 	"github.com/infraboard/mcube/v2/http/request"
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/types"
+	"github.com/infraboard/modules/iam/apps"
+	"github.com/infraboard/modules/iam/apps/endpoint"
+	"github.com/infraboard/modules/iam/apps/namespace"
+	"github.com/infraboard/modules/iam/apps/view"
 )
 
 const (
@@ -17,6 +21,13 @@ func GetService() Service {
 }
 
 type Service interface {
+	// 策略管理
+	PolicyService
+	// 权限查询, 整合用户多个角色的权限合集
+	PermissionService
+}
+
+type PolicyService interface {
 	// 创建策略
 	CreatePolicy(context.Context, *CreatePolicyRequest) (*Policy, error)
 	// 查询策略列表
@@ -86,11 +97,51 @@ func (r *QueryPolicyRequest) SetWithUser(v bool) *QueryPolicyRequest {
 	return r
 }
 
+func NewDescribePolicyRequest() *DescribePolicyRequest {
+	return &DescribePolicyRequest{}
+}
+
 type DescribePolicyRequest struct {
+	apps.GetRequest
 }
 
 type UpdatePolicyRequest struct {
 }
 
+func NewDeletePolicyRequest() *DeletePolicyRequest {
+	return &DeletePolicyRequest{}
+}
+
 type DeletePolicyRequest struct {
+	apps.GetRequest
+}
+
+type PermissionService interface {
+	// 查询用户可以访问的空间
+	QueryNamespace(context.Context, *QueryNamespaceRequest) (*types.Set[*namespace.Namespace], error)
+	// 查询用户可以访问的菜单
+	QueryMenu(context.Context, *QueryMenuRequest) (*types.Set[*view.Menu], error)
+	// 查询用户可以访问的Api接口
+	QueryEndpoint(context.Context, *QueryEndpointRequest) (*types.Set[*endpoint.Endpoint], error)
+}
+
+func NewQueryNamespaceRequest() *QueryNamespaceRequest {
+	return &QueryNamespaceRequest{}
+}
+
+type QueryNamespaceRequest struct {
+}
+
+func NewQueryMenuRequest() *QueryMenuRequest {
+	return &QueryMenuRequest{}
+}
+
+type QueryMenuRequest struct {
+}
+
+func NewQueryEndpointRequest() *QueryEndpointRequest {
+	return &QueryEndpointRequest{}
+}
+
+type QueryEndpointRequest struct {
 }

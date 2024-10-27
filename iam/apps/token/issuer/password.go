@@ -44,7 +44,7 @@ func (p *PasswordTokenIssuer) IssueToken(ctx context.Context, parameter token.Is
 	u, err := p.user.DescribeUser(ctx, uReq)
 	if err != nil {
 		if exception.IsNotFoundError(err) {
-			return nil, token.NewAuthFailed("%s", err)
+			return nil, exception.NewUnauthorized("%s", err)
 		}
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (p *PasswordTokenIssuer) IssueToken(ctx context.Context, parameter token.Is
 	// 2. 比对密码
 	err = u.CheckPassword(parameter.Password())
 	if err != nil {
-		return nil, token.NewAuthFailed("%s", err)
+		return nil, exception.NewUnauthorized("%s", err)
 	}
 
 	// 3. 颁发token

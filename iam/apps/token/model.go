@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/infraboard/mcube/v2/exception"
 	"github.com/infraboard/mcube/v2/tools/pretty"
 )
 
@@ -94,7 +95,7 @@ func (t *Token) IsAccessTokenExpired() error {
 	if t.AccessTokenExpiredAt != nil {
 		expiredSeconds := time.Since(*t.AccessTokenExpiredAt).Seconds()
 		if expiredSeconds > 0 {
-			return NewAccessTokenExpired("access token %s 过期了 %f秒",
+			return exception.NewAccessTokenExpired("access token %s 过期了 %f秒",
 				t.AccessToken, expiredSeconds)
 		}
 	}
@@ -106,7 +107,7 @@ func (t *Token) IsRreshTokenExpired() error {
 	if t.RefreshTokenExpiredAt != nil {
 		expiredSeconds := time.Since(*t.RefreshTokenExpiredAt).Seconds()
 		if expiredSeconds > 0 {
-			return NewRefreshTokenExpired("refresh token %s 过期了 %f秒",
+			return exception.NewRefreshTokenExpired("refresh token %s 过期了 %f秒",
 				t.RefreshToken, expiredSeconds)
 		}
 	}
@@ -158,7 +159,7 @@ func (t *Token) UserIdString() string {
 
 func (t *Token) CheckRefreshToken(refreshToken string) error {
 	if t.RefreshToken != refreshToken {
-		return NewPermissionDeny("refresh token not conrect")
+		return exception.NewPermissionDeny("refresh token not conrect")
 	}
 	return nil
 }

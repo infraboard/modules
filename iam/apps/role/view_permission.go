@@ -8,6 +8,8 @@ import (
 type ViewPermission struct {
 	// 基础数据
 	apps.Meta
+	// 角色Id
+	RoleId uint64 `json:"role_id" gorm:"column:role_id;index" description:"Role Id"`
 	// Menu权限定义
 	ViewPermissionSpec
 }
@@ -17,8 +19,6 @@ func (r *ViewPermission) TableName() string {
 }
 
 type ViewPermissionSpec struct {
-	// 角色Id
-	RoleId uint64 `json:"role_id" gorm:"column:role_id;index"`
 	// 权限序号
 	SequenceNumber uint16 `json:"sequence_number" gorm:"column:sequence_number;index" description:"权限序号" optional:"true"`
 	// 创建者ID

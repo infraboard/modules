@@ -3,7 +3,6 @@ package restful
 import (
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/gorestful"
-	"github.com/infraboard/modules/iam/apps/role"
 	"github.com/infraboard/modules/iam/apps/user"
 	permission "github.com/infraboard/modules/iam/permission/restful"
 
@@ -36,6 +35,7 @@ func (h *UserRestfulApiHandler) Init() error {
 		Doc("用户列表查询").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
+		Metadata(permission.Permission(true)).
 		Param(restful.QueryParameter("page_size", "页大小").DataType("integer")).
 		Param(restful.QueryParameter("page_number", "页码").DataType("integer")).
 		Writes(user.User{}).
@@ -45,6 +45,7 @@ func (h *UserRestfulApiHandler) Init() error {
 		Doc("用户详情查询").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
+		Metadata(permission.Permission(true)).
 		Param(restful.PathParameter("id", "用户Id")).
 		Writes(user.User{}).
 		Returns(200, "OK", user.User{}))
@@ -53,6 +54,7 @@ func (h *UserRestfulApiHandler) Init() error {
 		Doc("创建用户").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
+		Metadata(permission.Permission(true)).
 		Reads(user.CreateUserRequest{}).
 		Writes(user.User{}).
 		Returns(200, "OK", user.User{}))
@@ -61,7 +63,7 @@ func (h *UserRestfulApiHandler) Init() error {
 		Doc("删除用户").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
-		Metadata(permission.Required(role.ADMIN)).
+		Metadata(permission.Permission(true)).
 		Reads(user.DeleteUserRequest{}).
 		Writes(user.User{}).
 		Returns(200, "OK", user.User{}).

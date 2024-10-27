@@ -45,6 +45,27 @@ func (h *TokenRestulApiHandler) Login(r *restful.Request, w *restful.Response) {
 	response.Success(w, tk)
 }
 
+func (h *TokenRestulApiHandler) ChangeNamespce(r *restful.Request, w *restful.Response) {
+	// 1. 获取用户的请求参数， 参数在Body里面
+	req := token.NewChangeNamespceRequest()
+
+	err := r.ReadEntity(req)
+	if err != nil {
+		response.Failed(w, err)
+		return
+	}
+
+	// 2. 执行逻辑
+	tk, err := h.svc.ChangeNamespce(r.Request.Context(), req)
+	if err != nil {
+		response.Failed(w, err)
+		return
+	}
+
+	// 3. Body中返回Token对象
+	response.Success(w, tk)
+}
+
 // Logout HandleFunc
 func (h *TokenRestulApiHandler) Logout(r *restful.Request, w *restful.Response) {
 	req := token.NewRevolkTokenRequest(

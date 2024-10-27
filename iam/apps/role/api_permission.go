@@ -8,6 +8,8 @@ import (
 type ApiPermission struct {
 	// 基础数据
 	apps.Meta
+	// 角色Id
+	RoleId uint64 `json:"role_id" gorm:"column:role_id;index" description:"角色Id"`
 	// Api权限定义
 	ApiPermissionSpec
 }
@@ -17,8 +19,6 @@ func (r *ApiPermission) TableName() string {
 }
 
 type ApiPermissionSpec struct {
-	// 角色Id
-	RoleId uint64 `json:"role_id" gorm:"column:role_id;index"`
 	// 权限序号
 	SequenceNumber uint16 `json:"sequence_number" gorm:"column:sequence_number" description:"权限序号" optional:"true"`
 	// 创建者ID

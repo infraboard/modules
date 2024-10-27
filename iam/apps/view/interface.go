@@ -6,6 +6,7 @@ import (
 	"github.com/infraboard/mcube/v2/http/request"
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/types"
+	"github.com/infraboard/modules/iam/apps"
 )
 
 const (
@@ -17,9 +18,9 @@ func GetService() Service {
 }
 
 type Service interface {
-	// 菜单
+	// 菜单管理
 	MenuService
-	// 页面
+	// 页面管理
 	PageService
 }
 
@@ -36,16 +37,33 @@ type MenuService interface {
 	DeleteMenu(context.Context, *DeleteMenuRequest) (*Menu, error)
 }
 
+func NewQueryMenuRequest() *QueryMenuRequest {
+	return &QueryMenuRequest{
+		PageRequest: request.NewDefaultPageRequest(),
+	}
+}
+
 type QueryMenuRequest struct {
+	*request.PageRequest
+}
+
+func NewDescribeMenuRequest() *DescribeMenuRequest {
+	return &DescribeMenuRequest{}
 }
 
 type DescribeMenuRequest struct {
+	apps.GetRequest
 }
 
 type UpdateMenuRequest struct {
 }
 
+func NewDeleteMenuRequest() *DeleteMenuRequest {
+	return &DeleteMenuRequest{}
+}
+
 type DeleteMenuRequest struct {
+	apps.GetRequest
 }
 
 type PageService interface {
@@ -73,10 +91,20 @@ type QueryPageRequest struct {
 	MenuId uint64 `json:"menu_id"`
 }
 
+func NewDescribePageRequest() *DescribePageRequest {
+	return &DescribePageRequest{}
+}
+
 type DescribePageRequest struct {
+	apps.GetRequest
+}
+
+func NewDeletePageRequest() *DeletePageRequest {
+	return &DeletePageRequest{}
 }
 
 type DeletePageRequest struct {
+	apps.GetRequest
 }
 
 type UpdatePageRequest struct {

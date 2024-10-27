@@ -38,7 +38,7 @@ func (p *PrivateTokenIssuer) IssueToken(ctx context.Context, parameter token.Iss
 	u, err := p.user.DescribeUser(ctx, uReq)
 	if err != nil {
 		if exception.IsNotFoundError(err) {
-			return nil, token.NewAuthFailed("%s", err)
+			return nil, exception.NewUnauthorized("%s", err)
 		}
 		return nil, err
 	}

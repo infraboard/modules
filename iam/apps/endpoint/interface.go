@@ -3,8 +3,10 @@ package endpoint
 import (
 	"context"
 
+	"github.com/infraboard/mcube/v2/http/request"
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/types"
+	"github.com/infraboard/modules/iam/apps"
 )
 
 const (
@@ -24,10 +26,28 @@ type Service interface {
 	RegistryEndpoint(context.Context, *RegistryEndpointRequest) (*types.Set[*Endpoint], error)
 }
 
+func NewQueryEndpointRequest() *QueryEndpointRequest {
+	return &QueryEndpointRequest{
+		PageRequest: request.NewDefaultPageRequest(),
+	}
+}
+
 type QueryEndpointRequest struct {
+	*request.PageRequest
+}
+
+func NewDescribeEndpointRequest() *DescribeEndpointRequest {
+	return &DescribeEndpointRequest{}
 }
 
 type DescribeEndpointRequest struct {
+	apps.GetRequest
+}
+
+func NewRegistryEndpointRequest() *RegistryEndpointRequest {
+	return &RegistryEndpointRequest{
+		Items: []*Endpoint{},
+	}
 }
 
 type RegistryEndpointRequest struct {

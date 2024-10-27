@@ -3,8 +3,10 @@ package namespace
 import (
 	"context"
 
+	"github.com/infraboard/mcube/v2/http/request"
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/types"
+	"github.com/infraboard/modules/iam/apps"
 )
 
 const (
@@ -28,14 +30,31 @@ type Service interface {
 	DeleteNamespace(context.Context, *DeleteNamespaceRequest) (*Namespace, error)
 }
 
+func NewQueryNamespaceRequest() *QueryNamespaceRequest {
+	return &QueryNamespaceRequest{
+		PageRequest: request.NewDefaultPageRequest(),
+	}
+}
+
 type QueryNamespaceRequest struct {
+	*request.PageRequest
+}
+
+func NewDescribeNamespaceRequest() *DescribeNamespaceRequest {
+	return &DescribeNamespaceRequest{}
 }
 
 type DescribeNamespaceRequest struct {
+	apps.GetRequest
 }
 
 type UpdateNamespaceRequest struct {
 }
 
+func NewDeleteNamespaceRequest() *DeleteNamespaceRequest {
+	return &DeleteNamespaceRequest{}
+}
+
 type DeleteNamespaceRequest struct {
+	apps.GetRequest
 }

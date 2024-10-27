@@ -167,3 +167,8 @@ func (i *TokenServiceImpl) QueryToken(ctx context.Context, in *token.QueryTokenR
 
 	return set, nil
 }
+
+// 用户切换空间
+func (i *TokenServiceImpl) ChangeNamespce(ctx context.Context, in *token.ChangeNamespceRequest) (*token.Token, error) {
+	return nil, nil
+}

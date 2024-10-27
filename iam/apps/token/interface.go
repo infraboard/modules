@@ -28,9 +28,18 @@ type Service interface {
 	// 校验Token 是给内部中间层使用 身份校验层
 	// 校验完后返回Token, 通过Token获取 用户信息
 	ValiateToken(context.Context, *ValiateTokenRequest) (*Token, error)
-
+	// 用户切换空间
+	ChangeNamespce(context.Context, *ChangeNamespceRequest) (*Token, error)
 	// 查询已经颁发出去的Token
 	QueryToken(context.Context, *QueryTokenRequest) (*types.Set[*Token], error)
+}
+
+func NewChangeNamespceRequest() *ChangeNamespceRequest {
+	return &ChangeNamespceRequest{}
+}
+
+type ChangeNamespceRequest struct {
+	NamespaceId uint64 `json:"namespace_id"`
 }
 
 func NewDescribeTokenRequest(accessToken string) *DescribeTokenRequest {

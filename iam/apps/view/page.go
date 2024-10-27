@@ -13,10 +13,18 @@ type Page struct {
 	apps.Meta
 	// 菜单定义
 	CreatePageRequest
+	// 用户是否有权限访问该页面, 只有在策略模块查询时，才会计算出该字段
+	HasPermission *bool `json:"has_permission,omitempty" gorm:"column:has_permission;type:tinyint(1)" optional:"true" description:"用户是否有权限访问该页面"`
 }
 
 func (p *Page) TableName() string {
 	return "pages"
+}
+
+func NewCreatePageRequest() *CreatePageRequest {
+	return &CreatePageRequest{
+		Extras: map[string]string{},
+	}
 }
 
 type CreatePageRequest struct {

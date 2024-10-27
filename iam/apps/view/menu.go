@@ -4,7 +4,8 @@ import "github.com/infraboard/modules/iam/apps"
 
 func NewMenu() *Menu {
 	return &Menu{
-		Meta: *apps.NewMeta(),
+		Meta:  *apps.NewMeta(),
+		Pages: []*Page{},
 	}
 }
 
@@ -13,9 +14,18 @@ type Menu struct {
 	apps.Meta
 	// 菜单定义
 	CreateMenuRequest
+	// 用户是否有权限访问该菜单, 只有在策略模块查询时，才会计算出该字段
+	HasPermission *bool `json:"has_permission,omitempty" gorm:"column:has_permission;type:tinyint(1)" optional:"true" description:"用户是否有权限访问该菜单"`
+	// 菜单关联的页面
+	Pages []*Page `json:"pages,omitempty" gorm:"-" description:"菜单关联的页面"`
 }
 
-func (u *Menu) TableName() string {
+func (m *Menu) SetHasPermission(v bool) *Menu {
+	m.HasPermission = &v
+	return m
+}
+
+func (m *Menu) TableName() string {
 	return "menus"
 }
 

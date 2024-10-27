@@ -27,17 +27,24 @@ func (h *TokenRestulApiHandler) Name() string {
 func (h *TokenRestulApiHandler) Init() error {
 	h.svc = token.GetService()
 
-	tags := []string{"登录"}
+	tags := []string{"用户登录"}
 	ws := gorestful.ObjectRouter(h)
 	ws.Route(ws.POST("").To(h.Login).
-		Doc("颁发令牌").
+		Doc("颁发令牌(登录)").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Reads(token.IssueTokenRequest{}).
 		Writes(token.Token{}).
 		Returns(200, "OK", token.Token{}))
 
+	ws.Route(ws.POST("/change_namespace").To(h.ChangeNamespce).
+		Doc("切换令牌访问空间").
+		Metadata(restfulspec.KeyOpenAPITags, tags).
+		Reads(token.ChangeNamespceRequest{}).
+		Writes(token.Token{}).
+		Returns(200, "OK", token.Token{}))
+
 	ws.Route(ws.DELETE("").To(h.Logout).
-		Doc("撤销令牌").
+		Doc("撤销令牌(退出)").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(label.Auth, label.Enable).
 		Metadata(label.PERMISSION_MODE, label.PERMISSION_MODE_ACL.Value()).
