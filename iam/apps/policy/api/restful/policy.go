@@ -9,7 +9,6 @@ import (
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/gorestful"
 	"github.com/infraboard/modules/iam/apps/policy"
-	"github.com/infraboard/modules/iam/apps/view"
 	permission "github.com/infraboard/modules/iam/permission/restful"
 )
 
@@ -34,7 +33,7 @@ func (h *PolicyRestfulApiHandler) Init() error {
 	tags := []string{"权限策略管理"}
 	ws := gorestful.ObjectRouter(h)
 
-	ws.Route(ws.GET("").To(h.QueryMenu).
+	ws.Route(ws.GET("").To(h.QueryPolicy).
 		Doc("策略列表查询").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
@@ -44,37 +43,37 @@ func (h *PolicyRestfulApiHandler) Init() error {
 		Writes(PolicySet{}).
 		Returns(200, "OK", PolicySet{}))
 
-	ws.Route(ws.GET("/:id").To(h.DescribeMenu).
+	ws.Route(ws.GET("/:id").To(h.DescribePolicy).
 		Doc("策略详情查询").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
 		Param(restful.PathParameter("id", "Policy Id")).
-		Writes(view.Menu{}).
-		Returns(200, "OK", view.Menu{}))
+		Writes(policy.Policy{}).
+		Returns(200, "OK", policy.Policy{}))
 
-	ws.Route(ws.POST("").To(h.CreateMenu).
+	ws.Route(ws.POST("").To(h.CreatePolicy).
 		Doc("创建策略").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
-		Reads(view.CreateMenuRequest{}).
-		Writes(view.Menu{}).
-		Returns(200, "OK", view.Menu{}))
+		Reads(policy.CreatePolicyRequest{}).
+		Writes(policy.Policy{}).
+		Returns(200, "OK", policy.Policy{}))
 
-	ws.Route(ws.DELETE("").To(h.DeleteMenu).
+	ws.Route(ws.DELETE("").To(h.DeletePolicy).
 		Doc("删除策略").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
-		Reads(view.DeleteMenuRequest{}).
-		Writes(view.Menu{}).
-		Returns(200, "OK", view.Menu{}).
+		Reads(policy.DeletePolicyRequest{}).
+		Writes(policy.Policy{}).
+		Returns(200, "OK", policy.Policy{}).
 		Returns(404, "Not Found", nil))
 	return nil
 }
 
-func (h *PolicyRestfulApiHandler) QueryMenu(r *restful.Request, w *restful.Response) {
+func (h *PolicyRestfulApiHandler) QueryPolicy(r *restful.Request, w *restful.Response) {
 	// 1. 获取用户的请求参数， 参数在Body里面
 	req := policy.NewQueryPolicyRequest()
 	req.PageRequest = request.NewPageRequestFromHTTP(r.Request)
@@ -90,7 +89,7 @@ func (h *PolicyRestfulApiHandler) QueryMenu(r *restful.Request, w *restful.Respo
 	response.Success(w, tk)
 }
 
-func (h *PolicyRestfulApiHandler) DescribeMenu(r *restful.Request, w *restful.Response) {
+func (h *PolicyRestfulApiHandler) DescribePolicy(r *restful.Request, w *restful.Response) {
 	// 1. 获取用户的请求参数， 参数在Body里面
 	req := policy.NewDescribePolicyRequest()
 	if err := req.SetIdByString(r.PathParameter("id")); err != nil {
@@ -109,7 +108,7 @@ func (h *PolicyRestfulApiHandler) DescribeMenu(r *restful.Request, w *restful.Re
 	response.Success(w, tk)
 }
 
-func (h *PolicyRestfulApiHandler) CreateMenu(r *restful.Request, w *restful.Response) {
+func (h *PolicyRestfulApiHandler) CreatePolicy(r *restful.Request, w *restful.Response) {
 	// 1. 获取用户的请求参数， 参数在Body里面
 	req := policy.NewCreatePolicyRequest()
 
@@ -130,7 +129,7 @@ func (h *PolicyRestfulApiHandler) CreateMenu(r *restful.Request, w *restful.Resp
 	response.Success(w, tk)
 }
 
-func (h *PolicyRestfulApiHandler) DeleteMenu(r *restful.Request, w *restful.Response) {
+func (h *PolicyRestfulApiHandler) DeletePolicy(r *restful.Request, w *restful.Response) {
 	req := policy.NewDeletePolicyRequest()
 	if err := req.SetIdByString(r.PathParameter("id")); err != nil {
 		response.Failed(w, exception.NewBadRequest("parse id error, %s", err))
