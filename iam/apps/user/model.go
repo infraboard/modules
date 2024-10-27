@@ -64,9 +64,9 @@ type CreateUserRequest struct {
 	// 是不是管理员
 	IsAdmin bool `json:"is_admin" gorm:"column:is_admin;type:tinyint(1)" optional:"true" description:"是不是管理员"`
 	// 用户状态，01:正常，02:冻结
-	Locked bool `json:"stat" gorm:"column:stat;type:tinyint(1)" optional:"true" description:"用户状态，01:正常，02:冻结"`
+	Locked bool `json:"stat" gorm:"column:stat;type:tinyint(1)" optional:"true" description:"用户状态, 01:正常, 02:冻结"`
 	// 激活，1：激活，0：未激活
-	Activate bool `json:"activate" gorm:"column:activate;type:tinyint(1)" optional:"true" description:"激活，1：激活，0：未激活"`
+	Activate bool `json:"activate" gorm:"column:activate;type:tinyint(1)" optional:"true" description:"激活, 1: 激活, 0: 未激活"`
 	// 生日
 	Birthday *time.Time `json:"birthday" gorm:"column:birthday;type:varchar(200)" optional:"true" description:"生日"`
 	// 昵称
@@ -74,7 +74,7 @@ type CreateUserRequest struct {
 	// 头像图片
 	UserIcon string `json:"user_icon" gorm:"column:user_icon;type:varchar(500)" optional:"true" description:"头像图片"`
 	// 性别, 1:男，2:女，0：保密
-	Sex SEX `json:"sex" gorm:"column:sex;type:tinyint(1)" optional:"true" description:"性别, 1:男，2:女，0：保密"`
+	Sex SEX `json:"sex" gorm:"column:sex;type:tinyint(1)" optional:"true" description:"性别, 1:男, 2:女, 0: 保密"`
 
 	// 邮箱
 	Email string `json:"email" gorm:"column:email;type:varchar(200);uniqueIndex" optional:"true" description:"邮箱" unique:"true"`

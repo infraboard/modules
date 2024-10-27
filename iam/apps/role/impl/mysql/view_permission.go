@@ -9,7 +9,7 @@ import (
 )
 
 // 添加角色关联菜单
-func (i *RoleServiceImpl) AddMViewPermission(ctx context.Context, in *role.AddViewPermissionRequest) ([]*role.ViewPermission, error) {
+func (i *RoleServiceImpl) AddViewPermission(ctx context.Context, in *role.AddViewPermissionRequest) ([]*role.ViewPermission, error) {
 	return nil, nil
 }
 

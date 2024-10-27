@@ -10,6 +10,8 @@ func init() {
 	ioc.Controller().Registry(&RoleServiceImpl{})
 }
 
+var _ role.Service = (*RoleServiceImpl)(nil)
+
 type RoleServiceImpl struct {
 	ioc.ObjectImpl
 }

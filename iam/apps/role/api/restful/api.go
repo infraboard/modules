@@ -77,8 +77,8 @@ func (h *RoleRestfulApiHandler) Init() error {
 		Metadata(permission.Permission(true)).
 		Param(restful.PathParameter("id", "Role Id")).
 		Reads(role.AddApiPermissionRequest{}).
-		Writes([]*role.ApiPermission{}).
-		Returns(200, "OK", []*role.ApiPermission{}))
+		Writes([]role.ApiPermission{}).
+		Returns(200, "OK", []role.ApiPermission{}))
 
 	ws.Route(ws.POST("/:id/remove_api_permission").To(h.RemoveApiPermission).
 		Doc("移除接口访问权限").
@@ -86,8 +86,8 @@ func (h *RoleRestfulApiHandler) Init() error {
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
 		Reads(role.RemoveApiPermissionRequest{}).
-		Writes([]*role.ApiPermission{}).
-		Returns(200, "OK", []*role.ApiPermission{}))
+		Writes([]role.ApiPermission{}).
+		Returns(200, "OK", []role.ApiPermission{}))
 
 	ws.Route(ws.GET("/:id/endpoints").To(h.QueryMatchedEndpoint).
 		Doc("查询允许访问的接口").
@@ -105,8 +105,8 @@ func (h *RoleRestfulApiHandler) Init() error {
 		Metadata(permission.Permission(true)).
 		Param(restful.PathParameter("id", "Role Id")).
 		Reads(role.AddViewPermissionRequest{}).
-		Writes([]*role.ViewPermission{}).
-		Returns(200, "OK", []*role.ViewPermission{}))
+		Writes([]role.ViewPermission{}).
+		Returns(200, "OK", []role.ViewPermission{}))
 
 	ws.Route(ws.POST("/:id/remove_view_permission").To(h.RemoveViewPermission).
 		Doc("移除视图访问权限").
@@ -115,7 +115,7 @@ func (h *RoleRestfulApiHandler) Init() error {
 		Metadata(permission.Permission(true)).
 		Reads(role.RemoveViewPermissionRequest{}).
 		Writes([]*role.ViewPermission{}).
-		Returns(200, "OK", []*role.ViewPermission{}))
+		Returns(200, "OK", []role.ViewPermission{}))
 
 	ws.Route(ws.GET("/:id/menus").To(h.QueryMatchedMenu).
 		Doc("查询允许访问的菜单").

@@ -24,7 +24,7 @@ type NamespaceRestfulApiHandler struct {
 }
 
 func (h *NamespaceRestfulApiHandler) Name() string {
-	return "menu"
+	return "namespace"
 }
 
 func (h *NamespaceRestfulApiHandler) Init() error {

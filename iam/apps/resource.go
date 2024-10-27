@@ -23,7 +23,7 @@ type Meta struct {
 }
 
 type GetRequest struct {
-	Id uint64
+	Id uint64 `json:"id"`
 }
 
 func (r *GetRequest) SetId(id uint64) {
