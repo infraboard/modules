@@ -39,7 +39,9 @@ func NewChangeNamespceRequest() *ChangeNamespceRequest {
 }
 
 type ChangeNamespceRequest struct {
+	UserId      uint64 `json:"user_id"`
 	NamespaceId uint64 `json:"namespace_id"`
+	AccessToken string `json:"access_token"`
 }
 
 func NewDescribeTokenRequest(accessToken string) *DescribeTokenRequest {

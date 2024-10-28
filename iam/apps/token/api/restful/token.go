@@ -48,15 +48,17 @@ func (h *TokenRestulApiHandler) Login(r *restful.Request, w *restful.Response) {
 func (h *TokenRestulApiHandler) ChangeNamespce(r *restful.Request, w *restful.Response) {
 	// 1. 获取用户的请求参数， 参数在Body里面
 	req := token.NewChangeNamespceRequest()
-
 	err := r.ReadEntity(req)
 	if err != nil {
 		response.Failed(w, err)
 		return
 	}
 
+	tk := token.GetTokenFromCtx(r.Request.Context())
+	req.UserId = tk.UserId
+
 	// 2. 执行逻辑
-	tk, err := h.svc.ChangeNamespce(r.Request.Context(), req)
+	tk, err = h.svc.ChangeNamespce(r.Request.Context(), req)
 	if err != nil {
 		response.Failed(w, err)
 		return

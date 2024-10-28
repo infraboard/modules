@@ -8,6 +8,7 @@ import (
 	"github.com/infraboard/mcube/v2/exception"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
 	"github.com/infraboard/mcube/v2/types"
+	"github.com/infraboard/modules/iam/apps/policy"
 	"github.com/infraboard/modules/iam/apps/token"
 )
 
@@ -170,5 +171,29 @@ func (i *TokenServiceImpl) QueryToken(ctx context.Context, in *token.QueryTokenR
 
 // 用户切换空间
 func (i *TokenServiceImpl) ChangeNamespce(ctx context.Context, in *token.ChangeNamespceRequest) (*token.Token, error) {
-	return nil, nil
+	set, err := i.policy.QueryNamespace(ctx, policy.NewQueryNamespaceRequest().SetUserId(in.UserId).SetNamespaceId(in.NamespaceId))
+	if err != nil {
+		return nil, err
+	}
+
+	ns := set.First()
+	if ns == nil {
+		return nil, exception.NewPermissionDeny("你没有该空间访问权限")
+	}
+
+	// 更新Token
+	tk, err := i.DescribeToken(ctx, token.NewDescribeTokenRequest(in.AccessToken))
+	if err != nil {
+		return nil, err
+	}
+	tk.NamespaceId = ns.Id
+	tk.NamespaceName = ns.Name
+
+	// 保存状态
+	if err := datasource.DBFromCtx(ctx).
+		Updates(tk).
+		Error; err != nil {
+		return nil, err
+	}
+	return tk, nil
 }

@@ -130,6 +130,18 @@ func NewQueryNamespaceRequest() *QueryNamespaceRequest {
 }
 
 type QueryNamespaceRequest struct {
+	UserId      uint64 `json:"user_id"`
+	NamespaceId uint64 `json:"namespace_id"`
+}
+
+func (r *QueryNamespaceRequest) SetUserId(v uint64) *QueryNamespaceRequest {
+	r.UserId = v
+	return r
+}
+
+func (r *QueryNamespaceRequest) SetNamespaceId(v uint64) *QueryNamespaceRequest {
+	r.NamespaceId = v
+	return r
 }
 
 func NewQueryMenuRequest() *QueryMenuRequest {

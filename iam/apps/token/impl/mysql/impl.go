@@ -6,6 +6,7 @@ import (
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
 	"github.com/infraboard/mcube/v2/ioc/config/log"
+	"github.com/infraboard/modules/iam/apps/policy"
 	"github.com/infraboard/modules/iam/apps/token"
 	"github.com/infraboard/modules/iam/apps/user"
 	"github.com/rs/zerolog"
@@ -22,8 +23,9 @@ var _ token.Service = (*TokenServiceImpl)(nil)
 
 type TokenServiceImpl struct {
 	ioc.ObjectImpl
-	user user.Service
-	log  *zerolog.Logger
+	user   user.Service
+	log    *zerolog.Logger
+	policy policy.PermissionService
 
 	// 自动刷新, 直接刷新Token的过期时间，而不是生成一个新Token
 	AutoRefresh bool `json:"auto_refresh" toml:"auto_refresh" yaml:"auto_refresh" env:"AUTO_REFRESH"`
@@ -37,7 +39,8 @@ type TokenServiceImpl struct {
 
 func (i *TokenServiceImpl) Init() error {
 	i.log = log.Sub(i.Name())
-	i.user = ioc.Controller().Get(user.AppName).(user.Service)
+	i.user = user.GetService()
+	i.policy = policy.GetService()
 	i.refreshDuration = time.Duration(i.RereshTTLSecond) * time.Second
 
 	if datasource.Get().AutoMigrate {
