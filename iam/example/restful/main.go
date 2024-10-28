@@ -12,6 +12,7 @@ import (
 
 	// 引入模块
 	_ "github.com/infraboard/modules/iam/init"
+	permission "github.com/infraboard/modules/iam/permission/restful"
 
 	// 非功能性模块
 	_ "github.com/infraboard/mcube/v2/ioc/apps/apidoc/restful"
@@ -48,10 +49,13 @@ func (h *ApiHandler) Init() error {
 
 	tags := []string{"DB状态"}
 	ws := gorestful.ObjectRouter(h)
-	ws.Route(ws.GET("/db_stats").To(h.DBStats).
+	ws.Route(ws.GET("/db_stats").
+		To(h.DBStats).
 		Doc("查询数据库状态").
-		Metadata(restfulspec.KeyOpenAPITags, tags))
-
+		Metadata(restfulspec.KeyOpenAPITags, tags).
+		Metadata(permission.Auth(true)).
+		Metadata(permission.Permission(true)),
+	)
 	return nil
 }
 

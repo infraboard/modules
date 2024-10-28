@@ -49,7 +49,7 @@ func (h *ApiHandler) Init() error {
 	h.db = datasource.DB()
 
 	r := ioc_gin.ObjectRouter(h)
-	r.Use(permission.Auth())
+	r.Use(permission.Auth(), permission.Required("admin"))
 	r.GET("/db_stats", permission.Required(role.ADMIN), h.DBStats)
 	return nil
 }

@@ -61,6 +61,16 @@ func (h *NamespaceRestfulApiHandler) Init() error {
 		Writes(namespace.Namespace{}).
 		Returns(200, "OK", namespace.Namespace{}))
 
+	ws.Route(ws.PUT("/:id").To(h.UpdateNamespace).
+		Doc("更新空间").
+		Metadata(restfulspec.KeyOpenAPITags, tags).
+		Metadata(permission.Auth(true)).
+		Metadata(permission.Permission(true)).
+		Param(restful.PathParameter("id", "Namespace Id")).
+		Reads(namespace.CreateNamespaceRequest{}).
+		Writes(namespace.Namespace{}).
+		Returns(200, "OK", namespace.Namespace{}))
+
 	ws.Route(ws.DELETE("").To(h.DeleteNamespace).
 		Doc("删除空间").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
@@ -126,6 +136,28 @@ func (h *NamespaceRestfulApiHandler) CreateNamespace(r *restful.Request, w *rest
 	}
 
 	// 3. 返回响应
+	response.Success(w, tk)
+}
+
+func (h *NamespaceRestfulApiHandler) UpdateNamespace(r *restful.Request, w *restful.Response) {
+	req := namespace.NewUpdateNamespaceRequest()
+	if err := req.SetIdByString(r.PathParameter("id")); err != nil {
+		response.Failed(w, exception.NewBadRequest("parse id error, %s", err))
+		return
+	}
+
+	err := r.ReadEntity(&req.CreateNamespaceRequest)
+	if err != nil {
+		response.Failed(w, err)
+		return
+	}
+
+	tk, err := h.svc.UpdateNamespace(r.Request.Context(), req)
+	if err != nil {
+		response.Failed(w, err)
+		return
+	}
+
 	response.Success(w, tk)
 }
 

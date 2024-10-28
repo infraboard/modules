@@ -1,6 +1,9 @@
 package namespace
 
-import "github.com/infraboard/modules/iam/apps"
+import (
+	"github.com/infraboard/mcube/v2/ioc/config/validator"
+	"github.com/infraboard/modules/iam/apps"
+)
 
 func NewNamespace() *Namespace {
 	return &Namespace{
@@ -42,4 +45,8 @@ type CreateNamespaceRequest struct {
 	Label string `json:"label" gorm:"column:label;type:varchar(200);index" description:"标签"`
 	// 扩展信息
 	Extras map[string]string `json:"extras" bson:"extras" gorm:"column:extras;serializer:json;type:json" description:"扩展信息"`
+}
+
+func (r *CreateNamespaceRequest) Validate() error {
+	return validator.Validate(r)
 }

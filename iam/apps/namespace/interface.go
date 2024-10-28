@@ -48,7 +48,13 @@ type DescribeNamespaceRequest struct {
 	apps.GetRequest
 }
 
+func NewUpdateNamespaceRequest() *UpdateNamespaceRequest {
+	return &UpdateNamespaceRequest{}
+}
+
 type UpdateNamespaceRequest struct {
+	apps.GetRequest
+	CreateNamespaceRequest
 }
 
 func NewDeleteNamespaceRequest() *DeleteNamespaceRequest {
