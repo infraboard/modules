@@ -60,6 +60,8 @@ type DescribeRoleRequest struct {
 }
 
 type UpdateRoleRequest struct {
+	apps.GetRequest
+	CreateRoleRequest
 }
 
 func NewDeleteRoleRequest() *DeleteRoleRequest {
