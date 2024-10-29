@@ -37,7 +37,7 @@ type PolicyService interface {
 	// 更新策略
 	UpdatePolicy(context.Context, *UpdatePolicyRequest) (*Policy, error)
 	// 删除策略
-	DeletePolicy(context.Context, *DeletePolicyRequest) (*types.Set[*Policy], error)
+	DeletePolicy(context.Context, *DeletePolicyRequest) (*Policy, error)
 }
 
 func NewQueryPolicyRequest() *QueryPolicyRequest {
@@ -106,6 +106,8 @@ type DescribePolicyRequest struct {
 }
 
 type UpdatePolicyRequest struct {
+	apps.GetRequest
+	CreatePolicyRequest
 }
 
 func NewDeletePolicyRequest() *DeletePolicyRequest {

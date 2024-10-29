@@ -10,6 +10,8 @@ func init() {
 	ioc.Controller().Registry(&EndpointServiceImpl{})
 }
 
+var _ endpoint.Service = (*EndpointServiceImpl)(nil)
+
 // 他是user service 服务的控制器
 type EndpointServiceImpl struct {
 	ioc.ObjectImpl

@@ -3,6 +3,7 @@ package policy
 import (
 	"time"
 
+	"github.com/infraboard/mcube/v2/ioc/config/validator"
 	"github.com/infraboard/modules/iam/apps"
 	"github.com/infraboard/modules/iam/apps/namespace"
 	"github.com/infraboard/modules/iam/apps/role"
@@ -60,4 +61,8 @@ type CreatePolicyRequest struct {
 	Label string `json:"label" gorm:"column:label;type:varchar(200);index" description:"策略标签" optional:"true"`
 	// 扩展信息
 	Extras map[string]string `json:"extras" bson:"extras" gorm:"column:extras;serializer:json;type:json" description:"扩展信息" optional:"true"`
+}
+
+func (r *CreatePolicyRequest) Validate() error {
+	return validator.Validate(r)
 }

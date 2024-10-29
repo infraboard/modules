@@ -10,6 +10,8 @@ func init() {
 	ioc.Controller().Registry(&PolicyServiceImpl{})
 }
 
+var _ policy.Service = (*PolicyServiceImpl)(nil)
+
 type PolicyServiceImpl struct {
 	ioc.ObjectImpl
 }

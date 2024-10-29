@@ -25,6 +25,11 @@ func (u *Endpoint) TableName() string {
 	return "namespaces"
 }
 
+func (u *Endpoint) SetRouteEntry(v RouteEntry) *Endpoint {
+	u.RouteEntry = v
+	return u
+}
+
 func NewRouteEntry() *RouteEntry {
 	return &RouteEntry{
 		RequiredRole: []string{},

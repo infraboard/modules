@@ -1,6 +1,9 @@
 package view
 
-import "github.com/infraboard/modules/iam/apps"
+import (
+	"github.com/infraboard/mcube/v2/ioc/config/validator"
+	"github.com/infraboard/modules/iam/apps"
+)
 
 func NewPage() *Page {
 	return &Page{
@@ -40,4 +43,8 @@ type CreatePageRequest struct {
 	RefEndpointId []uint64 `json:"ref_endpoints" gorm:"column:ref_endpoints;serializer:json;type:json" description:"该页面管理的Api接口关联的接口" optional:"true"`
 	// 其他扩展信息
 	Extras map[string]string `json:"extras" gorm:"column:extras;serializer:json;type:json" description:"其他扩展信息" optional:"true"`
+}
+
+func (r *CreatePageRequest) Validate() error {
+	return validator.Validate(r)
 }

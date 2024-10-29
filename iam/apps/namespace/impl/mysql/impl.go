@@ -10,6 +10,8 @@ func init() {
 	ioc.Controller().Registry(&NameSpaceServiceImpl{})
 }
 
+var _ namespace.Service = (*NameSpaceServiceImpl)(nil)
+
 type NameSpaceServiceImpl struct {
 	ioc.ObjectImpl
 }

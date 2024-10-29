@@ -56,6 +56,8 @@ type DescribeMenuRequest struct {
 }
 
 type UpdateMenuRequest struct {
+	apps.GetRequest
+	CreateMenuRequest
 }
 
 func NewDeleteMenuRequest() *DeleteMenuRequest {
@@ -108,4 +110,6 @@ type DeletePageRequest struct {
 }
 
 type UpdatePageRequest struct {
+	apps.GetRequest
+	CreatePageRequest
 }

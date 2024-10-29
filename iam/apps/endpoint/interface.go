@@ -5,6 +5,7 @@ import (
 
 	"github.com/infraboard/mcube/v2/http/request"
 	"github.com/infraboard/mcube/v2/ioc"
+	"github.com/infraboard/mcube/v2/ioc/config/validator"
 	"github.com/infraboard/mcube/v2/types"
 	"github.com/infraboard/modules/iam/apps"
 )
@@ -46,10 +47,14 @@ type DescribeEndpointRequest struct {
 
 func NewRegistryEndpointRequest() *RegistryEndpointRequest {
 	return &RegistryEndpointRequest{
-		Items: []*Endpoint{},
+		Items: []*RouteEntry{},
 	}
 }
 
 type RegistryEndpointRequest struct {
-	Items []*Endpoint `json:"items"`
+	Items []*RouteEntry `json:"items"`
+}
+
+func (r *RegistryEndpointRequest) Validate() error {
+	return validator.Validate(r)
 }

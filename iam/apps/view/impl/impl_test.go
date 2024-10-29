@@ -3,16 +3,16 @@ package impl_test
 import (
 	"context"
 
-	"github.com/infraboard/modules/iam/apps/endpoint"
+	"github.com/infraboard/modules/iam/apps/view"
 	"github.com/infraboard/modules/iam/test"
 )
 
 var (
-	impl endpoint.Service
+	impl view.Service
 	ctx  = context.Background()
 )
 
 func init() {
 	test.DevelopmentSetup()
-	impl = endpoint.GetService()
+	impl = view.GetService()
 }

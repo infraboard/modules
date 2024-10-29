@@ -1,6 +1,9 @@
 package view
 
-import "github.com/infraboard/modules/iam/apps"
+import (
+	"github.com/infraboard/mcube/v2/ioc/config/validator"
+	"github.com/infraboard/modules/iam/apps"
+)
 
 func NewMenu() *Menu {
 	return &Menu{
@@ -50,4 +53,8 @@ type CreateMenuRequest struct {
 	Label string `json:"label" gorm:"column:label;type:varchar(200);index" description:"标签" optional:"true"`
 	// 其他扩展信息
 	Extras map[string]string `json:"extras" gorm:"column:extras;serializer:json;type:json" description:"其他扩展信息" optional:"true"`
+}
+
+func (r *CreateMenuRequest) Validate() error {
+	return validator.Validate(r)
 }

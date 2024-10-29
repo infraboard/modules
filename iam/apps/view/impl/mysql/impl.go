@@ -7,14 +7,16 @@ import (
 )
 
 func init() {
-	ioc.Controller().Registry(&MenuServiceImpl{})
+	ioc.Controller().Registry(&ViewServiceImpl{})
 }
 
-type MenuServiceImpl struct {
+var _ view.Service = (*ViewServiceImpl)(nil)
+
+type ViewServiceImpl struct {
 	ioc.ObjectImpl
 }
 
-func (i *MenuServiceImpl) Init() error {
+func (i *ViewServiceImpl) Init() error {
 	if datasource.Get().AutoMigrate {
 		err := datasource.DB().AutoMigrate(&view.Menu{})
 		if err != nil {
@@ -24,6 +26,6 @@ func (i *MenuServiceImpl) Init() error {
 	return nil
 }
 
-func (i *MenuServiceImpl) Name() string {
+func (i *ViewServiceImpl) Name() string {
 	return view.AppName
 }
