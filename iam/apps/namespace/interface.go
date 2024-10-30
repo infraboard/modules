@@ -32,12 +32,31 @@ type Service interface {
 
 func NewQueryNamespaceRequest() *QueryNamespaceRequest {
 	return &QueryNamespaceRequest{
-		PageRequest: request.NewDefaultPageRequest(),
+		PageRequest:  *request.NewDefaultPageRequest(),
+		NamespaceIds: []uint64{},
 	}
 }
 
 type QueryNamespaceRequest struct {
-	*request.PageRequest
+	request.PageRequest
+	NamespaceIds []uint64 `json:"namespace_ids"`
+}
+
+func (r *QueryNamespaceRequest) AddNamespaceIds(ids ...uint64) {
+	for _, id := range ids {
+		if !r.HasNamespaceIds(id) {
+			r.NamespaceIds = append(r.NamespaceIds, id)
+		}
+	}
+}
+
+func (r *QueryNamespaceRequest) HasNamespaceIds(namespaceId uint64) bool {
+	for i := range r.NamespaceIds {
+		if r.NamespaceIds[i] == namespaceId {
+			return true
+		}
+	}
+	return false
 }
 
 func NewDescribeNamespaceRequest() *DescribeNamespaceRequest {

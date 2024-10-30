@@ -5,6 +5,14 @@ import (
 	"github.com/infraboard/modules/iam/apps/view"
 )
 
+func NewViewPermission(roleId uint64, spec *ViewPermissionSpec) *ViewPermission {
+	return &ViewPermission{
+		Meta:               *apps.NewMeta(),
+		RoleId:             roleId,
+		ViewPermissionSpec: *spec,
+	}
+}
+
 type ViewPermission struct {
 	// 基础数据
 	apps.Meta

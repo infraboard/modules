@@ -5,6 +5,7 @@ import (
 
 	"github.com/infraboard/mcube/v2/http/request"
 	"github.com/infraboard/mcube/v2/ioc"
+	"github.com/infraboard/mcube/v2/ioc/config/validator"
 	"github.com/infraboard/mcube/v2/types"
 	"github.com/infraboard/modules/iam/apps"
 	"github.com/infraboard/modules/iam/apps/endpoint"
@@ -74,6 +75,8 @@ type DeleteRoleRequest struct {
 
 // 角色API接口管理
 type ApiPermissionService interface {
+	// 查询角色关联的权限条目
+	QueryApiPermission(context.Context, *QueryApiPermissionRequest) ([]*ApiPermission, error)
 	// 添加角色关联API
 	AddApiPermission(context.Context, *AddApiPermissionRequest) ([]*ApiPermission, error)
 	// 移除角色关联API
@@ -82,6 +85,10 @@ type ApiPermissionService interface {
 	UpdateApiPermission(context.Context, *UpdateApiPermissionRequest) ([]*ApiPermission, error)
 	// 查询匹配到的Api接口列表
 	QueryMatchedEndpoint(context.Context, *QueryMatchedEndpointRequest) (*types.Set[*endpoint.Endpoint], error)
+}
+
+type QueryApiPermissionRequest struct {
+	RoleIds []uint64 `json:"role_ids"`
 }
 
 func NewQueryMatchedEndpointRequest() *QueryMatchedEndpointRequest {
@@ -101,6 +108,10 @@ type AddApiPermissionRequest struct {
 	Items  []*ApiPermissionSpec `json:"items"`
 }
 
+func (r *AddApiPermissionRequest) Validate() error {
+	return validator.Validate(r)
+}
+
 func NewRemoveApiPermissionRequest() *RemoveApiPermissionRequest {
 	return &RemoveApiPermissionRequest{
 		ApiPermissionIds: []uint64{},
@@ -118,6 +129,8 @@ type UpdateApiPermissionRequest struct {
 
 // 角色菜单管理
 type ViewPermissionService interface {
+	// 查询角色关联的视图权限
+	QueryViewPermission(context.Context, *QueryViewPermissionRequest) ([]*ViewPermission, error)
 	// 添加角色关联菜单
 	AddViewPermission(context.Context, *AddViewPermissionRequest) ([]*ViewPermission, error)
 	// 移除角色关联菜单
@@ -126,6 +139,16 @@ type ViewPermissionService interface {
 	UpdateViewPermission(context.Context, *UpdateViewPermission) ([]*ViewPermission, error)
 	// 查询能匹配到视图菜单
 	QueryMatchedMenu(context.Context, *QueryMatchedMenuRequest) (*types.Set[*view.Menu], error)
+}
+
+func NewQueryViewPermissionRequest() *QueryViewPermissionRequest {
+	return &QueryViewPermissionRequest{
+		RoleIds: []uint64{},
+	}
+}
+
+type QueryViewPermissionRequest struct {
+	RoleIds []uint64 `json:"role_ids"`
 }
 
 func NewQueryMatchedMenuRequest() *QueryMatchedMenuRequest {
@@ -145,6 +168,10 @@ func NewAddViewPermissionRequest() *AddViewPermissionRequest {
 type AddViewPermissionRequest struct {
 	RoleId uint64                `json:"role_id"`
 	Items  []*ViewPermissionSpec `json:"items"`
+}
+
+func (r *AddViewPermissionRequest) Validate() error {
+	return validator.Validate(r)
 }
 
 type UpdateViewPermission struct {

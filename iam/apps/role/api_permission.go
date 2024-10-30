@@ -5,6 +5,14 @@ import (
 	"github.com/infraboard/modules/iam/apps/endpoint"
 )
 
+func NewApiPermission(roleId uint64, spec *ApiPermissionSpec) *ApiPermission {
+	return &ApiPermission{
+		Meta:              *apps.NewMeta(),
+		RoleId:            roleId,
+		ApiPermissionSpec: *spec,
+	}
+}
+
 type ApiPermission struct {
 	// 基础数据
 	apps.Meta

@@ -86,7 +86,7 @@ func (h *NamespaceRestfulApiHandler) Init() error {
 func (h *NamespaceRestfulApiHandler) QueryNamespace(r *restful.Request, w *restful.Response) {
 	// 1. 获取用户的请求参数， 参数在Body里面
 	req := namespace.NewQueryNamespaceRequest()
-	req.PageRequest = request.NewPageRequestFromHTTP(r.Request)
+	req.PageRequest = *request.NewPageRequestFromHTTP(r.Request)
 
 	// 2. 执行逻辑
 	tk, err := h.svc.QueryNamespace(r.Request.Context(), req)

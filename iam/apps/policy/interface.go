@@ -48,6 +48,8 @@ func NewQueryPolicyRequest() *QueryPolicyRequest {
 
 type QueryPolicyRequest struct {
 	*request.PageRequest
+	// 忽略分页
+	SkipPage bool `json:"skip_page"`
 	// 关联用户Id
 	UserId *uint64 `json:"user_id"`
 	// 关联空间
@@ -81,6 +83,11 @@ func (r *QueryPolicyRequest) SetExpired(v bool) *QueryPolicyRequest {
 
 func (r *QueryPolicyRequest) SetEnabled(v bool) *QueryPolicyRequest {
 	r.Enabled = &v
+	return r
+}
+
+func (r *QueryPolicyRequest) SetSkipPage(v bool) *QueryPolicyRequest {
+	r.SkipPage = v
 	return r
 }
 
@@ -158,4 +165,16 @@ func NewQueryEndpointRequest() *QueryEndpointRequest {
 }
 
 type QueryEndpointRequest struct {
+	UserId      uint64 `json:"user_id"`
+	NamespaceId uint64 `json:"namespace_id"`
+}
+
+func (r *QueryEndpointRequest) SetUserId(v uint64) *QueryEndpointRequest {
+	r.UserId = v
+	return r
+}
+
+func (r *QueryEndpointRequest) SetNamespaceId(v uint64) *QueryEndpointRequest {
+	r.NamespaceId = v
+	return r
 }

@@ -32,21 +32,22 @@ func (i *PolicyServiceImpl) CreatePolicy(ctx context.Context, in *policy.CreateP
 func (i *PolicyServiceImpl) QueryPolicy(ctx context.Context, in *policy.QueryPolicyRequest) (*types.Set[*policy.Policy], error) {
 	set := types.New[*policy.Policy]()
 
-	query := datasource.DBFromCtx(ctx).Model(&policy.Policy{})
+	query := datasource.DBFromCtx(ctx).Model(&policy.Policy{}).Order("created_at desc")
 	err := query.Count(&set.Total).Error
 	if err != nil {
 		return nil, err
 	}
 
-	err = query.
-		Order("created_at desc").
-		Offset(int(in.ComputeOffset())).
-		Limit(int(in.PageSize)).
-		Find(&set.Items).
-		Error
-	if err != nil {
+	if !in.SkipPage {
+		query = query.
+			Offset(int(in.ComputeOffset())).
+			Limit(int(in.PageSize))
+	}
+
+	if err = query.Find(&set.Items).Error; err != nil {
 		return nil, err
 	}
+
 	return set, nil
 }
 
