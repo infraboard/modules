@@ -14,3 +14,14 @@ func TestQueryMenu(t *testing.T) {
 	}
 	t.Log(set)
 }
+
+func TestCreateMenu(t *testing.T) {
+	req := view.NewCreateMenuRequest()
+	req.Path = "/system/develop/tool"
+	req.Name = "研发工具"
+	set, err := impl.CreateMenu(ctx, req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(set)
+}

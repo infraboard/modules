@@ -37,11 +37,17 @@ func (i *RoleServiceImpl) AddApiPermission(ctx context.Context, in *role.AddApiP
 
 // 移除角色关联API
 func (i *RoleServiceImpl) QueryApiPermission(ctx context.Context, in *role.QueryApiPermissionRequest) ([]*role.ApiPermission, error) {
+	query := datasource.DBFromCtx(ctx).Model(&role.ApiPermission{})
+	if len(in.RoleIds) > 0 {
+		query = query.Where("role_id IN ?", in.RoleIds)
+	}
+	if len(in.ApiPermissionIds) > 0 {
+		query = query.Where("in IN ?", in.ApiPermissionIds)
+	}
+
 	perms := []*role.ApiPermission{}
-	if err := datasource.DBFromCtx(ctx).
-		Model(&role.ApiPermission{}).
+	if err := query.
 		Order("created_at desc").
-		Where("id IN ?", in.RoleIds).
 		Find(&perms).Error; err != nil {
 		return nil, err
 	}
@@ -50,12 +56,23 @@ func (i *RoleServiceImpl) QueryApiPermission(ctx context.Context, in *role.Query
 
 // 移除角色关联API
 func (i *RoleServiceImpl) RemoveApiPermission(ctx context.Context, in *role.RemoveApiPermissionRequest) ([]*role.ApiPermission, error) {
-	return nil, nil
-}
+	if err := in.Validate(); err != nil {
+		return nil, err
+	}
+	perms, err := i.QueryApiPermission(ctx, role.NewQueryApiPermissionRequest().AddRoleId(in.RoleId).AddPermissionId(in.ApiPermissionIds...))
+	if err != nil {
+		return nil, err
+	}
 
-// 更新Api权限
-func (i *RoleServiceImpl) UpdateApiPermission(ctx context.Context, in *role.UpdateApiPermissionRequest) ([]*role.ApiPermission, error) {
-	return nil, nil
+	if err := datasource.DBFromCtx(ctx).
+		Where("role_id = ?", in.RoleId).
+		Where("id IN ?", in.ApiPermissionIds).
+		Delete(&role.ApiPermission{}).
+		Error; err != nil {
+		return nil, err
+	}
+
+	return perms, nil
 }
 
 // 查询匹配到的Api接口列表

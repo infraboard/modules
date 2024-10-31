@@ -37,10 +37,16 @@ func (i *RoleServiceImpl) AddViewPermission(ctx context.Context, in *role.AddVie
 
 // 查询角色关联的视图权限
 func (i *RoleServiceImpl) QueryViewPermission(ctx context.Context, in *role.QueryViewPermissionRequest) ([]*role.ViewPermission, error) {
+	query := datasource.DBFromCtx(ctx).Model(&role.ViewPermission{})
+	if len(in.RoleIds) > 0 {
+		query = query.Where("role_id IN ?", in.RoleIds)
+	}
+	if len(in.ViewPermissionIds) > 0 {
+		query = query.Where("in IN ?", in.ViewPermissionIds)
+	}
+
 	perms := []*role.ViewPermission{}
-	if err := datasource.DBFromCtx(ctx).
-		Model(&role.ViewPermission{}).
-		Order("created_at desc").
+	if err := query.Order("created_at desc").
 		Where("id IN ?", in.RoleIds).
 		Find(&perms).Error; err != nil {
 		return nil, err
@@ -50,12 +56,24 @@ func (i *RoleServiceImpl) QueryViewPermission(ctx context.Context, in *role.Quer
 
 // 移除角色关联菜单
 func (i *RoleServiceImpl) RemoveViewPermission(ctx context.Context, in *role.RemoveViewPermissionRequest) ([]*role.ViewPermission, error) {
-	return nil, nil
-}
+	if err := in.Validate(); err != nil {
+		return nil, err
+	}
 
-// 更新角色权限
-func (i *RoleServiceImpl) UpdateViewPermission(ctx context.Context, in *role.UpdateViewPermission) ([]*role.ViewPermission, error) {
-	return nil, nil
+	perms, err := i.QueryViewPermission(ctx, role.NewQueryViewPermissionRequest().AddRoleId(in.RoleId).AddPermissionId(in.ViewPermissionIds...))
+	if err != nil {
+		return nil, err
+	}
+
+	if err := datasource.DBFromCtx(ctx).
+		Where("role_id = ?", in.RoleId).
+		Where("id IN ?", in.ViewPermissionIds).
+		Delete(&role.ViewPermission{}).
+		Error; err != nil {
+		return nil, err
+	}
+
+	return perms, nil
 }
 
 // 查询能匹配到视图菜单

@@ -27,14 +27,10 @@ func (r *ViewPermission) TableName() string {
 }
 
 type ViewPermissionSpec struct {
-	// 权限序号
-	SequenceNumber uint16 `json:"sequence_number" gorm:"column:sequence_number;index" description:"权限序号" optional:"true"`
 	// 创建者ID
 	CreateBy uint64 `json:"create_by" gorm:"column:create_by" description:"创建者ID" optional:"true"`
 	// 角色描述
 	Description string `json:"description" gorm:"column:description;type:text" bson:"description" description:"角色描述"`
-	// 效力
-	Effect EFFECT_TYPE `json:"effect" gorm:"column:effect;type:tinyint(1);index" bson:"effect" description:"效力"`
 	// 服务
 	Service string `json:"service" gorm:"column:service;type:varchar(100);index" bson:"service" description:"服务名称"`
 	// 页面标签

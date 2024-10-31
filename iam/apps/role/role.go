@@ -2,6 +2,7 @@ package role
 
 import (
 	"github.com/infraboard/mcube/v2/ioc/config/validator"
+	"github.com/infraboard/mcube/v2/tools/pretty"
 	"github.com/infraboard/modules/iam/apps"
 	"github.com/infraboard/modules/iam/apps/endpoint"
 )
@@ -29,6 +30,10 @@ func (r *Role) TableName() string {
 	return "roles"
 }
 
+func (r *Role) String() string {
+	return pretty.ToJSON(r)
+}
+
 // 该角色是否允许该API访问
 func (r *Role) CheckPerm(re *endpoint.RouteEntry) error {
 	return nil
@@ -36,7 +41,8 @@ func (r *Role) CheckPerm(re *endpoint.RouteEntry) error {
 
 func NewCreateRoleRequest() *CreateRoleRequest {
 	return &CreateRoleRequest{
-		Extras: map[string]string{},
+		Extras:  map[string]string{},
+		Enabled: true,
 	}
 }
 

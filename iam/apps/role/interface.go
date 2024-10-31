@@ -81,20 +81,30 @@ type ApiPermissionService interface {
 	AddApiPermission(context.Context, *AddApiPermissionRequest) ([]*ApiPermission, error)
 	// 移除角色关联API
 	RemoveApiPermission(context.Context, *RemoveApiPermissionRequest) ([]*ApiPermission, error)
-	// 更新Api权限
-	UpdateApiPermission(context.Context, *UpdateApiPermissionRequest) ([]*ApiPermission, error)
 	// 查询匹配到的Api接口列表
 	QueryMatchedEndpoint(context.Context, *QueryMatchedEndpointRequest) (*types.Set[*endpoint.Endpoint], error)
 }
 
 func NewQueryApiPermissionRequest() *QueryApiPermissionRequest {
 	return &QueryApiPermissionRequest{
-		RoleIds: []uint64{},
+		RoleIds:          []uint64{},
+		ApiPermissionIds: []uint64{},
 	}
 }
 
 type QueryApiPermissionRequest struct {
-	RoleIds []uint64 `json:"role_ids"`
+	RoleIds          []uint64 `json:"role_ids"`
+	ApiPermissionIds []uint64 `json:"api_permission_ids"`
+}
+
+func (r *QueryApiPermissionRequest) AddRoleId(roleIds ...uint64) *QueryApiPermissionRequest {
+	r.RoleIds = append(r.RoleIds, roleIds...)
+	return r
+}
+
+func (r *QueryApiPermissionRequest) AddPermissionId(permissionIds ...uint64) *QueryApiPermissionRequest {
+	r.ApiPermissionIds = append(r.ApiPermissionIds, permissionIds...)
+	return r
 }
 
 func NewQueryMatchedEndpointRequest() *QueryMatchedEndpointRequest {
@@ -129,6 +139,10 @@ type RemoveApiPermissionRequest struct {
 	ApiPermissionIds []uint64 `json:"api_permission_ids"`
 }
 
+func (r *RemoveApiPermissionRequest) Validate() error {
+	return validator.Validate(r)
+}
+
 type UpdateApiPermissionRequest struct {
 	Items []*ApiPermission `json:"items"`
 }
@@ -141,20 +155,30 @@ type ViewPermissionService interface {
 	AddViewPermission(context.Context, *AddViewPermissionRequest) ([]*ViewPermission, error)
 	// 移除角色关联菜单
 	RemoveViewPermission(context.Context, *RemoveViewPermissionRequest) ([]*ViewPermission, error)
-	// 更新角色权限
-	UpdateViewPermission(context.Context, *UpdateViewPermission) ([]*ViewPermission, error)
 	// 查询能匹配到视图菜单
 	QueryMatchedMenu(context.Context, *QueryMatchedMenuRequest) (*types.Set[*view.Menu], error)
 }
 
 func NewQueryViewPermissionRequest() *QueryViewPermissionRequest {
 	return &QueryViewPermissionRequest{
-		RoleIds: []uint64{},
+		RoleIds:           []uint64{},
+		ViewPermissionIds: []uint64{},
 	}
 }
 
 type QueryViewPermissionRequest struct {
-	RoleIds []uint64 `json:"role_ids"`
+	RoleIds           []uint64 `json:"role_ids"`
+	ViewPermissionIds []uint64 `json:"view_permission_ids"`
+}
+
+func (r *QueryViewPermissionRequest) AddRoleId(roleIds ...uint64) *QueryViewPermissionRequest {
+	r.RoleIds = append(r.RoleIds, roleIds...)
+	return r
+}
+
+func (r *QueryViewPermissionRequest) AddPermissionId(permissionIds ...uint64) *QueryViewPermissionRequest {
+	r.ViewPermissionIds = append(r.ViewPermissionIds, permissionIds...)
+	return r
 }
 
 func NewQueryMatchedMenuRequest() *QueryMatchedMenuRequest {
@@ -193,4 +217,8 @@ func NewRemoveViewPermissionRequest() *RemoveViewPermissionRequest {
 type RemoveViewPermissionRequest struct {
 	RoleId            uint64   `json:"role_id"`
 	ViewPermissionIds []uint64 `json:"menu_permission_ids"`
+}
+
+func (r *RemoveViewPermissionRequest) Validate() error {
+	return validator.Validate(r)
 }

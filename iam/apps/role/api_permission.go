@@ -27,15 +27,10 @@ func (r *ApiPermission) TableName() string {
 }
 
 type ApiPermissionSpec struct {
-	// 权限序号
-	SequenceNumber uint16 `json:"sequence_number" gorm:"column:sequence_number" description:"权限序号" optional:"true"`
 	// 创建者ID
 	CreateBy uint64 `json:"create_by" gorm:"column:create_by" description:"创建者ID" optional:"true"`
 	// 角色描述
 	Description string `json:"description" gorm:"column:description;type:text" bson:"description" description:"角色描述"`
-	// 效力
-	Effect EFFECT_TYPE `json:"effect" gorm:"column:effect;type:tinyint(1);index" bson:"effect" description:"效力"`
-
 	// 权限匹配方式
 	MatchBy MATCH_BY `json:"match_by" gorm:"column:match_by;type:tinyint(1);index" bson:"match_by" description:"权限匹配方式"`
 	// MATCH_BY_ID 时指定的 Endpoint Id
