@@ -1,4 +1,4 @@
-package issuer
+package password
 
 import (
 	"context"
@@ -40,7 +40,7 @@ func (p *PasswordTokenIssuer) Init() error {
 
 func (p *PasswordTokenIssuer) IssueToken(ctx context.Context, parameter token.IssueParameter) (*token.Token, error) {
 	// 1. 查询用户
-	uReq := user.NewDescribeUserRequestByUsername(parameter.Username())
+	uReq := user.NewDescribeUserRequestByUserName(parameter.Username())
 	u, err := p.user.DescribeUser(ctx, uReq)
 	if err != nil {
 		if exception.IsNotFoundError(err) {

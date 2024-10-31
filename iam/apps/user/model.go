@@ -24,8 +24,7 @@ type User struct {
 	apps.Meta
 	// 用户传递过来的请求
 	CreateUserRequest
-	// 创建方式
-	CreateType CEATE_TYPE `json:"create_type" gorm:"column:create_type;type:tinyint(1);not null;index" optional:"true"`
+
 	// 密码强度
 	PwdIntensity int8 `json:"pwd_intensity" gorm:"column:pwd_intensity;type:tinyint(1);not null" optional:"true"`
 }
@@ -52,12 +51,17 @@ func NewCreateUserRequest() *CreateUserRequest {
 	}
 }
 
-// VO
 type CreateUserRequest struct {
+	// 账号提供方
+	Provider PROVIDER `json:"provider" gorm:"column:provider;type:tinyint(1);not null;index" description:"账号提供方"`
+	// 创建方式
+	CreateType CEATE_TYPE `json:"create_type" gorm:"column:create_type;type:tinyint(1);not null;index" optional:"true"`
 	// 用户名
 	UserName string `json:"user_name" gorm:"column:user_name;type:varchar(100);not null;uniqueIndex" description:"用户名"`
 	// 密码(Hash过后的)
 	Password string `json:"password" gorm:"column:password;type:varchar(200);not null" description:"用户密码"`
+	// 用户描述
+	Description string `json:"description" gorm:"column:description;type:varchar(200);not null" description:"用户描述"`
 
 	// 支持接口调用
 	EnabledApi bool `json:"enabled_api" gorm:"column:enabled_api;type:tinyint(1)" optional:"true" description:"支持接口调用"`

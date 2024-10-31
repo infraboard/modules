@@ -1,4 +1,4 @@
-package issuer
+package privatetoken
 
 import (
 	"context"
@@ -34,7 +34,7 @@ func (p *PrivateTokenIssuer) Init() error {
 
 func (p *PrivateTokenIssuer) IssueToken(ctx context.Context, parameter token.IssueParameter) (*token.Token, error) {
 	// 1. 查询用户
-	uReq := user.NewDescribeUserRequestByUsername(parameter.Username())
+	uReq := user.NewDescribeUserRequestByUserName(parameter.Username())
 	u, err := p.user.DescribeUser(ctx, uReq)
 	if err != nil {
 		if exception.IsNotFoundError(err) {

@@ -46,7 +46,7 @@ func NewDescribeUserRequestById(id string) *DescribeUserRequest {
 	}
 }
 
-func NewDescribeUserRequestByUsername(username string) *DescribeUserRequest {
+func NewDescribeUserRequestByUserName(username string) *DescribeUserRequest {
 	return &DescribeUserRequest{
 		DescribeBy:    DESCRIBE_BY_USERNAME,
 		DescribeValue: username,

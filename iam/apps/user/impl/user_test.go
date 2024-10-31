@@ -69,7 +69,7 @@ func TestDescribeUserRequestById(t *testing.T) {
 
 // SELECT * FROM `users` WHERE username = 'admin' ORDER BY `users`.`id` LIMIT 1
 func TestDescribeUserRequestByName(t *testing.T) {
-	req := user.NewDescribeUserRequestByUsername("admin")
+	req := user.NewDescribeUserRequestByUserName("admin")
 	ins, err := impl.DescribeUser(ctx, req)
 	if err != nil {
 		t.Fatal(err)
