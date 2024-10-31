@@ -87,6 +87,12 @@ type ApiPermissionService interface {
 	QueryMatchedEndpoint(context.Context, *QueryMatchedEndpointRequest) (*types.Set[*endpoint.Endpoint], error)
 }
 
+func NewQueryApiPermissionRequest() *QueryApiPermissionRequest {
+	return &QueryApiPermissionRequest{
+		RoleIds: []uint64{},
+	}
+}
+
 type QueryApiPermissionRequest struct {
 	RoleIds []uint64 `json:"role_ids"`
 }
