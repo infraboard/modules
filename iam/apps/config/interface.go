@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/types"
@@ -17,13 +18,23 @@ func GetService() Service {
 
 type Service interface {
 	// 添加配置
-	AddConfig(context.Context, *KVItem) (*ConfigItem, error)
+	AddConfig(context.Context, *AddConfigRequest) (*ConfigItem, error)
 	// 查询配置项
 	QueryConfig(context.Context, *QueryConfigRequest) (*types.Set[*ConfigItem], error)
 	// 查询配置详情
 	DescribeConfig(context.Context, *DescribeConfigRequest) (*ConfigItem, error)
 	// 更新配置
 	UpdateConfig(context.Context, *UpdateConfigRequest) (*ConfigItem, error)
+}
+
+func NewAddConfigRequest() *AddConfigRequest {
+	return &AddConfigRequest{
+		Items: []*KVItem{},
+	}
+}
+
+type AddConfigRequest struct {
+	Items []*KVItem `json:"items"`
 }
 
 func NewQueryConfigRequest() *QueryConfigRequest {
@@ -34,10 +45,32 @@ type QueryConfigRequest struct {
 	Group string `json:"group"`
 }
 
+func NewDescribeConfigRequestById(id string) *DescribeConfigRequest {
+	return &DescribeConfigRequest{
+		DescribeBy:    DESCRIBE_BY_ID,
+		DescribeValue: id,
+	}
+}
+
+func NewDescribeConfigRequestByKey(group, key string) *DescribeConfigRequest {
+	return &DescribeConfigRequest{
+		DescribeBy:    DESCRIBE_BY_ID,
+		DescribeValue: fmt.Sprintf("%s::%s", group, key),
+	}
+}
+
 type DescribeConfigRequest struct {
-	Group string `json:"group"`
-	Key   string `json:"key"`
+	DescribeBy    DESCRIBE_BY
+	DescribeValue string
+}
+
+func NewUpdateConfigRequest(id string) *UpdateConfigRequest {
+	return &UpdateConfigRequest{
+		Id: id,
+	}
 }
 
 type UpdateConfigRequest struct {
+	Id string `json:"id"`
+	KVItem
 }

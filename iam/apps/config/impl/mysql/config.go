@@ -8,7 +8,7 @@ import (
 )
 
 // 添加配置
-func (i *ConfigServiceImpl) AddConfig(ctx context.Context, in *config.KVItem) (*config.ConfigItem, error) {
+func (i *ConfigServiceImpl) AddConfig(ctx context.Context, in *config.AddConfigRequest) (*config.ConfigItem, error) {
 	return nil, nil
 }
 
