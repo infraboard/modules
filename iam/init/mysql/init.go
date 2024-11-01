@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	_ "github.com/infraboard/modules/iam/apps/config/impl/mysql"
 	_ "github.com/infraboard/modules/iam/apps/endpoint/impl/mysql"
 	_ "github.com/infraboard/modules/iam/apps/namespace/impl/mysql"
 	_ "github.com/infraboard/modules/iam/apps/policy/impl/mysql"
