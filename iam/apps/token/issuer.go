@@ -10,6 +10,7 @@ import (
 
 const (
 	ISSUER_LDAP          = "ldap"
+	ISSUER_FEISHU        = "feishu"
 	ISSUER_PASSWORD      = "password"
 	ISSUER_PRIVATE_TOKEN = "private_token"
 )

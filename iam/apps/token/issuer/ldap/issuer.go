@@ -15,6 +15,14 @@ import (
 func init() {
 	ioc.Config().Registry(&LdapTokenIssuer{
 		ExpiredTTLSecond: 1 * 60 * 60,
+		Config: Config{
+			MailAttribute:        "mail",
+			DisplayNameAttribute: "displayName",
+			GroupNameAttribute:   "cn",
+			UserNameAttribute:    "uid",
+			UserFilter:           "(uid={input})",
+			GroupFilter:          "(|(member={dn})(uid={username})(uid={input}))",
+		},
 	})
 }
 
