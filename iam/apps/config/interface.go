@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/infraboard/mcube/v2/ioc"
+	"github.com/infraboard/mcube/v2/ioc/config/validator"
 	"github.com/infraboard/mcube/v2/types"
 )
 
@@ -18,7 +19,7 @@ func GetService() Service {
 
 type Service interface {
 	// 添加配置
-	AddConfig(context.Context, *AddConfigRequest) (*ConfigItem, error)
+	AddConfig(context.Context, *AddConfigRequest) (*types.Set[*ConfigItem], error)
 	// 查询配置项
 	QueryConfig(context.Context, *QueryConfigRequest) (*types.Set[*ConfigItem], error)
 	// 查询配置详情
@@ -35,6 +36,15 @@ func NewAddConfigRequest() *AddConfigRequest {
 
 type AddConfigRequest struct {
 	Items []*KVItem `json:"items"`
+}
+
+func (r *AddConfigRequest) Validate() error {
+	return validator.Validate(r)
+}
+
+func (r *AddConfigRequest) AddKVItem(items ...*KVItem) *AddConfigRequest {
+	r.Items = append(r.Items, items...)
+	return r
 }
 
 func NewQueryConfigRequest() *QueryConfigRequest {

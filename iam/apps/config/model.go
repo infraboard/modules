@@ -2,6 +2,15 @@ package config
 
 import "github.com/infraboard/modules/iam/apps"
 
+func NewConfigItem() *ConfigItem {
+	return &ConfigItem{
+		Meta: *apps.NewMeta(),
+		KVItem: KVItem{
+			Extras: make(map[string]string),
+		},
+	}
+}
+
 type ConfigItem struct {
 	apps.Meta
 	KVItem
