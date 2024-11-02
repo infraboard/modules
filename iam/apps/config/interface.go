@@ -2,7 +2,6 @@ package config
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/validator"
@@ -62,10 +61,10 @@ func NewDescribeConfigRequestById(id string) *DescribeConfigRequest {
 	}
 }
 
-func NewDescribeConfigRequestByKey(group, key string) *DescribeConfigRequest {
+func NewDescribeConfigRequestByKey(key string) *DescribeConfigRequest {
 	return &DescribeConfigRequest{
-		DescribeBy:    DESCRIBE_BY_ID,
-		DescribeValue: fmt.Sprintf("%s::%s", group, key),
+		DescribeBy:    DESCRIBE_BY_KEY,
+		DescribeValue: key,
 	}
 }
 

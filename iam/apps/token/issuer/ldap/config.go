@@ -1,5 +1,11 @@
 package ldap
 
+import "github.com/infraboard/mcube/v2/tools/pretty"
+
+func NewConfig() *Config {
+	return &Config{}
+}
+
 type Config struct {
 	// 开启LDAP认证
 	Enabled bool `json:"enabled" toml:"enabled" yaml:"enabled" env:"ENABLED"`
@@ -27,4 +33,8 @@ type Config struct {
 	DisplayNameAttribute string `json:"display_name_attribute" toml:"display_name_attribute" yaml:"display_name_attribute" env:"DISPLAY_NAME_ATTRIBUTE"`
 	// 新增用户或者注销用户时，是否同步, 默认不做同步, 只读区用户信息
 	SyncUser bool `json:"sync_user" toml:"sync_user" yaml:"sync_user" env:"SYNC_USER"`
+}
+
+func (c *Config) String() string {
+	return pretty.ToJSON(c)
 }

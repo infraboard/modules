@@ -19,9 +19,12 @@ func (i *ConfigServiceImpl) AddConfig(ctx context.Context, in *config.AddConfigR
 	set := types.New[*config.ConfigItem]()
 	datasource.DBFromCtx(ctx).Transaction(func(tx *gorm.DB) error {
 		for i := range in.Items {
-			item := in.Items[i]
 			ins := config.NewConfigItem()
+			item := in.Items[i]
 			ins.KVItem = *item
+			if err := ins.Encrypt(); err != nil {
+				return err
+			}
 			if err := tx.Save(ins).Error; err != nil {
 				return err
 			}
@@ -52,11 +55,22 @@ func (i *ConfigServiceImpl) QueryConfig(ctx context.Context, in *config.QueryCon
 func (i *ConfigServiceImpl) DescribeConfig(ctx context.Context, in *config.DescribeConfigRequest) (*config.ConfigItem, error) {
 	query := datasource.DBFromCtx(ctx)
 
+	switch in.DescribeBy {
+	case config.DESCRIBE_BY_ID:
+		query = query.Where("id = ?", in.DescribeValue)
+	case config.DESCRIBE_BY_KEY:
+		query = query.Where("`key` = ?", in.DescribeValue)
+	}
+
 	ins := &config.ConfigItem{}
 	if err := query.First(ins).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, exception.NewNotFound("config %s not found", in.DescribeValue)
 		}
+		return nil, err
+	}
+
+	if err := ins.Decrypt(); err != nil {
 		return nil, err
 	}
 
@@ -70,7 +84,11 @@ func (i *ConfigServiceImpl) UpdateConfig(ctx context.Context, in *config.UpdateC
 	if err != nil {
 		return nil, err
 	}
-
 	ins.KVItem = in.KVItem
+
+	if err := ins.Encrypt(); err != nil {
+		return nil, err
+	}
+
 	return ins, datasource.DBFromCtx(ctx).Where("id = ?", in.Id).Updates(ins).Error
 }

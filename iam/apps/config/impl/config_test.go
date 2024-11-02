@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/infraboard/modules/iam/apps/config"
+	"github.com/infraboard/modules/iam/apps/token/issuer/ldap"
 )
 
 func TestQueryConfig(t *testing.T) {
@@ -16,17 +17,25 @@ func TestQueryConfig(t *testing.T) {
 }
 
 func TestDescribeConfig(t *testing.T) {
-	req := config.NewDescribeConfigRequestById("1")
+	req := config.NewDescribeConfigRequestByKey("ldap")
 	ins, err := impl.DescribeConfig(ctx, req)
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Log(ins)
+
+	ldapConf := ldap.NewConfig()
+	if err := ins.Load(ldapConf); err != nil {
+		t.Fatal(err)
+	}
+	t.Log(ldapConf)
 }
 
 func TestAddConfig(t *testing.T) {
 	req := config.NewAddConfigRequest()
-	req.AddKVItem()
+	ldapConf := ldap.NewConfig()
+	ldapConf.BindDn = "cn=admin,dc=example,dc=org"
+	ldapConf.BindPassword = "123456"
+	req.AddKVItem(config.NewKVItem("ldap", ldapConf.String()).SetGroup("登录设置").SetIsEncrypted(true))
 	set, err := impl.AddConfig(ctx, req)
 	if err != nil {
 		t.Fatal(err)
