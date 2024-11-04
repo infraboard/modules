@@ -1,6 +1,7 @@
 package restful
 
 import (
+	_ "github.com/infraboard/modules/iam/apps/code/api/restful"
 	_ "github.com/infraboard/modules/iam/apps/config/api/restful"
 	_ "github.com/infraboard/modules/iam/apps/endpoint/api/restful"
 	_ "github.com/infraboard/modules/iam/apps/namespace/api/restful"
