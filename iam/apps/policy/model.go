@@ -36,7 +36,7 @@ func (u *Policy) TableName() string {
 func NewCreatePolicyRequest() *CreatePolicyRequest {
 	return &CreatePolicyRequest{
 		Extras: map[string]string{},
-		Filter: map[string]string{},
+		Scope:  map[string]string{},
 	}
 }
 
@@ -49,8 +49,8 @@ type CreatePolicyRequest struct {
 	UserId uint64 `json:"user_id" bson:"user_id" gorm:"column:user_id;type:uint;not null;index" validate:"required" description:"被授权的用户"`
 	// 角色Id
 	RoleId uint64 `json:"role_id" bson:"role_id" gorm:"column:role_id;type:uint;not null;index" validate:"required" description:"被关联的角色"`
-	// 过滤器
-	Filter map[string]string `json:"filter" bson:"filter" gorm:"column:filter;serializer:json;type:json" description:"被关联的权限过滤器" optional:"true"`
+	// 访问范围, 需要提前定义scope, 比如环境
+	Scope map[string]string `json:"scope" bson:"scope" gorm:"column:scope;serializer:json;type:json" description:"数据访问的范围" optional:"true"`
 	// 策略过期时间
 	ExpiredTime *time.Time `json:"expired_time" bson:"expired_time" gorm:"column:expired_time;type:timestamp;index" description:"策略过期时间" optional:"true"`
 	// 只读策略, 不允许用户修改, 一般用于系统管理

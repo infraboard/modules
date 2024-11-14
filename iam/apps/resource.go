@@ -38,3 +38,10 @@ func (r *GetRequest) SetIdByString(id string) error {
 	r.Id = v
 	return nil
 }
+
+type Scope struct {
+	// 空间
+	NamespaceId *uint64 `json:"namespace_id" bson:"namespace_id" gorm:"column:namespace_id;type:varchar(200);index" description:"空间Id" optional:"true"`
+	// 访问范围定义, 比如 Env=Dev
+	Scope map[string]string `json:"scope" bson:"scope" gorm:"column:scope;serializer:json;type:json" description:"数据访问的范围定义" optional:"true"`
+}

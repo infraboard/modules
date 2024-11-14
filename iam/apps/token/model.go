@@ -47,6 +47,7 @@ func NewToken() *Token {
 		IssueAt:      time.Now(),
 		Status:       NewStatus(),
 		Extras:       map[string]string{},
+		Scope:        map[string]string{},
 	}
 
 	return tk
@@ -67,8 +68,10 @@ type Token struct {
 	IsAdmin bool `json:"is_admin" gorm:"column:is_admin;type:tinyint(1)" description:"是不是管理员"`
 	// 令牌生效空间Id
 	NamespaceId uint64 `json:"namespace_id" gorm:"column:namespace_id;type:uint;index" description:"令牌所属空间Id"`
-	//  令牌生效空间名称
+	// 令牌生效空间名称
 	NamespaceName string `json:"namespace_name" gorm:"column:namespace_name;type:varchar(100);index" description:"令牌所属空间"`
+	// 访问范围定义, 鉴权完成后补充
+	Scope map[string]string `json:"scope" gorm:"column:scope;type:varchar(100)" description:"令牌访问范围定义"`
 	// 颁发给用户的访问令牌(用户需要携带Token来访问接口)
 	AccessToken string `json:"access_token" gorm:"column:access_token;type:varchar(100);not null;uniqueIndex" description:"访问令牌"`
 	// 访问令牌过期时间

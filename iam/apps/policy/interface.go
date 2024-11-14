@@ -132,6 +132,33 @@ type PermissionService interface {
 	QueryMenu(context.Context, *QueryMenuRequest) (*types.Set[*view.Menu], error)
 	// 查询用户可以访问的Api接口
 	QueryEndpoint(context.Context, *QueryEndpointRequest) (*types.Set[*endpoint.Endpoint], error)
+	// 校验页面权限
+	ValidatePagePermission(context.Context, *ValidatePagePermissionRequest) (*ValidatePagePermissionResponse, error)
+	// 校验接口权限
+	ValidateEndpointPermission(context.Context, *ValidateEndpointPermissionRequest) (*ValidateEndpointPermissionResponse, error)
+}
+
+type ValidatePagePermissionRequest struct {
+	UserId      uint64 `json:"user_id"`
+	NamespaceId uint64 `json:"namespace_id"`
+	Path        string `json:"path"`
+}
+
+type ValidatePagePermissionResponse struct {
+	Page   *view.Page `json:"page"`
+	Policy *Policy    `json:"policy"`
+}
+
+type ValidateEndpointPermissionRequest struct {
+	UserId      uint64 `json:"user_id"`
+	NamespaceId uint64 `json:"namespace_id"`
+	Path        string `json:"path"`
+	Method      string `json:"method"`
+}
+
+type ValidateEndpointPermissionResponse struct {
+	Page   *endpoint.Endpoint `json:"endpoint"`
+	Policy *Policy            `json:"policy"`
 }
 
 func NewQueryNamespaceRequest() *QueryNamespaceRequest {
@@ -158,6 +185,8 @@ func NewQueryMenuRequest() *QueryMenuRequest {
 }
 
 type QueryMenuRequest struct {
+	UserId      uint64 `json:"user_id"`
+	NamespaceId uint64 `json:"namespace_id"`
 }
 
 func NewQueryEndpointRequest() *QueryEndpointRequest {

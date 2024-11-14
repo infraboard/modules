@@ -11,6 +11,29 @@ import (
 	"github.com/infraboard/modules/iam/apps/view"
 )
 
+// 查询用户可以访问的空间
+func (i *PolicyServiceImpl) QueryNamespace(ctx context.Context, in *policy.QueryNamespaceRequest) (*types.Set[*namespace.Namespace], error) {
+	nsReq := namespace.NewQueryNamespaceRequest()
+
+	policies, err := i.QueryPolicy(ctx,
+		policy.NewQueryPolicyRequest().
+			SetSkipPage(true).
+			SetUserId(in.UserId).
+			SetExpired(false).
+			SetEnabled(true))
+	if err != nil {
+		return nil, err
+	}
+
+	policies.ForEach(func(t *policy.Policy) {
+		if t.NamespaceId != nil {
+			nsReq.AddNamespaceIds(*t.NamespaceId)
+		}
+	})
+
+	return i.namespace.QueryNamespace(ctx, nsReq)
+}
+
 // 查询用户可以访问的Api接口
 func (i *PolicyServiceImpl) QueryEndpoint(ctx context.Context, in *policy.QueryEndpointRequest) (*types.Set[*endpoint.Endpoint], error) {
 	policies, err := i.QueryPolicy(ctx,
@@ -33,25 +56,12 @@ func (i *PolicyServiceImpl) QueryMenu(ctx context.Context, in *policy.QueryMenuR
 	return nil, nil
 }
 
-// 查询用户可以访问的空间
-func (i *PolicyServiceImpl) QueryNamespace(ctx context.Context, in *policy.QueryNamespaceRequest) (*types.Set[*namespace.Namespace], error) {
-	nsReq := namespace.NewQueryNamespaceRequest()
+// 校验Api接口权限
+func (i *PolicyServiceImpl) ValidateEndpointPermission(ctx context.Context, in *policy.ValidateEndpointPermissionRequest) (*policy.ValidateEndpointPermissionResponse, error) {
+	return nil, nil
+}
 
-	policies, err := i.QueryPolicy(ctx,
-		policy.NewQueryPolicyRequest().
-			SetSkipPage(true).
-			SetUserId(in.UserId).
-			SetExpired(false).
-			SetEnabled(true))
-	if err != nil {
-		return nil, err
-	}
-
-	policies.ForEach(func(t *policy.Policy) {
-		if t.NamespaceId != nil {
-			nsReq.AddNamespaceIds(*t.NamespaceId)
-		}
-	})
-
-	return i.namespace.QueryNamespace(ctx, nsReq)
+// 校验Menu视图权限
+func (i *PolicyServiceImpl) ValidatePagePermission(ctx context.Context, in *policy.ValidatePagePermissionRequest) (*policy.ValidatePagePermissionResponse, error) {
+	return nil, nil
 }
