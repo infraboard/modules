@@ -6,7 +6,7 @@ import (
 	"github.com/infraboard/mcube/v2/exception"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
 	"github.com/infraboard/mcube/v2/types"
-	"github.com/infraboard/modules/iam/apps/config"
+	"github.com/infraboard/modules/system/apps/config"
 	"gorm.io/gorm"
 )
 

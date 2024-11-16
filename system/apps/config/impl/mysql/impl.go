@@ -3,7 +3,7 @@ package mysql
 import (
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
-	"github.com/infraboard/modules/iam/apps/config"
+	"github.com/infraboard/modules/system/apps/config"
 )
 
 func init() {
