@@ -72,6 +72,8 @@ type KVItem struct {
 	Key string `json:"key" bson:"key" validate:"required,lte=64" gorm:"column:key;type:varchar(200);index"`
 	// 配置Key描述
 	Desc string `json:"desc" bson:"desc" gorm:"column:desc;type:text"`
+	// 格式
+	Format FORMAT `json:"format" bson:"format" gorm:"column:format;type:tinyint(1)"`
 	// 配置Key的值
 	Value string `json:"value" bson:"value" validate:"required" gorm:"column:value;type:text"`
 	// 是否加密

@@ -6,7 +6,7 @@ import (
 	"github.com/infraboard/mcube/v2/exception"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
 	"github.com/infraboard/mcube/v2/types"
-	"github.com/infraboard/modules/system/apps/config"
+	"github.com/infraboard/modules/iam/apps/config"
 	"gorm.io/gorm"
 )
 
@@ -22,9 +22,14 @@ func (i *ConfigServiceImpl) AddConfig(ctx context.Context, in *config.AddConfigR
 			ins := config.NewConfigItem()
 			item := in.Items[i]
 			ins.KVItem = *item
-			if err := ins.Encrypt(); err != nil {
-				return err
+
+			switch ins.Format {
+			case config.FORMAT_JSON:
+				if err := ins.Encrypt(); err != nil {
+					return err
+				}
 			}
+
 			if err := tx.Save(ins).Error; err != nil {
 				return err
 			}

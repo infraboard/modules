@@ -6,8 +6,8 @@ import (
 	"github.com/infraboard/mcube/v2/http/restful/response"
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/gorestful"
+	"github.com/infraboard/modules/iam/apps/config"
 	permission "github.com/infraboard/modules/iam/permission/restful"
-	"github.com/infraboard/modules/system/apps/config"
 )
 
 func init() {
