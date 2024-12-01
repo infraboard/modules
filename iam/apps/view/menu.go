@@ -7,14 +7,14 @@ import (
 
 func NewMenu() *Menu {
 	return &Menu{
-		Meta:  *apps.NewMeta(),
-		Pages: []*Page{},
+		ResourceMeta: *apps.NewResourceMeta(),
+		Pages:        []*Page{},
 	}
 }
 
 type Menu struct {
 	// 基础数据
-	apps.Meta
+	apps.ResourceMeta
 	// 菜单定义
 	CreateMenuRequest
 	// 用户是否有权限访问该菜单, 只有在策略模块查询时，才会计算出该字段

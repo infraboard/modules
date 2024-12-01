@@ -7,13 +7,13 @@ import (
 
 func NewPage() *Page {
 	return &Page{
-		Meta: *apps.NewMeta(),
+		ResourceMeta: *apps.NewResourceMeta(),
 	}
 }
 
 type Page struct {
 	// 基础数据
-	apps.Meta
+	apps.ResourceMeta
 	// 菜单定义
 	CreatePageRequest
 	// 用户是否有权限访问该页面, 只有在策略模块查询时，才会计算出该字段

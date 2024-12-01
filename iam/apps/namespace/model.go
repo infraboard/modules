@@ -7,13 +7,13 @@ import (
 
 func NewNamespace() *Namespace {
 	return &Namespace{
-		Meta: *apps.NewMeta(),
+		ResourceMeta: *apps.NewResourceMeta(),
 	}
 }
 
 type Namespace struct {
 	// 基础数据
-	apps.Meta
+	apps.ResourceMeta
 	// 空间属性
 	CreateNamespaceRequest
 }

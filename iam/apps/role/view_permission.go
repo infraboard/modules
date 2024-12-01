@@ -7,7 +7,7 @@ import (
 
 func NewViewPermission(roleId uint64, spec *ViewPermissionSpec) *ViewPermission {
 	return &ViewPermission{
-		Meta:               *apps.NewMeta(),
+		ResourceMeta:       *apps.NewResourceMeta(),
 		RoleId:             roleId,
 		ViewPermissionSpec: *spec,
 	}
@@ -15,7 +15,7 @@ func NewViewPermission(roleId uint64, spec *ViewPermissionSpec) *ViewPermission 
 
 type ViewPermission struct {
 	// 基础数据
-	apps.Meta
+	apps.ResourceMeta
 	// 角色Id
 	RoleId uint64 `json:"role_id" gorm:"column:role_id;index" description:"Role Id"`
 	// Menu权限定义

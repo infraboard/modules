@@ -7,7 +7,7 @@ import (
 
 func NewApiPermission(roleId uint64, spec *ApiPermissionSpec) *ApiPermission {
 	return &ApiPermission{
-		Meta:              *apps.NewMeta(),
+		ResourceMeta:      *apps.NewResourceMeta(),
 		RoleId:            roleId,
 		ApiPermissionSpec: *spec,
 	}
@@ -15,7 +15,7 @@ func NewApiPermission(roleId uint64, spec *ApiPermissionSpec) *ApiPermission {
 
 type ApiPermission struct {
 	// 基础数据
-	apps.Meta
+	apps.ResourceMeta
 	// 角色Id
 	RoleId uint64 `json:"role_id" gorm:"column:role_id;index" description:"角色Id"`
 	// Api权限定义

@@ -9,7 +9,7 @@ import (
 
 func NewRole() *Role {
 	return &Role{
-		Meta:            *apps.NewMeta(),
+		ResourceMeta:    *apps.NewResourceMeta(),
 		MenuPermissions: []*ViewPermission{},
 		ApiPermissions:  []*ApiPermission{},
 	}
@@ -17,7 +17,7 @@ func NewRole() *Role {
 
 type Role struct {
 	// 基础数据
-	apps.Meta
+	apps.ResourceMeta
 	// 角色创建信息
 	CreateRoleRequest
 	// 菜单权限

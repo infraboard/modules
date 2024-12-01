@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/infraboard/mcube/v2/crypto/cbc"
+	"github.com/infraboard/mcube/v2/exception"
 	"github.com/infraboard/mcube/v2/ioc/config/application"
 	"github.com/infraboard/mcube/v2/tools/pretty"
 	"github.com/infraboard/modules/iam/apps"
@@ -11,7 +12,7 @@ import (
 
 func NewConfigItem() *ConfigItem {
 	return &ConfigItem{
-		Meta: *apps.NewMeta(),
+		ResourceMeta: *apps.NewResourceMeta(),
 		KVItem: KVItem{
 			Extras: make(map[string]string),
 		},
@@ -19,7 +20,7 @@ func NewConfigItem() *ConfigItem {
 }
 
 type ConfigItem struct {
-	apps.Meta
+	apps.ResourceMeta
 	KVItem
 }
 
@@ -33,7 +34,7 @@ func (c *ConfigItem) String() string {
 
 func (c *ConfigItem) Encrypt() error {
 	if c.IsEncrypted {
-		cihperText, err := cbc.EncryptToString(c.Value, []byte(application.Get().EncryptKey))
+		cihperText, err := cbc.MustNewAESCBCCihper(application.Get().GenCBCEncryptKey()).EncryptFromString(c.Value)
 		if err != nil {
 			return err
 		}
@@ -44,7 +45,7 @@ func (c *ConfigItem) Encrypt() error {
 
 func (c *ConfigItem) Decrypt() error {
 	if c.IsEncrypted {
-		plainText, err := cbc.DecryptFromString(c.Value, []byte(application.Get().EncryptKey))
+		plainText, err := cbc.MustNewAESCBCCihper(application.Get().GenCBCEncryptKey()).DecryptFromCipherText(c.Value)
 		if err != nil {
 			return err
 		}
@@ -54,7 +55,12 @@ func (c *ConfigItem) Decrypt() error {
 }
 
 func (c *ConfigItem) Load(v any) error {
-	return json.Unmarshal([]byte(c.Value), v)
+	switch c.Format {
+	case FORMAT_JSON:
+		return json.Unmarshal([]byte(c.Value), v)
+	default:
+		return exception.NewInternalServerError("unknow support format: %d", c.Format)
+	}
 }
 
 func NewKVItem(key, value string) *KVItem {

@@ -9,14 +9,14 @@ import (
 
 func NewEndpoint() *Endpoint {
 	return &Endpoint{
-		Meta: *apps.NewMeta(),
+		ResourceMeta: *apps.NewResourceMeta(),
 	}
 }
 
 // Endpoint Service's features
 type Endpoint struct {
 	// 基础数据
-	apps.Meta
+	apps.ResourceMeta
 	// 路由条目信息
 	RouteEntry `json:"route_entry" bson:",inline" validate:"required"`
 }

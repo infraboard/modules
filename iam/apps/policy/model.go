@@ -12,13 +12,13 @@ import (
 
 func NewPolicy() *Policy {
 	return &Policy{
-		Meta: *apps.NewMeta(),
+		ResourceMeta: *apps.NewResourceMeta(),
 	}
 }
 
 type Policy struct {
 	// 基础数据
-	apps.Meta
+	apps.ResourceMeta
 	// 策略定义
 	CreatePolicyRequest
 	// 关联空间

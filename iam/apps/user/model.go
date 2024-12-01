@@ -13,7 +13,7 @@ func NewUser(req *CreateUserRequest) *User {
 	req.PasswordHash()
 
 	return &User{
-		Meta:              *apps.NewMeta(),
+		ResourceMeta:      *apps.NewResourceMeta(),
 		CreateUserRequest: *req,
 	}
 }
@@ -21,7 +21,7 @@ func NewUser(req *CreateUserRequest) *User {
 // 用于存放 存入数据库的对象(PO)
 type User struct {
 	// 基础数据
-	apps.Meta
+	apps.ResourceMeta
 	// 用户传递过来的请求
 	CreateUserRequest
 

@@ -22,14 +22,9 @@ func (i *ConfigServiceImpl) AddConfig(ctx context.Context, in *config.AddConfigR
 			ins := config.NewConfigItem()
 			item := in.Items[i]
 			ins.KVItem = *item
-
-			switch ins.Format {
-			case config.FORMAT_JSON:
-				if err := ins.Encrypt(); err != nil {
-					return err
-				}
+			if err := ins.Encrypt(); err != nil {
+				return err
 			}
-
 			if err := tx.Save(ins).Error; err != nil {
 				return err
 			}

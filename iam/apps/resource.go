@@ -5,13 +5,13 @@ import (
 	"time"
 )
 
-func NewMeta() *Meta {
-	return &Meta{
+func NewResourceMeta() *ResourceMeta {
+	return &ResourceMeta{
 		CreatedAt: time.Now(),
 	}
 }
 
-type Meta struct {
+type ResourceMeta struct {
 	// 自增Id
 	Id uint64 `json:"id" gorm:"column:id;type:uint;primary_key;" unique:"true" description:"Id"`
 	// 创建时间
