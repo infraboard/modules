@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/emicklei/go-restful/v3"
+	"github.com/google/uuid"
 	"github.com/infraboard/modules/iam/apps"
 )
 
@@ -22,7 +23,7 @@ type Endpoint struct {
 }
 
 func (u *Endpoint) TableName() string {
-	return "namespaces"
+	return "endpoints"
 }
 
 func (u *Endpoint) SetRouteEntry(v RouteEntry) *Endpoint {
@@ -37,8 +38,10 @@ func NewRouteEntry() *RouteEntry {
 	}
 }
 
-// Entry 路由条目
+// Entry 路由条目, service-method-path
 type RouteEntry struct {
+	// 该功能属于那个服务
+	UUID string `json:"uuid" bson:"uuid" gorm:"column:uuid;type:varchar(100);uniqueIndex"`
 	// 该功能属于那个服务
 	Service string `json:"service" bson:"service" validate:"required,lte=64" gorm:"column:service;type:varchar(100);index"`
 	// 服务那个版本的功能
@@ -73,6 +76,12 @@ type RouteEntry struct {
 	RequiredNamespace bool `json:"required_namespace" bson:"required_namespace" gorm:"column:required_namespace;type:tinyint(1)"`
 	// 扩展信息
 	Extras map[string]string `json:"extras" bson:"extras" gorm:"column:extras;serializer:json;type:json"`
+}
+
+// service-method-path
+func (e *RouteEntry) BuildUUID() *RouteEntry {
+	e.UUID = uuid.NewSHA1(uuid.Nil, fmt.Appendf(nil, "%s-%s-%s", e.Service, e.Method, e.Path)).String()
+	return e
 }
 
 func (e *RouteEntry) LoadMeta(meta map[string]any) {
@@ -161,7 +170,7 @@ func NewEntryFromRestRequest(req *restful.Request) *RouteEntry {
 	return entry
 }
 
-func NewEntryFromRestRoute(route restful.RouteReader) *RouteEntry {
+func NewEntryFromRestRouteReader(route restful.RouteReader) *RouteEntry {
 	entry := NewRouteEntry()
 	entry.FunctionName = route.Operation()
 	entry.Method = route.Method()
@@ -170,4 +179,26 @@ func NewEntryFromRestRoute(route restful.RouteReader) *RouteEntry {
 
 	entry.Path = entry.UniquePath()
 	return entry
+}
+
+func NewEntryFromRestRoute(route restful.Route) *RouteEntry {
+	entry := NewRouteEntry()
+	entry.FunctionName = route.Operation
+	entry.Method = route.Method
+	entry.LoadMeta(route.Metadata)
+	entry.Path = route.Path
+
+	entry.Path = entry.UniquePath()
+	return entry
+}
+
+func NewEntryFromRestfulContainer(c *restful.Container) (entries []*RouteEntry) {
+	wss := c.RegisteredWebServices()
+	for i := range wss {
+		for _, route := range wss[i].Routes() {
+			es := NewEntryFromRestRoute(route)
+			entries = append(entries, es)
+		}
+	}
+	return nil
 }

@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/modules/iam/apps/user"
 	"github.com/spf13/cobra"
 
@@ -20,7 +19,7 @@ var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "初始化Admin用户名密码",
 	Run: func(cmd *cobra.Command, args []string) {
-		svc := ioc.Controller().Get(user.AppName).(user.Service)
+		svc := user.GetService()
 		req := user.NewCreateUserRequest()
 
 		cobra.CheckErr(survey.AskOne(

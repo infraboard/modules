@@ -58,7 +58,7 @@ func (c *Checker) Init() error {
 }
 
 func (c *Checker) Check(r *restful.Request, w *restful.Response, next *restful.FilterChain) {
-	route := endpoint.NewEntryFromRestRoute(r.SelectedRoute())
+	route := endpoint.NewEntryFromRestRouteReader(r.SelectedRoute())
 	if route.RequiredAuth {
 		// 校验身份
 		tk, err := c.CheckToken(r)

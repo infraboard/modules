@@ -14,3 +14,19 @@ func TestQueryEndpoint(t *testing.T) {
 	}
 	t.Log(set)
 }
+
+func TestRegistryEndpoint(t *testing.T) {
+	req := endpoint.NewRegistryEndpointRequest()
+	re := endpoint.NewRouteEntry()
+	re.Service = "cmdb"
+	re.Method = "GET"
+	re.Path = "/cmdb/api/v1/secret"
+	re.Resource = "secret"
+	re.Action = "list"
+	req.AddItem(re)
+	set, err := impl.RegistryEndpoint(ctx, req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(set)
+}

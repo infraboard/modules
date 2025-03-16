@@ -55,6 +55,10 @@ type RegistryEndpointRequest struct {
 	Items []*RouteEntry `json:"items"`
 }
 
+func (r *RegistryEndpointRequest) AddItem(items ...*RouteEntry) {
+	r.Items = append(r.Items, items...)
+}
+
 func (r *RegistryEndpointRequest) Validate() error {
 	return validator.Validate(r)
 }

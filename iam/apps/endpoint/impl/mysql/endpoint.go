@@ -19,11 +19,26 @@ func (i *EndpointServiceImpl) RegistryEndpoint(ctx context.Context, in *endpoint
 	set := types.New[*endpoint.Endpoint]()
 	err := datasource.DBFromCtx(ctx).Transaction(func(tx *gorm.DB) error {
 		for i := range in.Items {
-			item := in.Items[i]
+			item := in.Items[i].BuildUUID()
 			ins := endpoint.NewEndpoint().SetRouteEntry(*item)
 
-			if err := tx.Save(ins).Error; err != nil {
-				return err
+			oldEnpoint := endpoint.NewEndpoint()
+			if err := tx.Where("uuid = ?", item.UUID).Take(oldEnpoint).Error; err != nil {
+				if err != gorm.ErrRecordNotFound {
+					return err
+				}
+
+				// 需要创建
+				if err := tx.Save(ins).Error; err != nil {
+					return err
+				}
+			} else {
+				// 需要更新
+				ins.Id = oldEnpoint.Id
+				if err := tx.Where("uuid = ?", item.UUID).Updates(ins).Error; err != nil {
+					return err
+				}
+
 			}
 			set.Add(ins)
 		}
