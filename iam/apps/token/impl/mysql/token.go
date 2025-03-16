@@ -157,7 +157,7 @@ func (i *TokenServiceImpl) QueryToken(ctx context.Context, in *token.QueryTokenR
 	}
 
 	err = query.
-		Order("created_at desc").
+		Order("issue_at desc").
 		Offset(int(in.ComputeOffset())).
 		Limit(int(in.PageSize)).
 		Find(&set.Items).
