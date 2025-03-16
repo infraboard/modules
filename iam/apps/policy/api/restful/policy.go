@@ -43,7 +43,7 @@ func (h *PolicyRestfulApiHandler) Init() error {
 		Writes(PolicySet{}).
 		Returns(200, "OK", PolicySet{}))
 
-	ws.Route(ws.GET("/:id").To(h.DescribePolicy).
+	ws.Route(ws.GET("/{id}").To(h.DescribePolicy).
 		Doc("策略详情查询").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).

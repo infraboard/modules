@@ -43,7 +43,7 @@ func (h *MenuRestfulApiHandler) Init() error {
 		Writes(MenuSet{}).
 		Returns(200, "OK", MenuSet{}))
 
-	ws.Route(ws.GET("/:id").To(h.DescribeMenu).
+	ws.Route(ws.GET("/{id}").To(h.DescribeMenu).
 		Doc("菜单详情查询").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).

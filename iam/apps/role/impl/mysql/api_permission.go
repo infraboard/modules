@@ -35,7 +35,7 @@ func (i *RoleServiceImpl) AddApiPermission(ctx context.Context, in *role.AddApiP
 	return perms, nil
 }
 
-// 移除角色关联API
+// 查询角色关联的权限条目
 func (i *RoleServiceImpl) QueryApiPermission(ctx context.Context, in *role.QueryApiPermissionRequest) ([]*role.ApiPermission, error) {
 	query := datasource.DBFromCtx(ctx).Model(&role.ApiPermission{})
 	if len(in.RoleIds) > 0 {

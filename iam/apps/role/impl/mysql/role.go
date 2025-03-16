@@ -61,6 +61,12 @@ func (i *RoleServiceImpl) DescribeRole(ctx context.Context, in *role.DescribeRol
 		return nil, err
 	}
 
+	pm, err := i.QueryApiPermission(ctx, role.NewQueryApiPermissionRequest().AddRoleId(in.Id))
+	if err != nil {
+		return nil, err
+	}
+	ins.ApiPermissions = pm
+
 	return ins, nil
 }
 

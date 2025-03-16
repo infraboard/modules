@@ -48,8 +48,8 @@ func NewQueryRoleRequest() *QueryRoleRequest {
 
 type QueryRoleRequest struct {
 	*request.PageRequest
-	WithMenuPermission bool `json:"with_menu_permission"`
-	WithApiPermission  bool `json:"with_api_permission"`
+	WithMenuPermission bool `json:"with_menu_permission" form:"with_menu_permission"`
+	WithApiPermission  bool `json:"with_api_permission" form:"with_api_permission"`
 }
 
 func NewDescribeRoleRequest() *DescribeRoleRequest {

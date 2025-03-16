@@ -43,7 +43,7 @@ func (h *EndpointRestfulApiHandler) Init() error {
 		Writes(EndpointSet{}).
 		Returns(200, "OK", EndpointSet{}))
 
-	ws.Route(ws.GET("/:id").To(h.DescribeEndpoint).
+	ws.Route(ws.GET("/{id}").To(h.DescribeEndpoint).
 		Doc("API详情查询").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).

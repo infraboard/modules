@@ -2,8 +2,8 @@ package restful
 
 import (
 	"github.com/emicklei/go-restful/v3"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/infraboard/mcube/v2/exception"
-	"github.com/infraboard/mcube/v2/http/request"
 	"github.com/infraboard/mcube/v2/http/restful/response"
 	"github.com/infraboard/modules/iam/apps/role"
 )
@@ -11,7 +11,10 @@ import (
 func (h *RoleRestfulApiHandler) QueryRole(r *restful.Request, w *restful.Response) {
 	// 1. 获取用户的请求参数， 参数在Body里面
 	req := role.NewQueryRoleRequest()
-	req.PageRequest = request.NewPageRequestFromHTTP(r.Request)
+	if err := binding.Query.Bind(r.Request, req); err != nil {
+		response.Failed(w, err)
+		return
+	}
 
 	// 2. 执行逻辑
 	tk, err := h.svc.QueryRole(r.Request.Context(), req)

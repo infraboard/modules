@@ -41,7 +41,7 @@ func (h *RoleRestfulApiHandler) Init() error {
 		Writes(RoleSet{}).
 		Returns(200, "OK", RoleSet{}))
 
-	ws.Route(ws.GET("/:id").To(h.DescribeRole).
+	ws.Route(ws.GET("/{id}").To(h.DescribeRole).
 		Doc("角色详情查询").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
@@ -70,26 +70,26 @@ func (h *RoleRestfulApiHandler) Init() error {
 		Returns(404, "Not Found", nil))
 
 	// 角色 Api权限管理
-	ws.Route(ws.POST("/:id/add_api_permission").To(h.AddApiPermission).
+	ws.Route(ws.POST("/{id}/add_api_permission").To(h.AddApiPermission).
 		Doc("添加接口访问权限").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
 		Param(restful.PathParameter("id", "Role Id")).
-		Reads(role.AddApiPermissionRequest{}).
+		Reads([]role.ApiPermissionSpec{}).
 		Writes([]role.ApiPermission{}).
 		Returns(200, "OK", []role.ApiPermission{}))
 
-	ws.Route(ws.POST("/:id/remove_api_permission").To(h.RemoveApiPermission).
+	ws.Route(ws.POST("/{id}/remove_api_permission").To(h.RemoveApiPermission).
 		Doc("移除接口访问权限").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
-		Reads(role.RemoveApiPermissionRequest{}).
+		Reads([]uint64{}).
 		Writes([]role.ApiPermission{}).
 		Returns(200, "OK", []role.ApiPermission{}))
 
-	ws.Route(ws.GET("/:id/endpoints").To(h.QueryMatchedEndpoint).
+	ws.Route(ws.GET("/{id}/endpoints").To(h.QueryMatchedEndpoint).
 		Doc("查询允许访问的接口").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
@@ -98,26 +98,26 @@ func (h *RoleRestfulApiHandler) Init() error {
 		Returns(200, "OK", EndpointSet{}))
 
 	// 角色视图权限管理
-	ws.Route(ws.POST("/:id/add_view_permission").To(h.AddViewPermission).
+	ws.Route(ws.POST("/{id}/add_view_permission").To(h.AddViewPermission).
 		Doc("添加视图访问权限").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
 		Param(restful.PathParameter("id", "Role Id")).
-		Reads(role.AddViewPermissionRequest{}).
+		Reads([]*role.ViewPermissionSpec{}).
 		Writes([]role.ViewPermission{}).
 		Returns(200, "OK", []role.ViewPermission{}))
 
-	ws.Route(ws.POST("/:id/remove_view_permission").To(h.RemoveViewPermission).
+	ws.Route(ws.POST("/{id}/remove_view_permission").To(h.RemoveViewPermission).
 		Doc("移除视图访问权限").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
-		Reads(role.RemoveViewPermissionRequest{}).
+		Reads([]uint64{}).
 		Writes([]*role.ViewPermission{}).
 		Returns(200, "OK", []role.ViewPermission{}))
 
-	ws.Route(ws.GET("/:id/menus").To(h.QueryMatchedMenu).
+	ws.Route(ws.GET("/{id}/menus").To(h.QueryMatchedMenu).
 		Doc("查询允许访问的菜单").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).

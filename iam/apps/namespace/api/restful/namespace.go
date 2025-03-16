@@ -43,7 +43,7 @@ func (h *NamespaceRestfulApiHandler) Init() error {
 		Writes(NamespaceSet{}).
 		Returns(200, "OK", NamespaceSet{}))
 
-	ws.Route(ws.GET("/:id").To(h.DescribeNamespace).
+	ws.Route(ws.GET("/{id}").To(h.DescribeNamespace).
 		Doc("空间详情查询").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
@@ -61,7 +61,7 @@ func (h *NamespaceRestfulApiHandler) Init() error {
 		Writes(namespace.Namespace{}).
 		Returns(200, "OK", namespace.Namespace{}))
 
-	ws.Route(ws.PUT("/:id").To(h.UpdateNamespace).
+	ws.Route(ws.PUT("/{id}").To(h.UpdateNamespace).
 		Doc("更新空间").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).

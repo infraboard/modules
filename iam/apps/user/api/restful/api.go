@@ -41,7 +41,7 @@ func (h *UserRestfulApiHandler) Init() error {
 		Writes(user.User{}).
 		Returns(200, "OK", UserSet{}))
 
-	ws.Route(ws.GET("/:id").To(h.DescribeUser).
+	ws.Route(ws.GET("/{id}").To(h.DescribeUser).
 		Doc("用户详情查询").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).

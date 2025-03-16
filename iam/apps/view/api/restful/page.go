@@ -43,7 +43,7 @@ func (h *PageRestfulApiHandler) Init() error {
 		Writes(PageSet{}).
 		Returns(200, "OK", PageSet{}))
 
-	ws.Route(ws.GET("/:id").To(h.DescribePage).
+	ws.Route(ws.GET("/{id}").To(h.DescribePage).
 		Doc("页面详情查询").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).

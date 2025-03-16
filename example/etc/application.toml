@@ -1,19 +1,23 @@
 [app]
-name = "exapmle"
-key  = "this is your app key"
+  name = "mcenter"
+  description = "mcenter"
+  internal_address = "http://127.0.0.1:8020"
+  internal_token = "vCYg52HNzFcMMHq7sVLoFxHU"
 
 [http]
-host = "127.0.0.1"
-port = 8020
+  # 开启GRPC服务
+  enable = true
+  # HTTP服务Host
+  host = "127.0.0.1"
+  # HTTP服务端口
+  port = 8020
 
 [datasource]
-host = "127.0.0.1"
-port = 3306
-username = "root"
-password = "123456"
-database = "test"
-debug = true
-auto_migrate = true
-
-[log]
-level = "debug"
+  provider = "mysql"
+  host = "127.0.0.1"
+  port = 3306
+  database = "go17_mcenter"
+  username = "root"
+  password = "123456"
+  debug = true
+  auto_migrate = true

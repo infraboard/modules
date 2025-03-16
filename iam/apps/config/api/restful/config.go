@@ -41,7 +41,7 @@ func (h *ConfigRestfulApiHandler) Init() error {
 		Writes(ConfigSet{}).
 		Returns(200, "OK", ConfigSet{}))
 
-	ws.Route(ws.GET("/:id").To(h.DescribeConfig).
+	ws.Route(ws.GET("/{id}").To(h.DescribeConfig).
 		Doc("查询配置项详情").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
@@ -59,7 +59,7 @@ func (h *ConfigRestfulApiHandler) Init() error {
 		Writes(config.ConfigItem{}).
 		Returns(200, "OK", config.ConfigItem{}))
 
-	ws.Route(ws.PUT("/:id").To(h.UpdateConfig).
+	ws.Route(ws.PUT("/{id}").To(h.UpdateConfig).
 		Doc("更新系统配置").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
