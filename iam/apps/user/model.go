@@ -81,11 +81,11 @@ type CreateUserRequest struct {
 	Sex SEX `json:"sex" gorm:"column:sex;type:tinyint(1)" optional:"true" description:"性别, 1:男, 2:女, 0: 保密"`
 
 	// 邮箱
-	Email string `json:"email" gorm:"column:email;type:varchar(200);uniqueIndex" optional:"true" description:"邮箱" unique:"true"`
+	Email string `json:"email" gorm:"column:email;type:varchar(200);uniqueIndex" description:"邮箱" unique:"true"`
 	// 邮箱是否验证ok
 	IsEmailConfirmed bool `json:"is_email_confirmed" gorm:"column:is_email_confirmed;type:tinyint(1)" optional:"true" description:"邮箱是否验证ok"`
 	// 手机
-	Mobile string `json:"mobile" gorm:"column:mobile;type:varchar(200);uniqueIndex" optional:"true" description:"手机" unique:"true"`
+	Mobile string `json:"mobile" gorm:"column:mobile;type:varchar(200);index" optional:"true" description:"手机" unique:"true"`
 	// 手机释放验证ok
 	IsMobileConfirmed bool `json:"is_mobile_confirmed" gorm:"column:is_mobile_confirmed;type:tinyint(1)" optional:"true" description:"手机释放验证ok"`
 	// 手机登录标识

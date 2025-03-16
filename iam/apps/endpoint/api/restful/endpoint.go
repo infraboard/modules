@@ -57,7 +57,7 @@ func (h *EndpointRestfulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
-		Reads(endpoint.RegistryEndpointRequest{}).
+		Reads([]endpoint.RouteEntry{}).
 		Writes(EndpointSet{}).
 		Returns(200, "OK", EndpointSet{}))
 	return nil
@@ -102,7 +102,7 @@ func (h *EndpointRestfulApiHandler) RegistryEndpoint(r *restful.Request, w *rest
 	// 1. 获取用户的请求参数， 参数在Body里面
 	req := endpoint.NewRegistryEndpointRequest()
 
-	err := r.ReadEntity(req)
+	err := r.ReadEntity(&req.Items)
 	if err != nil {
 		response.Failed(w, err)
 		return

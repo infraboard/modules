@@ -41,41 +41,41 @@ func NewRouteEntry() *RouteEntry {
 // Entry 路由条目, service-method-path
 type RouteEntry struct {
 	// 该功能属于那个服务
-	UUID string `json:"uuid" bson:"uuid" gorm:"column:uuid;type:varchar(100);uniqueIndex"`
+	UUID string `json:"uuid" bson:"uuid" gorm:"column:uuid;type:varchar(100);uniqueIndex" optional:"true" description:"路由UUID"`
 	// 该功能属于那个服务
-	Service string `json:"service" bson:"service" validate:"required,lte=64" gorm:"column:service;type:varchar(100);index"`
+	Service string `json:"service" bson:"service" validate:"required,lte=64" gorm:"column:service;type:varchar(100);index" description:"服务名称"`
 	// 服务那个版本的功能
-	Version string `json:"version" bson:"version" validate:"required,lte=64" gorm:"column:version;type:varchar(100)"`
+	Version string `json:"version" bson:"version" validate:"required,lte=64" gorm:"column:version;type:varchar(100)" optional:"true" description:"版本版本"`
 	// 资源名称
-	Resource string `json:"resource" bson:"resource" gorm:"column:resource;type:varchar(100);index"`
+	Resource string `json:"resource" bson:"resource" gorm:"column:resource;type:varchar(100);index" description:"资源名称"`
 	// 资源操作
-	Action string `json:"action" bson:"action" gorm:"column:action;type:varchar(100);index"`
+	Action string `json:"action" bson:"action" gorm:"column:action;type:varchar(100);index" description:"资源操作"`
 	// 读或者写
-	AccessMode ACCESS_MODE `json:"access_mode" bson:"access_mode" gorm:"column:access_mode;type:tinyint(1);index"`
+	AccessMode ACCESS_MODE `json:"access_mode" bson:"access_mode" gorm:"column:access_mode;type:tinyint(1);index" optional:"true" description:"读写权限"`
 	// 操作标签
-	ActionLabel string `json:"action_label" gorm:"column:action_label;type:varchar(200);index"`
+	ActionLabel string `json:"action_label" gorm:"column:action_label;type:varchar(200);index" optional:"true" description:"资源标签"`
 	// 函数名称
-	FunctionName string `json:"function_name" bson:"function_name" gorm:"column:function_name;type:varchar(100)"`
+	FunctionName string `json:"function_name" bson:"function_name" gorm:"column:function_name;type:varchar(100)"  optional:"true" description:"函数名称"`
 	// HTTP path 用于自动生成http api
-	Path string `json:"path" bson:"path" gorm:"column:path;type:varchar(200);index"`
+	Path string `json:"path" bson:"path" gorm:"column:path;type:varchar(200);index" description:"接口的路径"`
 	// HTTP method 用于自动生成http api
-	Method string `json:"method" bson:"method" gorm:"column:method;type:varchar(100);index"`
+	Method string `json:"method" bson:"method" gorm:"column:method;type:varchar(100);index" description:"接口的方法"`
 	// 接口说明
-	Description string `json:"description" bson:"description" gorm:"column:description;type:text"`
+	Description string `json:"description" bson:"description" gorm:"column:description;type:text" optional:"true" description:"接口说明"`
 	// 是否校验用户身份 (acccess_token 校验)
-	RequiredAuth bool `json:"required_auth" bson:"required_auth" gorm:"column:required_auth;type:tinyint(1)"`
+	RequiredAuth bool `json:"required_auth" bson:"required_auth" gorm:"column:required_auth;type:tinyint(1)" optional:"true" description:"是否校验用户身份 (acccess_token 校验)"`
 	// 验证码校验(开启双因子认证需要) (code 校验)
-	RequiredCode bool `json:"required_code" bson:"required_code" gorm:"column:required_code;type:tinyint(1)"`
+	RequiredCode bool `json:"required_code" bson:"required_code" gorm:"column:required_code;type:tinyint(1)" optional:"true" description:"验证码校验(开启双因子认证需要) (code 校验)"`
 	// 开启鉴权
-	RequiredPerm bool `json:"required_perm" bson:"required_perm" gorm:"column:required_perm;type:tinyint(1)"`
+	RequiredPerm bool `json:"required_perm" bson:"required_perm" gorm:"column:required_perm;type:tinyint(1)" optional:"true" description:"开启鉴权"`
 	// ACL模式下, 允许的通过的身份标识符, 比如角色, 用户类型之类
-	RequiredRole []string `json:"required_role" bson:"required_role" gorm:"column:required_role;serializer:json;type:json"`
+	RequiredRole []string `json:"required_role" bson:"required_role" gorm:"column:required_role;serializer:json;type:json" optional:"true" description:"ACL模式下, 允许的通过的身份标识符, 比如角色, 用户类型之类"`
 	// 是否开启操作审计, 开启后这次操作将被记录
-	RequiredAudit bool `json:"required_audit" bson:"required_audit" gorm:"column:required_audit;type:tinyint(1)"`
+	RequiredAudit bool `json:"required_audit" bson:"required_audit" gorm:"column:required_audit;type:tinyint(1)" optional:"true" description:"是否开启操作审计, 开启后这次操作将被记录"`
 	// 名称空间不能为空
-	RequiredNamespace bool `json:"required_namespace" bson:"required_namespace" gorm:"column:required_namespace;type:tinyint(1)"`
+	RequiredNamespace bool `json:"required_namespace" bson:"required_namespace" gorm:"column:required_namespace;type:tinyint(1)" optional:"true" description:"名称空间不能为空"`
 	// 扩展信息
-	Extras map[string]string `json:"extras" bson:"extras" gorm:"column:extras;serializer:json;type:json"`
+	Extras map[string]string `json:"extras" bson:"extras" gorm:"column:extras;serializer:json;type:json" optional:"true" description:"扩展信息"`
 }
 
 // service-method-path
