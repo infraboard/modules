@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/infraboard/mcube/v2/exception"
@@ -22,6 +23,12 @@ func GetAccessTokenFromHTTP(r *http.Request) string {
 			return ""
 		}
 		tk, _ = url.QueryUnescape(cookie.Value)
+	} else {
+		// 处理 带格式: Bearer <Your API key>
+		ft := strings.Split(tk, " ")
+		if len(ft) > 1 {
+			tk = ft[1]
+		}
 	}
 	return tk
 }

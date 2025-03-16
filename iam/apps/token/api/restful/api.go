@@ -36,6 +36,13 @@ func (h *TokenRestulApiHandler) Init() error {
 		Writes(token.Token{}).
 		Returns(200, "OK", token.Token{}))
 
+	ws.Route(ws.POST("/validate").To(h.ValiateToken).
+		Doc("校验令牌").
+		Metadata(restfulspec.KeyOpenAPITags, tags).
+		Reads(token.ValiateTokenRequest{}).
+		Writes(token.Token{}).
+		Returns(200, "OK", token.Token{}))
+
 	ws.Route(ws.POST("/change_namespace").To(h.ChangeNamespce).
 		Doc("切换令牌访问空间").
 		Metadata(restfulspec.KeyOpenAPITags, tags).

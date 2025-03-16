@@ -96,3 +96,23 @@ func (h *TokenRestulApiHandler) Logout(r *restful.Request, w *restful.Response) 
 	// 3. 返回响应
 	response.Success(w, tk)
 }
+
+func (h *TokenRestulApiHandler) ValiateToken(r *restful.Request, w *restful.Response) {
+	// 1. 获取用户的请求参数， 参数在Body里面
+	req := token.NewValiateTokenRequest("")
+	err := r.ReadEntity(req)
+	if err != nil {
+		response.Failed(w, err)
+		return
+	}
+
+	// 2. 执行逻辑
+	tk, err := h.svc.ValiateToken(r.Request.Context(), req)
+	if err != nil {
+		response.Failed(w, err)
+		return
+	}
+
+	// 3. Body中返回Token对象
+	response.Success(w, tk)
+}
