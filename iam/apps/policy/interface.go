@@ -5,6 +5,7 @@ import (
 
 	"github.com/infraboard/mcube/v2/http/request"
 	"github.com/infraboard/mcube/v2/ioc"
+	"github.com/infraboard/mcube/v2/tools/pretty"
 	"github.com/infraboard/mcube/v2/types"
 	"github.com/infraboard/modules/iam/apps"
 	"github.com/infraboard/modules/iam/apps/endpoint"
@@ -139,14 +140,23 @@ type PermissionService interface {
 }
 
 type ValidatePagePermissionRequest struct {
-	UserId      uint64 `json:"user_id"`
-	NamespaceId uint64 `json:"namespace_id"`
-	Path        string `json:"path"`
+	UserId      uint64 `json:"user_id" form:"user_id"`
+	NamespaceId uint64 `json:"namespace_id" form:"namespace_id"`
+	Service     string `json:"service" form:"service"`
+	Path        string `json:"path" form:"path"`
+	Method      string `json:"method" form:"method"`
+}
+
+func NewValidatePagePermissionResponse(req ValidatePagePermissionRequest) *ValidatePagePermissionResponse {
+	return &ValidatePagePermissionResponse{
+		ValidatePagePermissionRequest: req,
+	}
 }
 
 type ValidatePagePermissionResponse struct {
-	Page   *view.Page `json:"page"`
-	Policy *Policy    `json:"policy"`
+	ValidatePagePermissionRequest
+	HasPermission bool               `json:"has_permission"`
+	Endpoint      *endpoint.Endpoint `json:"endpoint"`
 }
 
 func NewValidateEndpointPermissionRequest() *ValidateEndpointPermissionRequest {
@@ -161,9 +171,20 @@ type ValidateEndpointPermissionRequest struct {
 	Method      string `json:"method" form:"method"`
 }
 
+func NewValidateEndpointPermissionResponse(req ValidateEndpointPermissionRequest) *ValidateEndpointPermissionResponse {
+	return &ValidateEndpointPermissionResponse{
+		ValidateEndpointPermissionRequest: req,
+	}
+}
+
 type ValidateEndpointPermissionResponse struct {
-	Page   *endpoint.Endpoint `json:"endpoint"`
-	Policy *Policy            `json:"policy"`
+	ValidateEndpointPermissionRequest
+	HasPermission bool               `json:"has_permission"`
+	Endpoint      *endpoint.Endpoint `json:"endpoint"`
+}
+
+func (r *ValidateEndpointPermissionResponse) String() string {
+	return pretty.ToJSON(r)
 }
 
 func NewQueryNamespaceRequest() *QueryNamespaceRequest {

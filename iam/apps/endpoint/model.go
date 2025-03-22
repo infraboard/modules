@@ -36,6 +36,19 @@ func (u *Endpoint) TableName() string {
 	return "endpoints"
 }
 
+func (e *Endpoint) IsMatched(service, method, path string) bool {
+	if e.Service != service {
+		return false
+	}
+	if e.Method != method {
+		return false
+	}
+	if e.Path != path {
+		return false
+	}
+	return true
+}
+
 func (u *Endpoint) SetRouteEntry(v RouteEntry) *Endpoint {
 	u.RouteEntry = v
 	return u

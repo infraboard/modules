@@ -61,7 +61,22 @@ func (i *PolicyServiceImpl) QueryEndpoint(ctx context.Context, in *policy.QueryE
 
 // 校验Api接口权限
 func (i *PolicyServiceImpl) ValidateEndpointPermission(ctx context.Context, in *policy.ValidateEndpointPermissionRequest) (*policy.ValidateEndpointPermissionResponse, error) {
-	return nil, nil
+	resp := policy.NewValidateEndpointPermissionResponse(*in)
+	endpointReq := policy.NewQueryEndpointRequest()
+	endpointReq.UserId = in.UserId
+	endpointReq.NamespaceId = in.NamespaceId
+	endpointSet, err := i.QueryEndpoint(ctx, endpointReq)
+	if err != nil {
+		return nil, err
+	}
+	for _, item := range endpointSet.Items {
+		if item.IsMatched(in.Service, in.Method, in.Path) {
+			resp.HasPermission = true
+			resp.Endpoint = item
+			break
+		}
+	}
+	return resp, nil
 }
 
 // 查询用户可以访问的菜单

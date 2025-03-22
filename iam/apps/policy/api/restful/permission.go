@@ -106,6 +106,26 @@ func (h *PermissionRestfulApiHandler) QueryEndpoint(r *restful.Request, w *restf
 	response.Success(w, tk)
 }
 
+func (h *PermissionRestfulApiHandler) ValidateEndpointPermission(r *restful.Request, w *restful.Response) {
+	// 1. 获取用户的请求参数， 参数在Body里面
+	req := policy.NewValidateEndpointPermissionRequest()
+	err := r.ReadEntity(req)
+	if err != nil {
+		response.Failed(w, err)
+		return
+	}
+
+	// 2. 执行逻辑
+	tk, err := h.svc.ValidateEndpointPermission(r.Request.Context(), req)
+	if err != nil {
+		response.Failed(w, err)
+		return
+	}
+
+	// 3. 返回响应
+	response.Success(w, tk)
+}
+
 type MenuSet struct {
 	Total int64        `json:"total"`
 	Items []*view.Menu `json:"items"`
