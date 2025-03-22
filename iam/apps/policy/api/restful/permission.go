@@ -38,7 +38,7 @@ func (h *PermissionRestfulApiHandler) Init() error {
 		Doc("空间列表").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
-		Metadata(permission.Permission(true)).
+		Metadata(permission.Permission(false)).
 		Writes(NamespaceSet{}).
 		Returns(200, "OK", NamespaceSet{}))
 
@@ -46,7 +46,7 @@ func (h *PermissionRestfulApiHandler) Init() error {
 		Doc("菜单列表").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
-		Metadata(permission.Permission(true)).
+		Metadata(permission.Permission(false)).
 		Writes(MenuSet{}).
 		Returns(200, "OK", MenuSet{}))
 
@@ -54,10 +54,18 @@ func (h *PermissionRestfulApiHandler) Init() error {
 		Doc("接口列表").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
-		Metadata(permission.Permission(true)).
+		Metadata(permission.Permission(false)).
 		Writes(EndpointSet{}).
 		Returns(200, "OK", EndpointSet{}))
 
+	ws.Route(ws.POST("/check").To(h.ValidateEndpointPermission).
+		Doc("接口权限校验").
+		Metadata(restfulspec.KeyOpenAPITags, tags).
+		Metadata(permission.Auth(true)).
+		Metadata(permission.Permission(false)).
+		Reads(policy.ValidateEndpointPermissionRequest{}).
+		Writes(policy.ValidateEndpointPermissionResponse{}).
+		Returns(200, "OK", policy.ValidateEndpointPermissionResponse{}))
 	return nil
 }
 

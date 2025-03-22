@@ -199,8 +199,6 @@ func NewEntryFromRestRouteReader(route restful.RouteReader) *RouteEntry {
 	entry.Method = route.Method()
 	entry.LoadMeta(route.Metadata())
 	entry.Path = route.Path()
-
-	entry.Path = entry.UniquePath()
 	return entry
 }
 

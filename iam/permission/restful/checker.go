@@ -112,11 +112,16 @@ func (c *Checker) CheckPolicy(r *restful.Request, tk *token.Token, route *endpoi
 		if err != nil {
 			return exception.NewInternalServerError(err.Error())
 		}
+		hasPerm := false
 		for i := range set.Items {
 			p := set.Items[i]
 			if route.IsRequireRole(p.Role.Name) {
-				return nil
+				hasPerm = true
+				break
 			}
+		}
+		if !hasPerm {
+			return exception.NewPermissionDeny("无权限访问")
 		}
 	}
 
@@ -132,8 +137,8 @@ func (c *Checker) CheckPolicy(r *restful.Request, tk *token.Token, route *endpoi
 		if err != nil {
 			return exception.NewInternalServerError(err.Error())
 		}
-		if resp.HasPermission {
-			return nil
+		if !resp.HasPermission {
+			return exception.NewPermissionDeny("无权限访问")
 		}
 	}
 

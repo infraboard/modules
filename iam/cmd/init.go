@@ -21,6 +21,7 @@ var initCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		svc := user.GetService()
 		req := user.NewCreateUserRequest()
+		req.IsAdmin = true
 
 		cobra.CheckErr(survey.AskOne(
 			&survey.Input{
@@ -45,7 +46,7 @@ var initCmd = &cobra.Command{
 			},
 			&repeatPass,
 			survey.WithValidator(survey.Required),
-			survey.WithValidator(func(ans interface{}) error {
+			survey.WithValidator(func(ans any) error {
 				if ans.(string) != req.Password {
 					return fmt.Errorf("两次输入的密码不一致")
 				}

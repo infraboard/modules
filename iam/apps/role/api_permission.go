@@ -76,6 +76,9 @@ func (a *ApiPermissionSpec) GetEndpointId() uint64 {
 func (a *ApiPermissionSpec) IsMatch(target *endpoint.Endpoint) bool {
 	switch a.MatchBy {
 	case MATCH_BY_ID:
+		if a.EndpointId == nil {
+			return false
+		}
 		if *a.EndpointId == target.Id {
 			return true
 		}

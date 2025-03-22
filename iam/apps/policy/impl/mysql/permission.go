@@ -36,6 +36,7 @@ func (i *PolicyServiceImpl) QueryNamespace(ctx context.Context, in *policy.Query
 
 // 查询用户可以访问的Api接口
 func (i *PolicyServiceImpl) QueryEndpoint(ctx context.Context, in *policy.QueryEndpointRequest) (*types.Set[*endpoint.Endpoint], error) {
+	set := types.New[*endpoint.Endpoint]()
 	policies, err := i.QueryPolicy(ctx,
 		policy.NewQueryPolicyRequest().
 			SetSkipPage(true).
@@ -52,10 +53,13 @@ func (i *PolicyServiceImpl) QueryEndpoint(ctx context.Context, in *policy.QueryE
 		roleReq.Add(t.RoleId)
 	})
 
-	set, err := role.GetService().QueryMatchedEndpoint(ctx, roleReq)
-	if err != nil {
-		return nil, err
+	if policies.Len() > 0 {
+		set, err = role.GetService().QueryMatchedEndpoint(ctx, roleReq)
+		if err != nil {
+			return nil, err
+		}
 	}
+
 	return set, nil
 }
 
