@@ -39,12 +39,26 @@ type CreatePageRequest struct {
 	Name string `json:"name" bson:"name" gorm:"column:name" description:"页面名称"`
 	// 标签
 	Label string `json:"label" gorm:"column:label;type:varchar(200);index" description:"标签" optional:"true"`
-	// 关联的Api接口
-	RefEndpointId []uint64 `json:"ref_endpoints" gorm:"column:ref_endpoints;serializer:json;type:json" description:"该页面管理的Api接口关联的接口" optional:"true"`
+	// 页面组件，比如按钮
+	Components []Component `json:"components" gorm:"column:components;type:json;serializer:json" description:"组件" optional:"true"`
 	// 其他扩展信息
 	Extras map[string]string `json:"extras" gorm:"column:extras;serializer:json;type:json" description:"其他扩展信息" optional:"true"`
 }
 
 func (r *CreatePageRequest) Validate() error {
 	return validator.Validate(r)
+}
+
+// 组件
+type Component struct {
+	// 组件名称
+	Name string `json:"name" bson:"name" description:"组件名称"`
+	// 组件说明
+	Description string `json:"description" optional:"true" description:"组件说明"`
+	// 组件使用文档链接
+	RefDocURL string `json:"ref_doc_url" optional:"true" description:"组件使用文档链接"`
+	// 关联的Api接口
+	RefEndpointId []uint64 `json:"ref_endpoints" description:"该页面管理的Api接口关联的接口" optional:"true"`
+	// 其他扩展信息
+	Extras map[string]string `json:"extras" description:"其他扩展信息" optional:"true"`
 }

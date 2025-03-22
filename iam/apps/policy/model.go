@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/infraboard/mcube/v2/ioc/config/validator"
+	"github.com/infraboard/mcube/v2/tools/pretty"
 	"github.com/infraboard/modules/iam/apps"
 	"github.com/infraboard/modules/iam/apps/namespace"
 	"github.com/infraboard/modules/iam/apps/role"
@@ -29,14 +30,20 @@ type Policy struct {
 	Role *role.Role `json:"role,omitempty" gorm:"-"`
 }
 
-func (u *Policy) TableName() string {
+func (p *Policy) TableName() string {
 	return "policy"
+}
+
+func (p *Policy) String() string {
+	return pretty.ToJSON(p)
 }
 
 func NewCreatePolicyRequest() *CreatePolicyRequest {
 	return &CreatePolicyRequest{
-		Extras: map[string]string{},
-		Scope:  map[string]string{},
+		Extras:   map[string]string{},
+		Scope:    map[string]string{},
+		Enabled:  true,
+		ReadOnly: false,
 	}
 }
 
@@ -65,4 +72,9 @@ type CreatePolicyRequest struct {
 
 func (r *CreatePolicyRequest) Validate() error {
 	return validator.Validate(r)
+}
+
+func (r *CreatePolicyRequest) SetNamespaceId(namespaceId uint64) *CreatePolicyRequest {
+	r.NamespaceId = &namespaceId
+	return r
 }

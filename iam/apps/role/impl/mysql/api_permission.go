@@ -80,7 +80,7 @@ func (i *RoleServiceImpl) QueryMatchedEndpoint(ctx context.Context, in *role.Que
 	set := types.New[*endpoint.Endpoint]()
 
 	// 查询角色的权限
-	perms, err := i.QueryApiPermission(ctx, role.NewQueryApiPermissionRequest().AddRoleId(in.Id))
+	perms, err := i.QueryApiPermission(ctx, role.NewQueryApiPermissionRequest().AddRoleId(in.RoleIds...))
 	if err != nil {
 		return nil, err
 	}

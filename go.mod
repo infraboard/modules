@@ -9,6 +9,7 @@ require (
 	github.com/emicklei/go-restful/v3 v3.12.1
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-ldap/ldap/v3 v3.4.8
+	github.com/google/uuid v1.6.0
 	github.com/infraboard/mcenter v0.0.45
 	github.com/infraboard/mcube/v2 v2.0.44
 	github.com/rs/zerolog v1.32.0
@@ -49,7 +50,6 @@ require (
 	github.com/go-playground/validator/v10 v10.20.0 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect

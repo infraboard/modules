@@ -2,12 +2,12 @@ package mysql
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/infraboard/mcube/v2/types"
 	"github.com/infraboard/modules/iam/apps/endpoint"
 	"github.com/infraboard/modules/iam/apps/namespace"
 	"github.com/infraboard/modules/iam/apps/policy"
+	"github.com/infraboard/modules/iam/apps/role"
 	"github.com/infraboard/modules/iam/apps/view"
 )
 
@@ -47,17 +47,25 @@ func (i *PolicyServiceImpl) QueryEndpoint(ctx context.Context, in *policy.QueryE
 		return nil, err
 	}
 
-	fmt.Println(policies)
+	roleReq := role.NewQueryMatchedEndpointRequest()
+	policies.ForEach(func(t *policy.Policy) {
+		roleReq.Add(t.RoleId)
+	})
+
+	set, err := role.GetService().QueryMatchedEndpoint(ctx, roleReq)
+	if err != nil {
+		return nil, err
+	}
+	return set, nil
+}
+
+// 校验Api接口权限
+func (i *PolicyServiceImpl) ValidateEndpointPermission(ctx context.Context, in *policy.ValidateEndpointPermissionRequest) (*policy.ValidateEndpointPermissionResponse, error) {
 	return nil, nil
 }
 
 // 查询用户可以访问的菜单
 func (i *PolicyServiceImpl) QueryMenu(ctx context.Context, in *policy.QueryMenuRequest) (*types.Set[*view.Menu], error) {
-	return nil, nil
-}
-
-// 校验Api接口权限
-func (i *PolicyServiceImpl) ValidateEndpointPermission(ctx context.Context, in *policy.ValidateEndpointPermissionRequest) (*policy.ValidateEndpointPermissionResponse, error) {
 	return nil, nil
 }
 

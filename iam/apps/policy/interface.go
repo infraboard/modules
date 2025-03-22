@@ -149,11 +149,16 @@ type ValidatePagePermissionResponse struct {
 	Policy *Policy    `json:"policy"`
 }
 
+func NewValidateEndpointPermissionRequest() *ValidateEndpointPermissionRequest {
+	return &ValidateEndpointPermissionRequest{}
+}
+
 type ValidateEndpointPermissionRequest struct {
-	UserId      uint64 `json:"user_id"`
-	NamespaceId uint64 `json:"namespace_id"`
-	Path        string `json:"path"`
-	Method      string `json:"method"`
+	UserId      uint64 `json:"user_id" form:"user_id"`
+	NamespaceId uint64 `json:"namespace_id" form:"namespace_id"`
+	Service     string `json:"service" form:"service"`
+	Path        string `json:"path" form:"path"`
+	Method      string `json:"method" form:"method"`
 }
 
 type ValidateEndpointPermissionResponse struct {

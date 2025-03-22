@@ -39,7 +39,7 @@ func TestRemoveApiPermission(t *testing.T) {
 
 func TestQueryMatchedEndpoint(t *testing.T) {
 	req := role.NewQueryMatchedEndpointRequest()
-	req.SetId(2)
+	req.Add(2)
 	set, err := impl.QueryMatchedEndpoint(ctx, req)
 	if err != nil {
 		t.Fatal(err)

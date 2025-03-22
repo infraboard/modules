@@ -38,9 +38,9 @@ func TestCreateAuthor2(t *testing.T) {
 	t.Log(u)
 }
 
-func TestCreateAuditorUser(t *testing.T) {
+func TestCreateGuestUser(t *testing.T) {
 	req := user.NewCreateUserRequest()
-	req.UserName = "auditor"
+	req.UserName = "guest"
 	req.Password = "123456"
 	u, err := impl.CreateUser(ctx, req)
 	if err != nil {

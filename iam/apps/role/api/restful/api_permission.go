@@ -11,11 +11,13 @@ import (
 )
 
 func (h *RoleRestfulApiHandler) QueryMatchedEndpoint(r *restful.Request, w *restful.Response) {
-	req := role.NewQueryMatchedEndpointRequest()
-	if err := req.SetIdByString(r.PathParameter("id")); err != nil {
+	v, err := strconv.ParseUint(r.PathParameter("id"), 10, 64)
+	if err != nil {
 		response.Failed(w, exception.NewBadRequest("parse id error, %s", err))
 		return
 	}
+	req := role.NewQueryMatchedEndpointRequest()
+	req.Add(v)
 
 	tk, err := h.svc.QueryMatchedEndpoint(r.Request.Context(), req)
 	if err != nil {

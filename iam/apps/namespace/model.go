@@ -2,6 +2,7 @@ package namespace
 
 import (
 	"github.com/infraboard/mcube/v2/ioc/config/validator"
+	"github.com/infraboard/mcube/v2/tools/pretty"
 	"github.com/infraboard/modules/iam/apps"
 )
 
@@ -22,9 +23,14 @@ func (u *Namespace) TableName() string {
 	return "namespaces"
 }
 
+func (u *Namespace) String() string {
+	return pretty.ToJSON(u)
+}
+
 func NewCreateNamespaceRequest() *CreateNamespaceRequest {
 	return &CreateNamespaceRequest{
-		Extras: map[string]string{},
+		Extras:  map[string]string{},
+		Enabled: true,
 	}
 }
 

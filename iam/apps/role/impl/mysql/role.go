@@ -32,6 +32,10 @@ func (i *RoleServiceImpl) QueryRole(ctx context.Context, in *role.QueryRoleReque
 	set := types.New[*role.Role]()
 
 	query := datasource.DBFromCtx(ctx).Model(&role.Role{})
+	if len(in.RoleIds) > 0 {
+		query = query.Where("id IN ?", in.RoleIds)
+		in.PageSize = uint64(len(in.RoleIds))
+	}
 	err := query.Count(&set.Total).Error
 	if err != nil {
 		return nil, err

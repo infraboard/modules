@@ -81,7 +81,7 @@ type CreateUserRequest struct {
 	Sex SEX `json:"sex" gorm:"column:sex;type:tinyint(1)" optional:"true" description:"性别, 1:男, 2:女, 0: 保密"`
 
 	// 邮箱
-	Email string `json:"email" gorm:"column:email;type:varchar(200);uniqueIndex" description:"邮箱" unique:"true"`
+	Email string `json:"email" gorm:"column:email;type:varchar(200);index" description:"邮箱" unique:"true"`
 	// 邮箱是否验证ok
 	IsEmailConfirmed bool `json:"is_email_confirmed" gorm:"column:is_email_confirmed;type:tinyint(1)" optional:"true" description:"邮箱是否验证ok"`
 	// 手机

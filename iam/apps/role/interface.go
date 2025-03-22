@@ -2,6 +2,7 @@ package role
 
 import (
 	"context"
+	"slices"
 
 	"github.com/infraboard/mcube/v2/http/request"
 	"github.com/infraboard/mcube/v2/ioc"
@@ -43,13 +44,24 @@ type RoleService interface {
 func NewQueryRoleRequest() *QueryRoleRequest {
 	return &QueryRoleRequest{
 		PageRequest: request.NewDefaultPageRequest(),
+		RoleIds:     []uint64{},
 	}
 }
 
 type QueryRoleRequest struct {
 	*request.PageRequest
-	WithMenuPermission bool `json:"with_menu_permission" form:"with_menu_permission"`
-	WithApiPermission  bool `json:"with_api_permission" form:"with_api_permission"`
+	WithMenuPermission bool     `json:"with_menu_permission" form:"with_menu_permission"`
+	WithApiPermission  bool     `json:"with_api_permission" form:"with_api_permission"`
+	RoleIds            []uint64 `json:"role_ids" form:"role_ids"`
+}
+
+func (r *QueryRoleRequest) AddRoleId(roleIds ...uint64) *QueryRoleRequest {
+	for _, rid := range roleIds {
+		if !slices.Contains(r.RoleIds, rid) {
+			r.RoleIds = append(r.RoleIds, rid)
+		}
+	}
+	return r
 }
 
 func NewDescribeRoleRequest() *DescribeRoleRequest {
@@ -109,12 +121,21 @@ func (r *QueryApiPermissionRequest) AddPermissionId(permissionIds ...uint64) *Qu
 
 func NewQueryMatchedEndpointRequest() *QueryMatchedEndpointRequest {
 	return &QueryMatchedEndpointRequest{
-		apps.GetRequest{},
+		RoleIds: []uint64{},
 	}
 }
 
 type QueryMatchedEndpointRequest struct {
-	apps.GetRequest
+	RoleIds []uint64 `json:"role_ids" form:"role_ids"`
+}
+
+func (r *QueryMatchedEndpointRequest) Add(roleIds ...uint64) *QueryMatchedEndpointRequest {
+	for _, rid := range roleIds {
+		if !slices.Contains(r.RoleIds, rid) {
+			r.RoleIds = append(r.RoleIds, rid)
+		}
+	}
+	return r
 }
 
 func NewAddApiPermissionRequest(roleId uint64) *AddApiPermissionRequest {
@@ -217,6 +238,11 @@ type AddViewPermissionRequest struct {
 
 func (r *AddViewPermissionRequest) Validate() error {
 	return validator.Validate(r)
+}
+
+func (r *AddViewPermissionRequest) Add(specs ...*ViewPermissionSpec) *AddViewPermissionRequest {
+	r.Items = append(r.Items, specs...)
+	return r
 }
 
 type UpdateViewPermission struct {

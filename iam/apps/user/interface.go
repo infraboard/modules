@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"slices"
 
 	"github.com/infraboard/mcube/v2/http/request"
 	"github.com/infraboard/mcube/v2/ioc"
@@ -33,11 +34,22 @@ type Service interface {
 func NewQueryUserRequest() *QueryUserRequest {
 	return &QueryUserRequest{
 		PageRequest: request.NewDefaultPageRequest(),
+		UserIds:     []uint64{},
 	}
 }
 
 type QueryUserRequest struct {
 	*request.PageRequest
+	UserIds []uint64 `form:"user" json:"user"`
+}
+
+func (r *QueryUserRequest) AddUser(userIds ...uint64) *QueryUserRequest {
+	for _, uid := range userIds {
+		if !slices.Contains(r.UserIds, uid) {
+			r.UserIds = append(r.UserIds, uid)
+		}
+	}
+	return r
 }
 
 func NewDescribeUserRequestById(id string) *DescribeUserRequest {
