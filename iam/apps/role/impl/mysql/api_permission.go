@@ -42,7 +42,7 @@ func (i *RoleServiceImpl) QueryApiPermission(ctx context.Context, in *role.Query
 		query = query.Where("role_id IN ?", in.RoleIds)
 	}
 	if len(in.ApiPermissionIds) > 0 {
-		query = query.Where("in IN ?", in.ApiPermissionIds)
+		query = query.Where("id IN ?", in.ApiPermissionIds)
 	}
 
 	perms := []*role.ApiPermission{}
@@ -77,5 +77,34 @@ func (i *RoleServiceImpl) RemoveApiPermission(ctx context.Context, in *role.Remo
 
 // 查询匹配到的Api接口列表
 func (i *RoleServiceImpl) QueryMatchedEndpoint(ctx context.Context, in *role.QueryMatchedEndpointRequest) (*types.Set[*endpoint.Endpoint], error) {
-	return nil, nil
+	set := types.New[*endpoint.Endpoint]()
+
+	// 查询角色的权限
+	perms, err := i.QueryApiPermission(ctx, role.NewQueryApiPermissionRequest().AddRoleId(in.Id))
+	if err != nil {
+		return nil, err
+	}
+
+	// 查询服务的Endpoint列表
+	endpointReq := endpoint.NewQueryEndpointRequest()
+	for _, perm := range perms {
+		endpointReq.WithService(perm.Service)
+	}
+	endpoints, err := endpoint.GetService().QueryEndpoint(ctx, endpointReq)
+	if err != nil {
+		return nil, err
+	}
+
+	// 找出能匹配的API
+	endpoints.ForEach(func(t *endpoint.Endpoint) {
+		for _, perm := range perms {
+			if perm.IsMatch(t) {
+				if !endpoint.IsEndpointExist(set, t) {
+					set.Add(t)
+				}
+			}
+		}
+	})
+
+	return set, nil
 }

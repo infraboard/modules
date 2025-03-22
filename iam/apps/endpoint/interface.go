@@ -3,7 +3,8 @@ package endpoint
 import (
 	"context"
 
-	"github.com/infraboard/mcube/v2/http/request"
+	"slices"
+
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/validator"
 	"github.com/infraboard/mcube/v2/types"
@@ -28,13 +29,24 @@ type Service interface {
 }
 
 func NewQueryEndpointRequest() *QueryEndpointRequest {
-	return &QueryEndpointRequest{
-		PageRequest: request.NewDefaultPageRequest(),
-	}
+	return &QueryEndpointRequest{}
 }
 
 type QueryEndpointRequest struct {
-	*request.PageRequest
+	Services []string `form:"services" json:"serivces"`
+}
+
+func (r *QueryEndpointRequest) WithService(services ...string) *QueryEndpointRequest {
+	for _, service := range services {
+		if !slices.Contains(r.Services, service) {
+			r.Services = append(r.Services, services...)
+		}
+	}
+	return r
+}
+
+func (r *QueryEndpointRequest) IsMatchAllService() bool {
+	return slices.Contains(r.Services, "*")
 }
 
 func NewDescribeEndpointRequest() *DescribeEndpointRequest {

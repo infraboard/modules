@@ -27,13 +27,12 @@ func (h *RoleRestfulApiHandler) QueryMatchedEndpoint(r *restful.Request, w *rest
 }
 
 func (h *RoleRestfulApiHandler) AddApiPermission(r *restful.Request, w *restful.Response) {
-	req := role.NewAddApiPermissionRequest()
 	v, err := strconv.ParseUint(r.PathParameter("id"), 10, 64)
 	if err != nil {
 		response.Failed(w, exception.NewBadRequest("parse id error, %s", err))
 		return
 	}
-	req.RoleId = v
+	req := role.NewAddApiPermissionRequest(v)
 
 	err = r.ReadEntity(&req.Items)
 	if err != nil {
@@ -53,13 +52,12 @@ func (h *RoleRestfulApiHandler) AddApiPermission(r *restful.Request, w *restful.
 }
 
 func (h *RoleRestfulApiHandler) RemoveApiPermission(r *restful.Request, w *restful.Response) {
-	req := role.NewRemoveApiPermissionRequest()
 	v, err := strconv.ParseUint(r.PathParameter("id"), 10, 64)
 	if err != nil {
 		response.Failed(w, exception.NewBadRequest("parse id error, %s", err))
 		return
 	}
-	req.RoleId = v
+	req := role.NewRemoveApiPermissionRequest(v)
 
 	err = r.ReadEntity(&req.ApiPermissionIds)
 	if err != nil {

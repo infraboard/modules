@@ -108,15 +108,19 @@ func (r *QueryApiPermissionRequest) AddPermissionId(permissionIds ...uint64) *Qu
 }
 
 func NewQueryMatchedEndpointRequest() *QueryMatchedEndpointRequest {
-	return &QueryMatchedEndpointRequest{}
+	return &QueryMatchedEndpointRequest{
+		apps.GetRequest{},
+	}
 }
 
 type QueryMatchedEndpointRequest struct {
 	apps.GetRequest
 }
 
-func NewAddApiPermissionRequest() *AddApiPermissionRequest {
-	return &AddApiPermissionRequest{}
+func NewAddApiPermissionRequest(roleId uint64) *AddApiPermissionRequest {
+	return &AddApiPermissionRequest{
+		RoleId: roleId,
+	}
 }
 
 type AddApiPermissionRequest struct {
@@ -128,8 +132,14 @@ func (r *AddApiPermissionRequest) Validate() error {
 	return validator.Validate(r)
 }
 
-func NewRemoveApiPermissionRequest() *RemoveApiPermissionRequest {
+func (r *AddApiPermissionRequest) Add(specs ...*ApiPermissionSpec) *AddApiPermissionRequest {
+	r.Items = append(r.Items, specs...)
+	return r
+}
+
+func NewRemoveApiPermissionRequest(roleId uint64) *RemoveApiPermissionRequest {
 	return &RemoveApiPermissionRequest{
+		RoleId:           roleId,
 		ApiPermissionIds: []uint64{},
 	}
 }
@@ -137,6 +147,11 @@ func NewRemoveApiPermissionRequest() *RemoveApiPermissionRequest {
 type RemoveApiPermissionRequest struct {
 	RoleId           uint64   `json:"role_id"`
 	ApiPermissionIds []uint64 `json:"api_permission_ids"`
+}
+
+func (r *RemoveApiPermissionRequest) Add(apiPermissionIds ...uint64) *RemoveApiPermissionRequest {
+	r.ApiPermissionIds = append(r.ApiPermissionIds, apiPermissionIds...)
+	return r
 }
 
 func (r *RemoveApiPermissionRequest) Validate() error {

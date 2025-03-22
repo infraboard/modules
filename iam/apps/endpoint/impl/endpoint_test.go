@@ -8,6 +8,7 @@ import (
 
 func TestQueryEndpoint(t *testing.T) {
 	req := endpoint.NewQueryEndpointRequest()
+	req.WithService("cmdb")
 	set, err := impl.QueryEndpoint(ctx, req)
 	if err != nil {
 		t.Fatal(err)

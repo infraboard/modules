@@ -1,6 +1,7 @@
 package role
 
 import (
+	"github.com/infraboard/mcube/v2/tools/pretty"
 	"github.com/infraboard/modules/iam/apps"
 	"github.com/infraboard/modules/iam/apps/endpoint"
 )
@@ -26,6 +27,20 @@ func (r *ApiPermission) TableName() string {
 	return "api_permissions"
 }
 
+func (r *ApiPermission) String() string {
+	return pretty.ToJSON(r)
+}
+
+func NewResourceActionApiPermissionSpec(service, resource, action string) *ApiPermissionSpec {
+	return &ApiPermissionSpec{
+		Extras:   map[string]string{},
+		MatchBy:  MATCH_BY_RESOURCE_ACTION,
+		Service:  service,
+		Resource: resource,
+		Action:   action,
+	}
+}
+
 type ApiPermissionSpec struct {
 	// 创建者ID
 	CreateBy uint64 `json:"create_by" gorm:"column:create_by" description:"创建者ID" optional:"true"`
@@ -48,4 +63,37 @@ type ApiPermissionSpec struct {
 
 	// 其他扩展信息
 	Extras map[string]string `json:"extras" gorm:"column:extras;serializer:json;type:json" description:"其他扩展信息" optional:"true"`
+}
+
+func (a *ApiPermissionSpec) GetEndpointId() uint64 {
+	if a.EndpointId == nil {
+		return 0
+	}
+	return *a.EndpointId
+}
+
+// 判断是否有当前API的访问权限
+func (a *ApiPermissionSpec) IsMatch(target *endpoint.Endpoint) bool {
+	switch a.MatchBy {
+	case MATCH_BY_ID:
+		if *a.EndpointId == target.Id {
+			return true
+		}
+	case MATCH_BY_RESOURCE_ACCESS_MODE:
+		if a.AccessMode == target.AccessMode {
+			return true
+		}
+	case MATCH_BY_RESOURCE_ACTION:
+		if a.Service != "*" && a.Service != target.Service {
+			return false
+		}
+		if a.Resource != "*" && a.Resource != target.Resource {
+			return false
+		}
+		if a.Action != "*" && a.Action != target.Action {
+			return false
+		}
+		return true
+	}
+	return false
 }

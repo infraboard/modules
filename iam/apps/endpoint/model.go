@@ -5,6 +5,7 @@ import (
 
 	"github.com/emicklei/go-restful/v3"
 	"github.com/google/uuid"
+	"github.com/infraboard/mcube/v2/types"
 	"github.com/infraboard/modules/iam/apps"
 )
 
@@ -14,12 +15,21 @@ func NewEndpoint() *Endpoint {
 	}
 }
 
+func IsEndpointExist(set *types.Set[*Endpoint], target *Endpoint) bool {
+	for _, item := range set.Items {
+		if item.Id == target.Id {
+			return true
+		}
+	}
+	return false
+}
+
 // Endpoint Service's features
 type Endpoint struct {
 	// 基础数据
 	apps.ResourceMeta
 	// 路由条目信息
-	RouteEntry `json:"route_entry" bson:",inline" validate:"required"`
+	RouteEntry `bson:",inline" validate:"required"`
 }
 
 func (u *Endpoint) TableName() string {

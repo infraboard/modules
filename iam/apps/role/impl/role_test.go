@@ -25,10 +25,21 @@ func TestDescribeRole(t *testing.T) {
 	t.Log(ins)
 }
 
-func TestCreateRole(t *testing.T) {
+func TestCreateAdminRole(t *testing.T) {
 	req := role.NewCreateRoleRequest()
 	req.Name = "admin"
 	req.Description = "管理员"
+	ins, err := impl.CreateRole(ctx, req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(ins)
+}
+
+func TestCreateGuestRole(t *testing.T) {
+	req := role.NewCreateRoleRequest()
+	req.Name = "guest"
+	req.Description = "访客"
 	ins, err := impl.CreateRole(ctx, req)
 	if err != nil {
 		t.Fatal(err)

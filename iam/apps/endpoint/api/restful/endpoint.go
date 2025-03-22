@@ -3,8 +3,8 @@ package restful
 import (
 	restfulspec "github.com/emicklei/go-restful-openapi/v2"
 	"github.com/emicklei/go-restful/v3"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/infraboard/mcube/v2/exception"
-	"github.com/infraboard/mcube/v2/http/request"
 	"github.com/infraboard/mcube/v2/http/restful/response"
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/gorestful"
@@ -64,9 +64,12 @@ func (h *EndpointRestfulApiHandler) Init() error {
 }
 
 func (h *EndpointRestfulApiHandler) QueryEndpoint(r *restful.Request, w *restful.Response) {
-	// 1. 获取用户的请求参数， 参数在Body里面
+	// 1. 获取用户的请求参数， 参数在Query String里面
 	req := endpoint.NewQueryEndpointRequest()
-	req.PageRequest = request.NewPageRequestFromHTTP(r.Request)
+	if err := binding.Query.Bind(r.Request, req); err != nil {
+		response.Failed(w, err)
+		return
+	}
 
 	// 2. 执行逻辑
 	tk, err := h.svc.QueryEndpoint(r.Request.Context(), req)

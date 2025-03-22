@@ -55,6 +55,10 @@ func (i *EndpointServiceImpl) QueryEndpoint(ctx context.Context, in *endpoint.Qu
 	set := types.New[*endpoint.Endpoint]()
 
 	query := datasource.DBFromCtx(ctx).Model(&endpoint.Endpoint{})
+	if len(in.Services) > 0 && !in.IsMatchAllService() {
+		query = query.Where("service IN ?", in.Services)
+	}
+
 	err := query.Count(&set.Total).Error
 	if err != nil {
 		return nil, err
@@ -62,8 +66,6 @@ func (i *EndpointServiceImpl) QueryEndpoint(ctx context.Context, in *endpoint.Qu
 
 	err = query.
 		Order("created_at desc").
-		Offset(int(in.ComputeOffset())).
-		Limit(int(in.PageSize)).
 		Find(&set.Items).
 		Error
 	if err != nil {
