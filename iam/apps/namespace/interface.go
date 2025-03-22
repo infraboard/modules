@@ -67,6 +67,11 @@ type DescribeNamespaceRequest struct {
 	apps.GetRequest
 }
 
+func (r *DescribeNamespaceRequest) SetNamespaceId(id uint64) *DescribeNamespaceRequest {
+	r.Id = id
+	return r
+}
+
 func NewUpdateNamespaceRequest() *UpdateNamespaceRequest {
 	return &UpdateNamespaceRequest{}
 }

@@ -19,12 +19,16 @@ type Namespace struct {
 	CreateNamespaceRequest
 }
 
-func (u *Namespace) TableName() string {
+func (n *Namespace) IsOwner(ownerUserId uint64) bool {
+	return n.OwnerUserId == ownerUserId
+}
+
+func (n *Namespace) TableName() string {
 	return "namespaces"
 }
 
-func (u *Namespace) String() string {
-	return pretty.ToJSON(u)
+func (n *Namespace) String() string {
+	return pretty.ToJSON(n)
 }
 
 func NewCreateNamespaceRequest() *CreateNamespaceRequest {

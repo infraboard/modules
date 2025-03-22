@@ -7,6 +7,7 @@ import (
 	"github.com/infraboard/mcube/v2/exception"
 	"github.com/infraboard/mcube/v2/http/restful/response"
 	"github.com/infraboard/mcube/v2/ioc"
+	"github.com/infraboard/mcube/v2/ioc/config/application"
 	"github.com/infraboard/mcube/v2/ioc/config/gorestful"
 	"github.com/infraboard/mcube/v2/ioc/config/log"
 	"github.com/infraboard/modules/iam/apps/endpoint"
@@ -98,20 +99,19 @@ func (c *Checker) CheckPolicy(r *restful.Request, tk *token.Token, route *endpoi
 		return nil
 	}
 
-	set, err := c.policy.QueryPolicy(r.Request.Context(),
-		policy.NewQueryPolicyRequest().
-			SetNamespaceId(tk.NamespaceId).
-			SetUserId(tk.UserId).
-			SetExpired(false).
-			SetEnabled(true).
-			SetWithRole(true),
-	)
-	if err != nil {
-		return exception.NewInternalServerError(err.Error())
-	}
-
 	// 角色校验
 	if route.HasRequiredRole() {
+		set, err := c.policy.QueryPolicy(r.Request.Context(),
+			policy.NewQueryPolicyRequest().
+				SetNamespaceId(tk.NamespaceId).
+				SetUserId(tk.UserId).
+				SetExpired(false).
+				SetEnabled(true).
+				SetWithRole(true),
+		)
+		if err != nil {
+			return exception.NewInternalServerError(err.Error())
+		}
 		for i := range set.Items {
 			p := set.Items[i]
 			if route.IsRequireRole(p.Role.Name) {
@@ -122,12 +122,18 @@ func (c *Checker) CheckPolicy(r *restful.Request, tk *token.Token, route *endpoi
 
 	// API权限校验
 	if route.RequiredPerm {
-		for i := range set.Items {
-			p := set.Items[i]
-			if p.Role == nil {
-				return exception.NewInternalServerError("policy role is nil")
-			}
-
+		validateReq := policy.NewValidateEndpointPermissionRequest()
+		validateReq.UserId = tk.UserId
+		validateReq.NamespaceId = tk.NamespaceId
+		validateReq.Service = application.Get().GetAppName()
+		validateReq.Method = route.Method
+		validateReq.Path = route.Path
+		resp, err := c.policy.ValidateEndpointPermission(r.Request.Context(), validateReq)
+		if err != nil {
+			return exception.NewInternalServerError(err.Error())
+		}
+		if resp.HasPermission {
+			return nil
 		}
 	}
 

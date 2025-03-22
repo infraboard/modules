@@ -62,6 +62,18 @@ func (i *PolicyServiceImpl) QueryEndpoint(ctx context.Context, in *policy.QueryE
 // 校验Api接口权限
 func (i *PolicyServiceImpl) ValidateEndpointPermission(ctx context.Context, in *policy.ValidateEndpointPermissionRequest) (*policy.ValidateEndpointPermissionResponse, error) {
 	resp := policy.NewValidateEndpointPermissionResponse(*in)
+
+	// 空间Owner有所有权限
+	ns, err := namespace.GetService().DescribeNamespace(ctx, namespace.NewDescribeNamespaceRequest().SetNamespaceId(in.NamespaceId))
+	if err != nil {
+		return nil, err
+	}
+	if ns.IsOwner(in.UserId) {
+		resp.HasPermission = true
+		return resp, nil
+	}
+
+	// 非空间管理员需要独立鉴权, 查询用户可以访问的API列表
 	endpointReq := policy.NewQueryEndpointRequest()
 	endpointReq.UserId = in.UserId
 	endpointReq.NamespaceId = in.NamespaceId
