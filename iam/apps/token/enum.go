@@ -9,8 +9,11 @@ const (
 	REFRESH_TOKEN_HEADER_NAME         = "X-REFRUSH-TOKEN"
 )
 
+// 自定义非导出类型，避免外部包直接实例化
+type tokenContextKey struct{}
+
 var (
-	CTX_TOKEN_KEY = struct{}{}
+	CTX_TOKEN_KEY = tokenContextKey{}
 )
 
 var (

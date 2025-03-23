@@ -29,6 +29,14 @@ func Required(roles ...string) (string, []string) {
 	return endpoint.META_REQUIRED_ROLE_KEY, roles
 }
 
+func Resource(v string) (string, string) {
+	return endpoint.META_RESOURCE_KEY, v
+}
+
+func Action(v string) (string, string) {
+	return endpoint.META_ACTION_KEY, v
+}
+
 func init() {
 	ioc.Config().Registry(&Checker{})
 }
@@ -98,6 +106,7 @@ func (c *Checker) CheckToken(r *restful.Request) (*token.Token, error) {
 func (c *Checker) ValiateToken(ctx context.Context, in *token.ValiateTokenRequest) (*token.Token, error) {
 	tk := token.NewToken()
 	resp, err := resty.New().
+		SetDebug(application.Get().Debug).
 		SetBaseURL(application.Get().InternalAddress).
 		SetAuthToken(application.Get().InternalToken).
 		R().
@@ -150,7 +159,7 @@ func (c *Checker) ValidateEndpointPermission(ctx context.Context, in *policy.Val
 	resp, err := resty.New().
 		SetBaseURL(application.Get().InternalAddress).
 		SetAuthToken(application.Get().InternalToken).
-		SetDebug(true).
+		SetDebug(application.Get().Debug).
 		R().
 		WithContext(ctx).
 		SetBody(in).

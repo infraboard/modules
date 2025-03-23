@@ -6,6 +6,7 @@ import (
 	"github.com/emicklei/go-restful/v3"
 	"github.com/google/uuid"
 	"github.com/infraboard/mcube/v2/ioc/config/application"
+	"github.com/infraboard/mcube/v2/tools/pretty"
 	"github.com/infraboard/mcube/v2/types"
 	"github.com/infraboard/modules/iam/apps"
 )
@@ -33,8 +34,12 @@ type Endpoint struct {
 	RouteEntry `bson:",inline" validate:"required"`
 }
 
-func (u *Endpoint) TableName() string {
+func (e *Endpoint) TableName() string {
 	return "endpoints"
+}
+
+func (e *Endpoint) String() string {
+	return pretty.ToJSON(e)
 }
 
 func (e *Endpoint) IsMatched(service, method, path string) bool {

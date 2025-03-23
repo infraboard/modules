@@ -3,6 +3,7 @@
   description = "mcenter"
   internal_address = "http://127.0.0.1:8020"
   internal_token = "vCYg52HNzFcMMHq7sVLoFxHU"
+  debug = true
 
 [http]
   # 开启GRPC服务
@@ -20,4 +21,4 @@
   username = "root"
   password = "123456"
   debug = true
-  auto_migrate = true
+  auto_migrate = false
