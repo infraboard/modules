@@ -22,6 +22,7 @@ var initCmd = &cobra.Command{
 		svc := user.GetService()
 		req := user.NewCreateUserRequest()
 		req.IsAdmin = true
+		req.EnabledApi = true
 
 		cobra.CheckErr(survey.AskOne(
 			&survey.Input{
