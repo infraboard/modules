@@ -3,6 +3,8 @@ package permission
 import (
 	"context"
 
+	"slices"
+
 	"github.com/gin-gonic/gin"
 	"github.com/infraboard/mcube/v2/exception"
 	"github.com/infraboard/mcube/v2/http/gin/response"
@@ -81,10 +83,8 @@ func (a *Permissoner) HasPerm(role string) error {
 		return nil
 	}
 
-	for _, r := range a.roles {
-		if r == role {
-			return nil
-		}
+	if slices.Contains(a.roles, role) {
+		return nil
 	}
 
 	return exception.NewPermissionDeny("role %s not allow ", role)

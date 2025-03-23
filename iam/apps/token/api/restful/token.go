@@ -20,6 +20,9 @@ func (h *TokenRestulApiHandler) Login(r *restful.Request, w *restful.Response) {
 		return
 	}
 
+	// 设置当前调用者的Token
+	req.Parameter.SetAccessToken(token.GetAccessTokenFromHTTP(r.Request))
+
 	// 2. 执行逻辑
 	tk, err := h.svc.IssueToken(r.Request.Context(), req)
 	if err != nil {

@@ -155,6 +155,10 @@ func (p IssueParameter) ExpireTTL() time.Duration {
 	return time.Second * time.Duration(GetIssueParameterValue[int64](p, "expired_ttl"))
 }
 
+func (p IssueParameter) SetAccessToken(v string) {
+	p["access_token"] = v
+}
+
 func NewRevolkTokenRequest(at, rk string) *RevolkTokenRequest {
 	return &RevolkTokenRequest{
 		AccessToken:  at,

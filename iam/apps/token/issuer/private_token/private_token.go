@@ -33,8 +33,14 @@ func (p *PrivateTokenIssuer) Init() error {
 }
 
 func (p *PrivateTokenIssuer) IssueToken(ctx context.Context, parameter token.IssueParameter) (*token.Token, error) {
-	// 1. 查询用户
-	uReq := user.NewDescribeUserRequestByUserName(parameter.Username())
+	// 1. 校验Token合法
+	oldTk, err := p.token.ValiateToken(ctx, token.NewValiateTokenRequest(parameter.AccessToken()))
+	if err != nil {
+		return nil, err
+	}
+
+	// 2. 查询用户
+	uReq := user.NewDescribeUserRequestById(oldTk.UserIdString())
 	u, err := p.user.DescribeUser(ctx, uReq)
 	if err != nil {
 		if exception.IsNotFoundError(err) {
@@ -45,12 +51,6 @@ func (p *PrivateTokenIssuer) IssueToken(ctx context.Context, parameter token.Iss
 
 	if !u.EnabledApi {
 		return nil, exception.NewPermissionDeny("未开启接口登录")
-	}
-
-	// 2. 校验Token合法
-	_, err = p.token.ValiateToken(ctx, token.NewValiateTokenRequest(parameter.AccessToken()))
-	if err != nil {
-		return nil, err
 	}
 
 	// 3. 颁发token
