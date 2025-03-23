@@ -15,4 +15,5 @@ const (
 	META_REQUIRED_AUDIT_KEY     = "required_audit"
 	META_REQUIRED_NAMESPACE_KEY = "required_namespace"
 	META_RESOURCE_KEY           = "resource"
+	META_ACTION_KEY             = "action"
 )

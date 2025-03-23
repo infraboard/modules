@@ -109,7 +109,9 @@ func (e *RouteEntry) BuildUUID() *RouteEntry {
 }
 
 func (e *RouteEntry) LoadMeta(meta map[string]any) {
+	e.Service = application.Get().AppName
 	e.Resource = GetRouteMeta[string](meta, META_RESOURCE_KEY)
+	e.Action = GetRouteMeta[string](meta, META_ACTION_KEY)
 	e.RequiredAuth = GetRouteMeta[bool](meta, META_REQUIRED_AUTH_KEY)
 	e.RequiredCode = GetRouteMeta[bool](meta, META_REQUIRED_CODE_KEY)
 	e.RequiredPerm = GetRouteMeta[bool](meta, META_REQUIRED_PERM_KEY)
@@ -209,9 +211,6 @@ func NewEntryFromRestRoute(route restful.Route) *RouteEntry {
 	entry.Method = route.Method
 	entry.LoadMeta(route.Metadata)
 	entry.Path = route.Path
-	entry.Service = application.Get().AppName
-
-	entry.Path = entry.UniquePath()
 	return entry
 }
 
