@@ -24,6 +24,14 @@ func Permission(v bool) (string, bool) {
 	return endpoint.META_REQUIRED_PERM_KEY, v
 }
 
+func Resource(v string) (string, string) {
+	return endpoint.META_RESOURCE_KEY, v
+}
+
+func Action(v string) (string, string) {
+	return endpoint.META_ACTION_KEY, v
+}
+
 func Required(roles ...string) (string, []string) {
 	return endpoint.META_REQUIRED_ROLE_KEY, roles
 }

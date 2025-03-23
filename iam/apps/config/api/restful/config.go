@@ -36,6 +36,8 @@ func (h *ConfigRestfulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
+		Metadata(permission.Resource("config")).
+		Metadata(permission.Action("list")).
 		Param(restful.QueryParameter("page_size", "页大小").DataType("integer")).
 		Param(restful.QueryParameter("page_number", "页码").DataType("integer")).
 		Writes(ConfigSet{}).
@@ -46,6 +48,8 @@ func (h *ConfigRestfulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
+		Metadata(permission.Resource("config")).
+		Metadata(permission.Action("get")).
 		Param(restful.PathParameter("id", "ConfigItem Id")).
 		Writes(config.ConfigItem{}).
 		Returns(200, "OK", config.ConfigItem{}))
@@ -55,6 +59,8 @@ func (h *ConfigRestfulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
+		Metadata(permission.Resource("config")).
+		Metadata(permission.Action("create")).
 		Reads(config.KVItem{}).
 		Writes(config.ConfigItem{}).
 		Returns(200, "OK", config.ConfigItem{}))
@@ -64,6 +70,8 @@ func (h *ConfigRestfulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
+		Metadata(permission.Resource("config")).
+		Metadata(permission.Action("update")).
 		Param(restful.PathParameter("id", "Namespace Id")).
 		Reads(config.KVItem{}).
 		Writes(config.ConfigItem{}).

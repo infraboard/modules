@@ -38,6 +38,8 @@ func (h *NamespaceRestfulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
+		Metadata(permission.Resource("namespace")).
+		Metadata(permission.Action("list")).
 		Param(restful.QueryParameter("page_size", "页大小").DataType("integer")).
 		Param(restful.QueryParameter("page_number", "页码").DataType("integer")).
 		Writes(NamespaceSet{}).
@@ -48,6 +50,8 @@ func (h *NamespaceRestfulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
+		Metadata(permission.Resource("namespace")).
+		Metadata(permission.Action("get")).
 		Param(restful.PathParameter("id", "Menu Id")).
 		Writes(namespace.Namespace{}).
 		Returns(200, "OK", namespace.Namespace{}))
@@ -57,6 +61,8 @@ func (h *NamespaceRestfulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
+		Metadata(permission.Resource("namespace")).
+		Metadata(permission.Action("create")).
 		Reads(namespace.CreateNamespaceRequest{}).
 		Writes(namespace.Namespace{}).
 		Returns(200, "OK", namespace.Namespace{}))
@@ -66,6 +72,8 @@ func (h *NamespaceRestfulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
+		Metadata(permission.Resource("namespace")).
+		Metadata(permission.Action("update")).
 		Param(restful.PathParameter("id", "Namespace Id")).
 		Reads(namespace.CreateNamespaceRequest{}).
 		Writes(namespace.Namespace{}).
@@ -76,6 +84,8 @@ func (h *NamespaceRestfulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
+		Metadata(permission.Resource("namespace")).
+		Metadata(permission.Action("delete")).
 		Reads(namespace.DeleteNamespaceRequest{}).
 		Writes(namespace.Namespace{}).
 		Returns(200, "OK", namespace.Namespace{}).

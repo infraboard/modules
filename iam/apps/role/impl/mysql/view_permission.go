@@ -77,6 +77,6 @@ func (i *RoleServiceImpl) RemoveViewPermission(ctx context.Context, in *role.Rem
 }
 
 // 查询能匹配到视图菜单
-func (i *RoleServiceImpl) QueryMatchedMenu(ctx context.Context, in *role.QueryMatchedMenuRequest) (*types.Set[*view.Menu], error) {
+func (i *RoleServiceImpl) QueryMatchedPage(ctx context.Context, in *role.QueryMatchedPageRequest) (*types.Set[*view.Menu], error) {
 	return nil, nil
 }

@@ -36,6 +36,8 @@ func (h *UserRestfulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
+		Metadata(permission.Resource("user")).
+		Metadata(permission.Action("list")).
 		Param(restful.QueryParameter("page_size", "页大小").DataType("integer")).
 		Param(restful.QueryParameter("page_number", "页码").DataType("integer")).
 		Writes(user.User{}).
@@ -46,6 +48,8 @@ func (h *UserRestfulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
+		Metadata(permission.Resource("user")).
+		Metadata(permission.Action("get")).
 		Param(restful.PathParameter("id", "用户Id")).
 		Writes(user.User{}).
 		Returns(200, "OK", user.User{}))
@@ -55,6 +59,8 @@ func (h *UserRestfulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
+		Metadata(permission.Resource("user")).
+		Metadata(permission.Action("create")).
 		Reads(user.CreateUserRequest{}).
 		Writes(user.User{}).
 		Returns(200, "OK", user.User{}))
@@ -64,6 +70,8 @@ func (h *UserRestfulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
+		Metadata(permission.Resource("user")).
+		Metadata(permission.Action("delete")).
 		Reads(user.DeleteUserRequest{}).
 		Writes(user.User{}).
 		Returns(200, "OK", user.User{}).

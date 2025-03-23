@@ -22,3 +22,10 @@
   password = "123456"
   debug = true
   auto_migrate = false
+
+[kafka]
+  brokers = ["127.0.0.1:9092"]
+  scram_algorithm = "SHA512"
+  username = ""
+  password = ""
+  debug = false

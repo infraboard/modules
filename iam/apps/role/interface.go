@@ -192,7 +192,7 @@ type ViewPermissionService interface {
 	// 移除角色关联菜单
 	RemoveViewPermission(context.Context, *RemoveViewPermissionRequest) ([]*ViewPermission, error)
 	// 查询能匹配到视图菜单
-	QueryMatchedMenu(context.Context, *QueryMatchedMenuRequest) (*types.Set[*view.Menu], error)
+	QueryMatchedPage(context.Context, *QueryMatchedPageRequest) (*types.Set[*view.Menu], error)
 }
 
 func NewQueryViewPermissionRequest() *QueryViewPermissionRequest {
@@ -217,11 +217,11 @@ func (r *QueryViewPermissionRequest) AddPermissionId(permissionIds ...uint64) *Q
 	return r
 }
 
-func NewQueryMatchedMenuRequest() *QueryMatchedMenuRequest {
-	return &QueryMatchedMenuRequest{}
+func NewQueryMatchedPageRequest() *QueryMatchedPageRequest {
+	return &QueryMatchedPageRequest{}
 }
 
-type QueryMatchedMenuRequest struct {
+type QueryMatchedPageRequest struct {
 	apps.GetRequest
 }
 

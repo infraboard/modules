@@ -10,16 +10,16 @@ import (
 	"github.com/infraboard/modules/iam/apps/view"
 )
 
-func (h *RoleRestfulApiHandler) QueryMatchedMenu(r *restful.Request, w *restful.Response) {
+func (h *RoleRestfulApiHandler) QueryMatchedPage(r *restful.Request, w *restful.Response) {
 	// 1. 获取用户的请求参数， 参数在Body里面
-	req := role.NewQueryMatchedMenuRequest()
+	req := role.NewQueryMatchedPageRequest()
 	if err := req.SetIdByString(r.PathParameter("id")); err != nil {
 		response.Failed(w, exception.NewBadRequest("parse id error, %s", err))
 		return
 	}
 
 	// 2. 执行逻辑
-	tk, err := h.svc.QueryMatchedMenu(r.Request.Context(), req)
+	tk, err := h.svc.QueryMatchedPage(r.Request.Context(), req)
 	if err != nil {
 		response.Failed(w, err)
 		return

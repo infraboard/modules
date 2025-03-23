@@ -38,6 +38,8 @@ func (h *MenuRestfulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
+		Metadata(permission.Resource("menu")).
+		Metadata(permission.Action("list")).
 		Param(restful.QueryParameter("page_size", "页大小").DataType("integer")).
 		Param(restful.QueryParameter("page_number", "页码").DataType("integer")).
 		Writes(MenuSet{}).
@@ -48,6 +50,8 @@ func (h *MenuRestfulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
+		Metadata(permission.Resource("menu")).
+		Metadata(permission.Action("get")).
 		Param(restful.PathParameter("id", "Menu Id")).
 		Writes(view.Menu{}).
 		Returns(200, "OK", view.Menu{}))
@@ -57,6 +61,8 @@ func (h *MenuRestfulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
+		Metadata(permission.Resource("menu")).
+		Metadata(permission.Action("create")).
 		Reads(view.CreateMenuRequest{}).
 		Writes(view.Menu{}).
 		Returns(200, "OK", view.Menu{}))
@@ -66,6 +72,8 @@ func (h *MenuRestfulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
+		Metadata(permission.Resource("menu")).
+		Metadata(permission.Action("delete")).
 		Reads(view.DeleteMenuRequest{}).
 		Writes(view.Menu{}).
 		Returns(200, "OK", view.Menu{}).

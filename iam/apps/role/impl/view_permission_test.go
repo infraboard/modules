@@ -35,8 +35,8 @@ func TestRemoveViewPermission(t *testing.T) {
 }
 
 func TestQueryMatchedMenu(t *testing.T) {
-	req := role.NewQueryMatchedMenuRequest()
-	set, err := impl.QueryMatchedMenu(ctx, req)
+	req := role.NewQueryMatchedPageRequest()
+	set, err := impl.QueryMatchedPage(ctx, req)
 	if err != nil {
 		t.Fatal(err)
 	}

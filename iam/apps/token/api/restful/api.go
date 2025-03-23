@@ -1,10 +1,10 @@
 package restful
 
 import (
-	"github.com/infraboard/mcube/v2/http/label"
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/gorestful"
 	"github.com/infraboard/modules/iam/apps/token"
+	permission "github.com/infraboard/modules/iam/permission/restful"
 
 	restfulspec "github.com/emicklei/go-restful-openapi/v2"
 )
@@ -38,6 +38,8 @@ func (h *TokenRestulApiHandler) Init() error {
 
 	ws.Route(ws.POST("/validate").To(h.ValiateToken).
 		Doc("校验令牌").
+		Metadata(permission.Auth(true)).
+		Metadata(permission.Permission(false)).
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Reads(token.ValiateTokenRequest{}).
 		Writes(token.Token{}).
@@ -45,6 +47,8 @@ func (h *TokenRestulApiHandler) Init() error {
 
 	ws.Route(ws.POST("/change_namespace").To(h.ChangeNamespce).
 		Doc("切换令牌访问空间").
+		Metadata(permission.Auth(true)).
+		Metadata(permission.Permission(false)).
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Reads(token.ChangeNamespceRequest{}).
 		Writes(token.Token{}).
@@ -52,9 +56,9 @@ func (h *TokenRestulApiHandler) Init() error {
 
 	ws.Route(ws.DELETE("").To(h.Logout).
 		Doc("撤销令牌(退出)").
+		Metadata(permission.Auth(true)).
+		Metadata(permission.Permission(false)).
 		Metadata(restfulspec.KeyOpenAPITags, tags).
-		Metadata(label.Auth, label.Enable).
-		Metadata(label.PERMISSION_MODE, label.PERMISSION_MODE_ACL.Value()).
 		Reads(token.IssueTokenRequest{}).
 		Writes(token.Token{}).
 		Returns(200, "OK", token.Token{}).

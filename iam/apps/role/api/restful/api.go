@@ -36,6 +36,8 @@ func (h *RoleRestfulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
+		Metadata(permission.Resource("role")).
+		Metadata(permission.Action("list")).
 		Param(restful.QueryParameter("page_size", "页大小").DataType("integer")).
 		Param(restful.QueryParameter("page_number", "页码").DataType("integer")).
 		Writes(RoleSet{}).
@@ -46,6 +48,8 @@ func (h *RoleRestfulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
+		Metadata(permission.Resource("role")).
+		Metadata(permission.Action("get")).
 		Param(restful.PathParameter("id", "Role Id")).
 		Writes(role.Role{}).
 		Returns(200, "OK", role.Role{}))
@@ -55,6 +59,8 @@ func (h *RoleRestfulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
+		Metadata(permission.Resource("role")).
+		Metadata(permission.Action("create")).
 		Reads(role.CreateRoleRequest{}).
 		Writes(role.Role{}).
 		Returns(200, "OK", role.Role{}))
@@ -64,6 +70,8 @@ func (h *RoleRestfulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
+		Metadata(permission.Resource("role")).
+		Metadata(permission.Action("delete")).
 		Reads(role.DeleteRoleRequest{}).
 		Writes(role.Role{}).
 		Returns(200, "OK", role.Role{}).
@@ -75,6 +83,8 @@ func (h *RoleRestfulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
+		Metadata(permission.Resource("role")).
+		Metadata(permission.Action("add_permission")).
 		Param(restful.PathParameter("id", "Role Id")).
 		Reads([]role.ApiPermissionSpec{}).
 		Writes([]role.ApiPermission{}).
@@ -85,6 +95,8 @@ func (h *RoleRestfulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
+		Metadata(permission.Resource("role")).
+		Metadata(permission.Action("remove_permission")).
 		Reads([]uint64{}).
 		Writes([]role.ApiPermission{}).
 		Returns(200, "OK", []role.ApiPermission{}))
@@ -94,6 +106,8 @@ func (h *RoleRestfulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
+		Metadata(permission.Resource("role")).
+		Metadata(permission.Action("list_endpoint")).
 		Writes(EndpointSet{}).
 		Returns(200, "OK", EndpointSet{}))
 
@@ -103,6 +117,8 @@ func (h *RoleRestfulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
+		Metadata(permission.Resource("role")).
+		Metadata(permission.Action("add_view")).
 		Param(restful.PathParameter("id", "Role Id")).
 		Reads([]*role.ViewPermissionSpec{}).
 		Writes([]role.ViewPermission{}).
@@ -113,15 +129,19 @@ func (h *RoleRestfulApiHandler) Init() error {
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
+		Metadata(permission.Resource("role")).
+		Metadata(permission.Action("remove_view")).
 		Reads([]uint64{}).
 		Writes([]*role.ViewPermission{}).
 		Returns(200, "OK", []role.ViewPermission{}))
 
-	ws.Route(ws.GET("/{id}/menus").To(h.QueryMatchedMenu).
-		Doc("查询允许访问的菜单").
+	ws.Route(ws.GET("/{id}/pages").To(h.QueryMatchedPage).
+		Doc("查询允许访问的页面").
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Metadata(permission.Auth(true)).
 		Metadata(permission.Permission(true)).
+		Metadata(permission.Resource("role")).
+		Metadata(permission.Action("list_page")).
 		Writes(MenuSet{}).
 		Returns(200, "OK", MenuSet{}))
 
