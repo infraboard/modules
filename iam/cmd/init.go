@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/AlecAivazis/survey/v2"
+	"github.com/infraboard/modules/iam/apps/namespace"
 	"github.com/infraboard/modules/iam/apps/user"
 	"github.com/spf13/cobra"
 
@@ -19,7 +20,6 @@ var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "初始化Admin用户名密码",
 	Run: func(cmd *cobra.Command, args []string) {
-		svc := user.GetService()
 		req := user.NewCreateUserRequest()
 		req.IsAdmin = true
 		req.EnabledApi = true
@@ -55,8 +55,18 @@ var initCmd = &cobra.Command{
 			}),
 		))
 
-		u, err := svc.CreateUser(context.Background(), req)
+		// 添加管理员用户
+		u, err := user.GetService().CreateUser(context.Background(), req)
 		cobra.CheckErr(err)
 		fmt.Println(u)
+
+		// 添加默认空间
+		defaultNS := namespace.NewCreateNamespaceRequest()
+		defaultNS.Name = namespace.DEFAULT_NS_NAME
+		defaultNS.Description = "默认空间"
+		defaultNS.OwnerUserId = u.Id
+		ns, err := namespace.GetService().CreateNamespace(context.Background(), defaultNS)
+		cobra.CheckErr(err)
+		fmt.Println(ns)
 	},
 }
