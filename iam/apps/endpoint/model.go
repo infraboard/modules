@@ -5,6 +5,7 @@ import (
 
 	"github.com/emicklei/go-restful/v3"
 	"github.com/google/uuid"
+	"github.com/infraboard/mcube/v2/ioc/config/application"
 	"github.com/infraboard/mcube/v2/types"
 	"github.com/infraboard/modules/iam/apps"
 )
@@ -208,6 +209,7 @@ func NewEntryFromRestRoute(route restful.Route) *RouteEntry {
 	entry.Method = route.Method
 	entry.LoadMeta(route.Metadata)
 	entry.Path = route.Path
+	entry.Service = application.Get().AppName
 
 	entry.Path = entry.UniquePath()
 	return entry
@@ -221,5 +223,5 @@ func NewEntryFromRestfulContainer(c *restful.Container) (entries []*RouteEntry) 
 			entries = append(entries, es)
 		}
 	}
-	return nil
+	return entries
 }
