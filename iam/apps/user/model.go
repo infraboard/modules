@@ -62,6 +62,10 @@ type CreateUserRequest struct {
 	Password string `json:"password" gorm:"column:password;type:varchar(200);not null" description:"用户密码"`
 	// 用户描述
 	Description string `json:"description" gorm:"column:description;type:varchar(200);not null" description:"用户描述"`
+	// 用户类型
+	Type TYPE `json:"type" gorm:"column:type;type:varchar(200);not null" description:"用户类型"`
+	// 用户描述
+	Domain string `json:"domain" gorm:"column:domain;type:varchar(200);" description:"用户所属域"`
 
 	// 支持接口调用
 	EnabledApi bool `json:"enabled_api" gorm:"column:enabled_api;type:tinyint(1)" optional:"true" description:"支持接口调用"`

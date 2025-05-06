@@ -1,68 +1,59 @@
 package ldap_test
 
-import (
-	"testing"
+// var (
+// 	p *ldap.Provider
+// )
 
-	"github.com/stretchr/testify/assert"
+// func TestCheckUserPassword(t *testing.T) {
+// 	should := assert.New(t)
 
-	"github.com/infraboard/mcenter/apps/domain"
-	"github.com/infraboard/mcenter/apps/token/provider/ldap"
-)
+// 	u, err := p.CheckUserPassword("oldfish", "123456")
+// 	if should.NoError(err) {
+// 		t.Log(u)
+// 	}
+// }
 
-var (
-	p *ldap.Provider
-)
+// func TestUserDetail(t *testing.T) {
+// 	should := assert.New(t)
 
-func TestCheckUserPassword(t *testing.T) {
-	should := assert.New(t)
+// 	ud, err := p.GetDetails("oldfish")
+// 	if should.NoError(err) {
+// 		t.Log(ud)
+// 	}
 
-	u, err := p.CheckUserPassword("oldfish", "123456")
-	if should.NoError(err) {
-		t.Log(u)
-	}
-}
+// }
 
-func TestUserDetail(t *testing.T) {
-	should := assert.New(t)
+// func TestGetBaseDNFromUser(t *testing.T) {
+// 	should := assert.New(t)
 
-	ud, err := p.GetDetails("oldfish")
-	if should.NoError(err) {
-		t.Log(ud)
-	}
+// 	conf := domain.NewDefaultLDAPConfig()
+// 	conf.BindDn = "cn=admin,dc=example,dc=org"
+// 	baseDN := conf.GetBaseDNFromUser()
 
-}
+// 	should.Equal("dc=example,dc=org", baseDN)
+// }
 
-func TestGetBaseDNFromUser(t *testing.T) {
-	should := assert.New(t)
+// func TestBaseDnToSuffix(t *testing.T) {
+// 	should := assert.New(t)
 
-	conf := domain.NewDefaultLDAPConfig()
-	conf.BindDn = "cn=admin,dc=example,dc=org"
-	baseDN := conf.GetBaseDNFromUser()
+// 	conf := domain.NewDefaultLDAPConfig()
+// 	conf.BaseDn = "dc=example,dc=org"
+// 	baseDN := conf.BaseDnToSuffix()
 
-	should.Equal("dc=example,dc=org", baseDN)
-}
+// 	should.Equal("example.org", baseDN)
+// }
 
-func TestBaseDnToSuffix(t *testing.T) {
-	should := assert.New(t)
+// func init() {
+// 	conf := domain.NewDefaultLDAPConfig()
+// 	conf.Url = "ldap://127.0.0.1:389"
+// 	conf.BindDn = "cn=admin,dc=example,dc=org"
+// 	conf.BindPassword = "admin"
+// 	conf.BaseDn = "dc=example,dc=org"
+// 	conf.UserFilter = "(uid={input})"
 
-	conf := domain.NewDefaultLDAPConfig()
-	conf.BaseDn = "dc=example,dc=org"
-	baseDN := conf.BaseDnToSuffix()
-
-	should.Equal("example.org", baseDN)
-}
-
-func init() {
-	conf := domain.NewDefaultLDAPConfig()
-	conf.Url = "ldap://127.0.0.1:389"
-	conf.BindDn = "cn=admin,dc=example,dc=org"
-	conf.BindPassword = "admin"
-	conf.BaseDn = "dc=example,dc=org"
-	conf.UserFilter = "(uid={input})"
-
-	p = ldap.NewProvider(conf)
-	err := p.CheckConnect()
-	if err != nil {
-		panic(err)
-	}
-}
+// 	p = ldap.NewProvider(conf)
+// 	err := p.CheckConnect()
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// }

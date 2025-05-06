@@ -3,7 +3,7 @@ package feishu
 import (
 	"strings"
 
-	"github.com/infraboard/mcenter/apps/user"
+	"github.com/infraboard/modules/iam/apps/user"
 )
 
 func NewUser() *User {
@@ -56,29 +56,29 @@ func (u *User) Username() string {
 	return u.Name
 }
 
-func (u *User) ToProfile() *user.Profile {
-	p := user.NewProfile()
-	p.RealName = u.Name
-	p.Avatar = u.AvatarUrl
-	p.Email = u.Email
-	p.Phone = u.Mobile
-	return p
-}
+// func (u *User) ToProfile() *user.Profile {
+// 	p := user.NewProfile()
+// 	p.RealName = u.Name
+// 	p.Avatar = u.AvatarUrl
+// 	p.Email = u.Email
+// 	p.Phone = u.Mobile
+// 	return p
+// }
 
 func (u *User) ToCreateUserRequest(domain, password, descriptoin string) *user.CreateUserRequest {
 	req := &user.CreateUserRequest{
-		Provider:    user.PROVIDER_FEISHU,
-		Type:        user.TYPE_SUB,
-		CreateFrom:  user.CREATE_FROM_PRIMARY_ACCOUNT,
+		Provider: user.PROVIDER_FEISHU,
+		Type:     user.TYPE_SUB,
+		// CreateFrom:  user.CREATE_FROM_PRIMARY_ACCOUNT,
 		Domain:      domain,
-		Username:    u.Username(),
+		UserName:    u.Username(),
 		Password:    password,
 		Description: descriptoin,
-		Feishu: &user.Feishu{
-			OpenId:  u.OpenId,
-			UnionId: u.UnionId,
-			UserId:  u.UserId,
-		},
+		// Feishu: &user.Feishu{
+		// 	OpenId:  u.OpenId,
+		// 	UnionId: u.UnionId,
+		// 	UserId:  u.UserId,
+		// },
 	}
 	return req
 }

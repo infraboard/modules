@@ -55,3 +55,9 @@ const (
 	// 来源企业微信
 	PROVIDER_WECHAT_WORK PROVIDER = 4
 )
+
+type TYPE int32
+
+const (
+	TYPE_SUB TYPE = 0
+)

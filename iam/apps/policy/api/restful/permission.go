@@ -3,10 +3,10 @@ package restful
 import (
 	restfulspec "github.com/emicklei/go-restful-openapi/v2"
 	"github.com/emicklei/go-restful/v3"
-	"github.com/infraboard/mcenter/apps/endpoint"
 	"github.com/infraboard/mcube/v2/http/restful/response"
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/gorestful"
+	"github.com/infraboard/modules/iam/apps/endpoint"
 	"github.com/infraboard/modules/iam/apps/namespace"
 	"github.com/infraboard/modules/iam/apps/policy"
 	"github.com/infraboard/modules/iam/apps/view"
