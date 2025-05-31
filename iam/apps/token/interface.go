@@ -110,7 +110,6 @@ func (i *IssueTokenRequest) IssueByPassword(username, password string) {
 }
 
 func GetIssueParameterValue[T any](p IssueParameter, key string) T {
-	types.New[*Token]()
 	v := p[key]
 	if v != nil {
 		if value, ok := v.(T); ok {
