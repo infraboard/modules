@@ -21,7 +21,10 @@ func (h *TokenRestulApiHandler) Login(r *restful.Request, w *restful.Response) {
 	}
 
 	// 设置当前调用者的Token
-	req.Parameter.SetAccessToken(token.GetAccessTokenFromHTTP(r.Request))
+	switch req.Issuer {
+	case token.ISSUER_PRIVATE_TOKEN:
+		req.Parameter.SetAccessToken(token.GetAccessTokenFromHTTP(r.Request))
+	}
 
 	// 2. 执行逻辑
 	tk, err := h.svc.IssueToken(r.Request.Context(), req)
@@ -87,7 +90,7 @@ func (h *TokenRestulApiHandler) Logout(r *restful.Request, w *restful.Response) 
 	// access_token 通过SetCookie 直接写到浏览器客户端(Web)
 	http.SetCookie(w, &http.Cookie{
 		Name:     token.ACCESS_TOKEN_COOKIE_NAME,
-		Value:    "",
+		Value:    tk.AccessToken,
 		MaxAge:   0,
 		Path:     "/",
 		Domain:   application.Get().Domain(),

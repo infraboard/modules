@@ -134,12 +134,14 @@ func (p IssueParameter) Password() string {
 	return GetIssueParameterValue[string](p, "password")
 }
 
-func (p IssueParameter) SetUsername(v string) {
+func (p IssueParameter) SetUsername(v string) IssueParameter {
 	p["username"] = v
+	return p
 }
 
-func (p IssueParameter) SetPassword(v string) {
+func (p IssueParameter) SetPassword(v string) IssueParameter {
 	p["password"] = v
+	return p
 }
 
 /*
@@ -154,8 +156,14 @@ func (p IssueParameter) ExpireTTL() time.Duration {
 	return time.Second * time.Duration(GetIssueParameterValue[int64](p, "expired_ttl"))
 }
 
-func (p IssueParameter) SetAccessToken(v string) {
+func (p IssueParameter) SetAccessToken(v string) IssueParameter {
 	p["access_token"] = v
+	return p
+}
+
+func (p IssueParameter) SetExpireTTL(v int64) IssueParameter {
+	p["expired_ttl"] = v
+	return p
 }
 
 func NewRevolkTokenRequest(at, rk string) *RevolkTokenRequest {

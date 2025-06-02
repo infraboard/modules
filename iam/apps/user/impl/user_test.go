@@ -20,6 +20,7 @@ func TestCreateAdminUser(t *testing.T) {
 	req.UserName = "admin"
 	req.Password = "123456"
 	req.IsAdmin = true
+	req.EnabledApi = true
 	u, err := impl.CreateUser(ctx, req)
 	if err != nil {
 		t.Fatal(err)
@@ -31,6 +32,7 @@ func TestCreateAuthor2(t *testing.T) {
 	req := user.NewCreateUserRequest()
 	req.UserName = "张三"
 	req.Password = "123456"
+	req.EnabledApi = true
 	u, err := impl.CreateUser(ctx, req)
 	if err != nil {
 		t.Fatal(err)
@@ -42,6 +44,7 @@ func TestCreateGuestUser(t *testing.T) {
 	req := user.NewCreateUserRequest()
 	req.UserName = "guest"
 	req.Password = "123456"
+	req.EnabledApi = true
 	u, err := impl.CreateUser(ctx, req)
 	if err != nil {
 		t.Fatal(err)

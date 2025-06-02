@@ -15,7 +15,7 @@ import (
 // 登录接口(颁发Token)
 func (i *TokenServiceImpl) IssueToken(ctx context.Context, in *token.IssueTokenRequest) (*token.Token, error) {
 	// 颁发Token
-	issuer := token.GetIssue(in.Issuer)
+	issuer := token.GetIssuer(in.Issuer)
 	if issuer == nil {
 		return nil, exception.NewBadRequest("provider %s no support", in.Issuer)
 	}

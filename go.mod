@@ -16,7 +16,6 @@ require (
 	github.com/spf13/cobra v1.9.1
 	go.mongodb.org/mongo-driver v1.17.3
 	golang.org/x/crypto v0.38.0
-	golang.org/x/exp v0.0.0-20250506013437-ce4c2cf36ca6
 	gorm.io/gorm v1.26.0
 	resty.dev/v3 v3.0.0-beta.2
 )
