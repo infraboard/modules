@@ -54,7 +54,7 @@ func (i *ViewServiceImpl) DescribePage(ctx context.Context, in *view.DescribePag
 	query := datasource.DBFromCtx(ctx)
 
 	ins := &view.Page{}
-	if err := query.First(ins).Error; err != nil {
+	if err := query.Where("id = ?", in.Id).First(ins).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, exception.NewNotFound("page %d not found", in.Id)
 		}

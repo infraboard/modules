@@ -58,7 +58,7 @@ func (i *RoleServiceImpl) DescribeRole(ctx context.Context, in *role.DescribeRol
 	query := datasource.DBFromCtx(ctx)
 
 	ins := &role.Role{}
-	if err := query.First(ins).Error; err != nil {
+	if err := query.Where("id = ?", in.Id).First(ins).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, exception.NewNotFound("role %d not found", in.Id)
 		}

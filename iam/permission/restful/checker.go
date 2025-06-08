@@ -97,6 +97,7 @@ func (c *Checker) CheckToken(r *restful.Request) (*token.Token, error) {
 		return nil, err
 	}
 
+	// 添加上下文
 	ctx := context.WithValue(r.Request.Context(), token.CTX_TOKEN_KEY, tk)
 	r.Request = r.Request.WithContext(ctx)
 	return tk, nil
@@ -118,7 +119,7 @@ func (c *Checker) CheckPolicy(r *restful.Request, tk *token.Token, route *endpoi
 				SetWithRole(true),
 		)
 		if err != nil {
-			return exception.NewInternalServerError(err.Error())
+			return exception.NewInternalServerError("%s", err.Error())
 		}
 		hasPerm := false
 		for i := range set.Items {
@@ -143,7 +144,7 @@ func (c *Checker) CheckPolicy(r *restful.Request, tk *token.Token, route *endpoi
 		validateReq.Path = route.Path
 		resp, err := c.policy.ValidateEndpointPermission(r.Request.Context(), validateReq)
 		if err != nil {
-			return exception.NewInternalServerError(err.Error())
+			return exception.NewInternalServerError("%s", err.Error())
 		}
 		if !resp.HasPermission {
 			return exception.NewPermissionDeny("无权限访问")

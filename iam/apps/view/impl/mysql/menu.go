@@ -54,7 +54,7 @@ func (i *ViewServiceImpl) DescribeMenu(ctx context.Context, in *view.DescribeMen
 	query := datasource.DBFromCtx(ctx)
 
 	ins := &view.Menu{}
-	if err := query.First(ins).Error; err != nil {
+	if err := query.Where("id = ?", in.Id).First(ins).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, exception.NewNotFound("menu %d not found", in.Id)
 		}

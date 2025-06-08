@@ -54,7 +54,7 @@ func (i *NameSpaceServiceImpl) DescribeNamespace(ctx context.Context, in *namesp
 	query := datasource.DBFromCtx(ctx)
 
 	ins := &namespace.Namespace{}
-	if err := query.First(ins).Error; err != nil {
+	if err := query.Where("id = ?", in.Id).First(ins).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, exception.NewNotFound("namespace %d not found", in.Id)
 		}
