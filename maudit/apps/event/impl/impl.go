@@ -31,6 +31,10 @@ func (i *impl) Name() string {
 	return event.AppName
 }
 
+func (i *impl) Priority() int {
+	return event.PRIORITY
+}
+
 // 初始化
 func (i *impl) Init() error {
 	// 对象

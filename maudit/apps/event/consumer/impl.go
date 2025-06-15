@@ -5,6 +5,7 @@ import (
 
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/log"
+	"github.com/infraboard/modules/maudit/apps/event"
 	"github.com/rs/zerolog"
 
 	ioc_kafka "github.com/infraboard/mcube/v2/ioc/config/kafka"
@@ -42,6 +43,10 @@ type consumer struct {
 // 对象名称
 func (i *consumer) Name() string {
 	return "maudit_consumer"
+}
+
+func (i *consumer) Priority() int {
+	return event.PRIORITY - 1
 }
 
 // 初始化
