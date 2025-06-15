@@ -13,8 +13,13 @@ import (
 	"github.com/infraboard/modules/iam/apps/endpoint"
 	"github.com/infraboard/modules/iam/apps/policy"
 	"github.com/infraboard/modules/iam/apps/token"
+	"github.com/infraboard/modules/iam/permission"
 	"github.com/rs/zerolog"
 )
+
+func init() {
+	ioc.Config().Registry(&Checker{})
+}
 
 func Auth(v bool) (string, bool) {
 	return endpoint.META_REQUIRED_AUTH_KEY, v
@@ -36,10 +41,6 @@ func Required(roles ...string) (string, []string) {
 	return endpoint.META_REQUIRED_ROLE_KEY, roles
 }
 
-func init() {
-	ioc.Config().Registry(&Checker{})
-}
-
 type Checker struct {
 	ioc.ObjectImpl
 	log *zerolog.Logger
@@ -49,11 +50,11 @@ type Checker struct {
 }
 
 func (c *Checker) Name() string {
-	return "permission_checker"
+	return CHECKER_APP_NAME
 }
 
 func (c *Checker) Priority() int {
-	return gorestful.Priority() - 1
+	return permission.GetCheckerPriority()
 }
 
 func (c *Checker) Init() error {

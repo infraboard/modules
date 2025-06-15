@@ -11,6 +11,7 @@ import (
 	"github.com/infraboard/mcube/v2/ioc/config/log"
 	"github.com/infraboard/modules/iam/apps/endpoint"
 	"github.com/infraboard/modules/iam/apps/token"
+	"github.com/infraboard/modules/iam/permission"
 	"github.com/infraboard/modules/maudit/apps/event"
 	"github.com/rs/zerolog"
 	"github.com/segmentio/kafka-go"
@@ -41,6 +42,10 @@ func (a *auditor) Name() string {
 	return "auditor"
 }
 
+func (i *auditor) Priority() int {
+	return permission.GetCheckerPriority() - 1
+}
+
 func (a *auditor) Init() error {
 	a.log = log.Sub("mauditor")
 	a.log.Debug().Msgf("maduit topic name: %s", a.Topic)
@@ -68,7 +73,7 @@ func (a *auditor) Audit() restful.FilterFunction {
 			tk := token.GetTokenFromCtx(r1.Request.Context())
 			if tk != nil {
 				e.Who = tk.UserName
-				e.Extras["namespace"] = tk.NamespaceName
+				e.Namespace = tk.NamespaceName
 			}
 
 			// ioc 里面获取当前应用的名称
