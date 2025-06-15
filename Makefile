@@ -2,6 +2,7 @@ PKG := "github.com/infraboard/modules"
 MOD_DIR := $(shell go env GOPATH)/pkg/mod
 PKG_LIST := $(shell go list ${PKG}/... | grep -v /vendor/ | grep -v redis)
 GO_FILES := $(shell find . -name '*.go' | grep -v /vendor/ | grep -v _test.go)
+GIT_TAG := $(shell git describe --tags --exact-match 2>/dev/null || echo "UnTag")
 
 .PHONY: all dep lint vet test test-coverage build clean
 

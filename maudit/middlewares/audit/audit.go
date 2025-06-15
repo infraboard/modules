@@ -10,7 +10,7 @@ import (
 	ioc_kafka "github.com/infraboard/mcube/v2/ioc/config/kafka"
 	"github.com/infraboard/mcube/v2/ioc/config/log"
 	"github.com/infraboard/modules/iam/apps/endpoint"
-	permission "github.com/infraboard/modules/iam/permission/restful"
+	"github.com/infraboard/modules/iam/apps/token"
 	"github.com/infraboard/modules/maudit/apps/event"
 	"github.com/rs/zerolog"
 	"github.com/segmentio/kafka-go"
@@ -65,7 +65,7 @@ func (a *auditor) Audit() restful.FilterFunction {
 			e := event.NewEvent()
 
 			// 用户信息
-			tk := permission.GetTokenFromCtx(r1.Request.Context())
+			tk := token.GetTokenFromCtx(r1.Request.Context())
 			if tk != nil {
 				e.Who = tk.UserName
 				e.Extras["namespace"] = tk.NamespaceName
