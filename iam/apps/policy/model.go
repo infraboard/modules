@@ -9,6 +9,9 @@ import (
 	"github.com/infraboard/modules/iam/apps/namespace"
 	"github.com/infraboard/modules/iam/apps/role"
 	"github.com/infraboard/modules/iam/apps/user"
+	"gorm.io/datatypes"
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 func NewPolicy() *Policy {
@@ -41,7 +44,7 @@ func (p *Policy) String() string {
 func NewCreatePolicyRequest() *CreatePolicyRequest {
 	return &CreatePolicyRequest{
 		ResourceScope: ResourceScope{
-			Scope: map[string]string{},
+			Scope: map[string][]string{},
 		},
 		Extras:   map[string]string{},
 		Enabled:  true,
@@ -74,8 +77,44 @@ type CreatePolicyRequest struct {
 type ResourceScope struct {
 	// 空间
 	NamespaceId *uint64 `json:"namespace_id" bson:"namespace_id" gorm:"column:namespace_id;type:varchar(200);index" description:"策略生效的空间Id" optional:"true"`
-	// 访问范围, 需要提前定义scope, 比如环境
-	Scope map[string]string `json:"scope" bson:"scope" gorm:"column:scope;serializer:json;type:json" description:"数据访问的范围" optional:"true"`
+	// 访问范围, 需要提前定义scope, 比如环境 env: ['dev','test']
+	Scope map[string][]string `json:"scope" bson:"scope" gorm:"column:scope;serializer:json;type:json" description:"数据访问的范围" optional:"true"`
+}
+
+func (l *ResourceScope) SetScope(key string, value []string) {
+	if l.Scope == nil {
+		l.Scope = map[string][]string{}
+	}
+	l.Scope[key] = value
+}
+
+func (r ResourceScope) GormResourceFilter(query *gorm.DB) *gorm.DB {
+	if r.NamespaceId != nil {
+		query = query.Where("namespace = ?", r.NamespaceId)
+	}
+
+	for key, values := range r.Scope {
+		if len(values) == 0 {
+			continue
+		}
+
+		// 构建"标签不存在"条件
+		notHasKey := clause.Not(datatypes.JSONQuery("label").HasKey(key))
+
+		// 构建"标签值匹配"条件
+		var valueMatches []clause.Expression
+		for _, val := range values {
+			valueMatches = append(valueMatches,
+				datatypes.JSONQuery("label").Equals(val, key))
+		}
+
+		// 组合条件：标签不存在 OR 标签值匹配
+		query = query.Where(clause.Or(
+			notHasKey,
+			clause.Or(valueMatches...),
+		))
+	}
+	return query
 }
 
 func (r *CreatePolicyRequest) Validate() error {
@@ -85,4 +124,18 @@ func (r *CreatePolicyRequest) Validate() error {
 func (r *CreatePolicyRequest) SetNamespaceId(namespaceId uint64) *CreatePolicyRequest {
 	r.NamespaceId = &namespaceId
 	return r
+}
+
+type ResourceLabel struct {
+	// 空间
+	NamespaceId *uint64 `json:"namespace_id" bson:"namespace_id" gorm:"column:namespace_id;type:varchar(200);index" description:"策略生效的空间Id" optional:"true"`
+	// 访问范围, 需要提前定义scope, 比如环境, 后端开发小组，开发资源
+	Label map[string]string `json:"label" bson:"label" gorm:"column:label;serializer:json;type:json" description:"数据访问的范围" optional:"true"`
+}
+
+func (l *ResourceLabel) SetLabel(key, value string) {
+	if l.Label == nil {
+		l.Label = map[string]string{}
+	}
+	l.Label[key] = value
 }
