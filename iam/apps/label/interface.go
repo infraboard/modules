@@ -4,10 +4,17 @@ import (
 	"context"
 
 	"github.com/infraboard/mcube/v2/http/request"
-	request1 "github.com/infraboard/mcube/v2/pb/request"
-	"github.com/infraboard/mcube/v2/pb/resource"
+	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/types"
 )
+
+const (
+	APP_NAME = "lable"
+)
+
+func GetService() Service {
+	return ioc.Controller().Get(APP_NAME).(Service)
+}
 
 type Service interface {
 	// 创建标签
@@ -23,10 +30,7 @@ type Service interface {
 }
 
 type UpdateLabelRequest struct {
-	// 更新模式
-	UpdateMode request1.UpdateMode `json:"update_mode"`
-	// 标签Id
-	Id string `json:"id"`
+	DescribeLabelRequest
 	// 更新人
 	UpdateBy string `json:"update_by"`
 	// 标签信息
@@ -34,17 +38,17 @@ type UpdateLabelRequest struct {
 }
 
 type DeleteLabelRequest struct {
-	// 标签Id
-	Id string `json:"id"`
+	DescribeLabelRequest
+}
+
+func NewQueryLabelRequest() *QueryLabelRequest {
+	return &QueryLabelRequest{
+		PageRequest: request.NewDefaultPageRequest(),
+	}
 }
 
 type QueryLabelRequest struct {
-	// 资源范围
-	Scope *resource.Scope `json:"scope"`
-	// 分页请求
-	Page *request.PageRequest `json:"page"`
-	// key
-	Keys []string `json:"keys"`
+	*request.PageRequest
 }
 
 type DescribeLabelRequest struct {
