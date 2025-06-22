@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"context"
+	"slices"
 
 	"github.com/infraboard/mcube/v2/exception"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
@@ -79,7 +80,7 @@ func (i *PolicyServiceImpl) QueryPolicy(ctx context.Context, in *policy.QueryPol
 	if in.WithRole {
 		roleReq := role.NewQueryRoleRequest()
 		set.ForEach(func(t *policy.Policy) {
-			roleReq.AddRoleId(t.RoleId)
+			roleReq.AddRoleId(t.RoleId...)
 		})
 		roleSet, err := role.GetService().QueryRole(ctx, roleReq)
 		if err != nil {
@@ -87,7 +88,7 @@ func (i *PolicyServiceImpl) QueryPolicy(ctx context.Context, in *policy.QueryPol
 		}
 		set.ForEach(func(p *policy.Policy) {
 			p.Role = roleSet.Filter(func(t *role.Role) bool {
-				return p.RoleId == t.Id
+				return slices.Contains(p.RoleId, t.Id)
 			}).First()
 		})
 	}

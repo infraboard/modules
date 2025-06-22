@@ -22,7 +22,7 @@ func TestCreatePolicy(t *testing.T) {
 	req := policy.NewCreatePolicyRequest()
 	req.SetNamespaceId(3)
 	req.UserId = 3
-	req.RoleId = 2
+	req.RoleId = []uint64{1}
 	set, err := impl.CreatePolicy(ctx, req)
 	if err != nil {
 		t.Fatal(err)
