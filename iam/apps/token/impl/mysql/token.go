@@ -186,7 +186,7 @@ func (i *TokenServiceImpl) ChangeNamespce(ctx context.Context, in *token.ChangeN
 	if err != nil {
 		return nil, err
 	}
-	tk.NamespaceId = ns.Id
+	tk.SetNamespaceId(ns.Id)
 	tk.NamespaceName = ns.Name
 
 	// 保存状态

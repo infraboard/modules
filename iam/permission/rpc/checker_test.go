@@ -23,7 +23,7 @@ func TestValiateToken(t *testing.T) {
 func TestValidateEndpointPermission(t *testing.T) {
 	req := policy.NewValidateEndpointPermissionRequest()
 	req.UserId = 5
-	req.NamespaceId = 1
+	req.SetNamespaceId(1)
 	req.Service = "cmdb"
 	req.Method = "GET"
 	req.Path = "/api/cmdb/v1/secret"

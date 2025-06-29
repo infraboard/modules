@@ -82,6 +82,31 @@ type ResourceScope struct {
 	Scope map[string][]string `json:"scope" bson:"scope" gorm:"column:scope;serializer:json;type:json" description:"数据访问的范围" optional:"true"`
 }
 
+func (r *ResourceScope) BuildMySQLPrefixBlob() {
+	for k := range r.Scope {
+		for i := range r.Scope[k] {
+			if !strings.HasSuffix(r.Scope[k][i], "%") {
+				r.Scope[k][i] += "%"
+			}
+		}
+	}
+}
+
+func (r ResourceScope) String() string {
+	return pretty.ToJSON(r)
+}
+
+func (r *ResourceScope) SetNamespaceId(v uint64) {
+	r.NamespaceId = &v
+}
+
+func (r *ResourceScope) GetNamespaceId() uint64 {
+	if r.NamespaceId == nil {
+		return 0
+	}
+	return *r.NamespaceId
+}
+
 func (l *ResourceScope) SetScope(key string, value []string) {
 	if l.Scope == nil {
 		l.Scope = map[string][]string{}
@@ -91,7 +116,7 @@ func (l *ResourceScope) SetScope(key string, value []string) {
 
 func (r ResourceScope) GormResourceFilter(query *gorm.DB) *gorm.DB {
 	if r.NamespaceId != nil {
-		query = query.Where("namespace = ?", r.NamespaceId)
+		query = query.Where("namespace_id = ?", r.NamespaceId)
 	}
 
 	for key, values := range r.Scope {
@@ -142,6 +167,14 @@ type ResourceLabel struct {
 	NamespaceId *uint64 `json:"namespace_id" bson:"namespace_id" gorm:"column:namespace_id;type:varchar(200);index" description:"策略生效的空间Id" optional:"true"`
 	// 访问范围, 需要提前定义scope, 比如环境, 后端开发小组，开发资源
 	Label map[string]string `json:"label" bson:"label" gorm:"column:label;serializer:json;type:json" description:"数据访问的范围" optional:"true"`
+}
+
+func (r ResourceLabel) String() string {
+	return pretty.ToJSON(r)
+}
+
+func (l *ResourceLabel) SetNamespaceId(v uint64) {
+	l.NamespaceId = &v
 }
 
 func (l *ResourceLabel) SetLabel(key, value string) {

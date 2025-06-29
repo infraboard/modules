@@ -82,6 +82,10 @@ func (c *Checker) Check(r *restful.Request, w *restful.Response, next *restful.F
 			response.Failed(w, err)
 			return
 		}
+
+		// 添加上下文
+		ctx := context.WithValue(r.Request.Context(), token.CTX_TOKEN_KEY, tk)
+		r.Request = r.Request.WithContext(ctx)
 	}
 
 	next.ProcessFilter(r, w)
@@ -97,10 +101,6 @@ func (c *Checker) CheckToken(r *restful.Request) (*token.Token, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	// 添加上下文
-	ctx := context.WithValue(r.Request.Context(), token.CTX_TOKEN_KEY, tk)
-	r.Request = r.Request.WithContext(ctx)
 	return tk, nil
 }
 
@@ -113,7 +113,7 @@ func (c *Checker) CheckPolicy(r *restful.Request, tk *token.Token, route *endpoi
 	if route.HasRequiredRole() {
 		set, err := c.policy.QueryPolicy(r.Request.Context(),
 			policy.NewQueryPolicyRequest().
-				SetNamespaceId(tk.NamespaceId).
+				SetNamespaceId(tk.GetNamespaceId()).
 				SetUserId(tk.UserId).
 				SetExpired(false).
 				SetEnabled(true).
@@ -139,7 +139,7 @@ func (c *Checker) CheckPolicy(r *restful.Request, tk *token.Token, route *endpoi
 	if route.RequiredPerm {
 		validateReq := policy.NewValidateEndpointPermissionRequest()
 		validateReq.UserId = tk.UserId
-		validateReq.NamespaceId = tk.NamespaceId
+		validateReq.ResourceScope = tk.ResourceScope
 		validateReq.Service = application.Get().GetAppName()
 		validateReq.Method = route.Method
 		validateReq.Path = route.Path
@@ -150,6 +150,9 @@ func (c *Checker) CheckPolicy(r *restful.Request, tk *token.Token, route *endpoi
 		if !resp.HasPermission {
 			return exception.NewPermissionDeny("无权限访问")
 		}
+
+		tk.ResourceScope = resp.ResourceScope
+		tk.BuildMySQLPrefixBlob()
 	}
 
 	return nil

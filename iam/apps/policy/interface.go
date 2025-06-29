@@ -132,17 +132,28 @@ type PermissionService interface {
 	// 查询用户可以访问的菜单
 	QueryMenu(context.Context, *QueryMenuRequest) (*types.Set[*view.Menu], error)
 	// 查询用户可以访问的Api接口
-	QueryEndpoint(context.Context, *QueryEndpointRequest) (*types.Set[*endpoint.Endpoint], error)
+	QueryEndpoint(context.Context, *QueryEndpointRequest) (*QueryEndpointResponse, error)
 	// 校验页面权限
 	ValidatePagePermission(context.Context, *ValidatePagePermissionRequest) (*ValidatePagePermissionResponse, error)
 	// 校验接口权限
 	ValidateEndpointPermission(context.Context, *ValidateEndpointPermissionRequest) (*ValidateEndpointPermissionResponse, error)
 }
 
+func NewQueryEndpointResponse() *QueryEndpointResponse {
+	return &QueryEndpointResponse{
+		Items: []*endpoint.Endpoint{},
+	}
+}
+
+type QueryEndpointResponse struct {
+	ResourceScope
+	Items []*endpoint.Endpoint
+}
+
 type ValidatePagePermissionRequest struct {
-	UserId      uint64 `json:"user_id" form:"user_id"`
-	NamespaceId uint64 `json:"namespace_id" form:"namespace_id"`
-	Path        string `json:"path" form:"path"`
+	UserId uint64 `json:"user_id" form:"user_id"`
+	Path   string `json:"path" form:"path"`
+	ResourceScope
 }
 
 func NewValidatePagePermissionResponse(req ValidatePagePermissionRequest) *ValidatePagePermissionResponse {
@@ -162,11 +173,11 @@ func NewValidateEndpointPermissionRequest() *ValidateEndpointPermissionRequest {
 }
 
 type ValidateEndpointPermissionRequest struct {
-	UserId      uint64 `json:"user_id" form:"user_id"`
-	NamespaceId uint64 `json:"namespace_id" form:"namespace_id"`
-	Service     string `json:"service" form:"service"`
-	Path        string `json:"path" form:"path"`
-	Method      string `json:"method" form:"method"`
+	UserId  uint64 `json:"user_id" form:"user_id"`
+	Service string `json:"service" form:"service"`
+	Path    string `json:"path" form:"path"`
+	Method  string `json:"method" form:"method"`
+	ResourceScope
 }
 
 func NewValidateEndpointPermissionResponse(req ValidateEndpointPermissionRequest) *ValidateEndpointPermissionResponse {

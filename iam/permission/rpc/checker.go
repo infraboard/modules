@@ -121,8 +121,8 @@ func (c *Checker) ValiateToken(ctx context.Context, in *token.ValiateTokenReques
 	if resp.StatusCode()/100 != 2 {
 		return nil, exception.NewUnauthorized("[%d] token校验异常: %s", resp.StatusCode(), resp.String())
 	}
-	if tk.NamespaceId == 0 {
-		tk.NamespaceId = 1
+	if tk.NamespaceId == nil {
+		tk.SetNamespaceId(1)
 	}
 	return tk, nil
 }
@@ -136,7 +136,7 @@ func (c *Checker) CheckPolicy(r *restful.Request, tk *token.Token, route *endpoi
 	if route.RequiredPerm {
 		permReq := policy.NewValidateEndpointPermissionRequest()
 		permReq.UserId = tk.UserId
-		permReq.NamespaceId = tk.NamespaceId
+		permReq.ResourceScope = tk.ResourceScope
 		permReq.Service = application.Get().AppName
 		permReq.Method = route.Method
 		permReq.Path = route.Path
