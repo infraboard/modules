@@ -48,6 +48,11 @@ func (i *PolicyServiceImpl) QueryEndpoint(ctx context.Context, in *policy.QueryE
 		return nil, err
 	}
 
+	// 没有权限
+	if policies.Len() == 0 {
+		return resp, nil
+	}
+
 	if policies.Len() > 1 {
 		return nil, fmt.Errorf("同一个空间下, 一个用户有多条[%d]授权", policies.Len())
 	}

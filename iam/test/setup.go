@@ -10,7 +10,7 @@ import (
 )
 
 func DevelopmentSetup() {
-	os.Setenv("DATASOURCE_DB", "test")
+	os.Setenv("DATASOURCE_DB", "devcloud_go18")
 	os.Setenv("DATASOURCE_USERNAME", "root")
 	os.Setenv("DATASOURCE_PASSWORD", "123456")
 	os.Setenv("DATASOURCE_DEBUG", "true")

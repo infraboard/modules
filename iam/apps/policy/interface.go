@@ -141,13 +141,14 @@ type PermissionService interface {
 
 func NewQueryEndpointResponse() *QueryEndpointResponse {
 	return &QueryEndpointResponse{
-		Items: []*endpoint.Endpoint{},
+		ResourceScope: *NewResourceScope(),
+		Items:         []*endpoint.Endpoint{},
 	}
 }
 
 type QueryEndpointResponse struct {
 	ResourceScope
-	Items []*endpoint.Endpoint
+	Items []*endpoint.Endpoint `json:"endpoints"`
 }
 
 type ValidatePagePermissionRequest struct {

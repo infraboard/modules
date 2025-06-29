@@ -40,3 +40,17 @@ func TestValidateEndpointPermission(t *testing.T) {
 	}
 	t.Log(set)
 }
+
+func TestValidateEndpointPermission2(t *testing.T) {
+	req := policy.NewValidateEndpointPermissionRequest()
+	req.UserId = 3
+	req.SetNamespaceId(1)
+	req.Service = "devcloud"
+	req.Method = "GET"
+	req.Path = "/api/devcloud/v1/users/"
+	set, err := impl.ValidateEndpointPermission(ctx, req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(set)
+}

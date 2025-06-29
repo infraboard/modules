@@ -75,6 +75,12 @@ type CreatePolicyRequest struct {
 	Extras map[string]string `json:"extras" bson:"extras" gorm:"column:extras;serializer:json;type:json" description:"扩展信息" optional:"true"`
 }
 
+func NewResourceScope() *ResourceScope {
+	return &ResourceScope{
+		Scope: map[string][]string{},
+	}
+}
+
 type ResourceScope struct {
 	// 空间
 	NamespaceId *uint64 `json:"namespace_id" bson:"namespace_id" gorm:"column:namespace_id;type:varchar(200);index" description:"策略生效的空间Id" optional:"true"`
