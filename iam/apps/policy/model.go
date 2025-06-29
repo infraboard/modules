@@ -1,6 +1,7 @@
 package policy
 
 import (
+	"strings"
 	"time"
 
 	"github.com/infraboard/mcube/v2/ioc/config/validator"
@@ -104,8 +105,18 @@ func (r ResourceScope) GormResourceFilter(query *gorm.DB) *gorm.DB {
 		// 构建"标签值匹配"条件
 		var valueMatches []clause.Expression
 		for _, val := range values {
-			valueMatches = append(valueMatches,
-				datatypes.JSONQuery("label").Equals(val, key))
+			if strings.Contains(val, "%") {
+				// 如果值包含通配符%，使用LIKE条件
+				valueMatches = append(valueMatches,
+					clause.Expr{
+						SQL:  "JSON_UNQUOTE(JSON_EXTRACT(label, ?)) LIKE ?",
+						Vars: []any{"$." + key, val},
+					})
+			} else {
+				// 否则使用精确匹配
+				valueMatches = append(valueMatches,
+					datatypes.JSONQuery("label").Equals(val, key))
+			}
 		}
 
 		// 组合条件：标签不存在 OR 标签值匹配

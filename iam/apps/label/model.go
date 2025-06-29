@@ -11,8 +11,8 @@ func NewLabel(spc *CreateLabelRequest) (*Label, error) {
 		return nil, err
 	}
 	return &Label{
-		ResourceMeta: *apps.NewResourceMeta(),
-		Spec:         spc,
+		ResourceMeta:       *apps.NewResourceMeta(),
+		CreateLabelRequest: *spc,
 	}, nil
 }
 
@@ -20,7 +20,7 @@ type Label struct {
 	// 基础数据
 	apps.ResourceMeta
 	// 空间定义
-	Spec *CreateLabelRequest `json:"spec" bson:",inline" gorm:"embedded"`
+	CreateLabelRequest `bson:",inline" gorm:"embedded"`
 }
 
 func (l *Label) TableName() string {
@@ -65,14 +65,14 @@ type CreateCreateLabelSpec struct {
 	// 适用于那些资源
 	Resources []string `json:"resources" bson:"resources" gorm:"column:resources;type:json;serializer:json;" description:"适用于那些资源" optional:"true"`
 
-	// 标签的键, 标签的Key不允许修改, 带前缀的 tech.dev.frontend01 tech.dev.backend01
+	// 标签的键
 	Key string `json:"key" bson:"key" gorm:"column:key;type:varchar(255)" validate:"required"`
 	// 标签的键的描述
 	KeyDesc string `json:"key_desc" bson:"key_desc" gorm:"column:key_desc;type:varchar(255)" validate:"required"`
 	// 标签的颜色
 	Color string `json:"color" bson:"color" gorm:"column:color;type:varchar(100)"`
 
-	// 值类型
+	// 值类型, 支持树状
 	ValueType VALUE_TYPE `json:"value_type" gorm:"column:value_type;type:varchar(20)" bson:"value_type"`
 	// 标签默认值
 	DefaultValue string `json:"default_value" gorm:"column:default_value;type:text" bson:"default_value"`
@@ -83,7 +83,7 @@ type CreateCreateLabelSpec struct {
 	// 枚举值的选项
 	EnumOptions []*EnumOption `json:"enum_options,omitempty" bson:"enum_options" gorm:"column:enum_options;type:json;serializer:json;"`
 	// 基于Http枚举的配置
-	HttpEnumConfig HttpEnumConfig `json:"http_enum_config,omitempty" gorm:"embedded" bson:"http_enum_config"`
+	HttpEnumConfig HttpEnumConfig `json:"http_enum_config" gorm:"embedded" bson:"http_enum_config"`
 	// 值的样例
 	Example string `json:"example" bson:"example" gorm:"column:example;type:text"`
 
@@ -98,6 +98,8 @@ type EnumOption struct {
 	Input string `json:"input" bson:"input" validate:"required"`
 	// 选项的值, 根据parent.input + children.input 自动生成
 	Value string `json:"value" bson:"value"`
+	// 是否禁止选中, 和前端UI组件配合使用
+	Disabled bool `json:"disabled" bson:"disabled"`
 	// 标签的颜色
 	Color string `json:"color" bson:"color"`
 	// 是否废弃

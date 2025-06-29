@@ -3,9 +3,11 @@ package impl
 import (
 	"context"
 
+	"github.com/infraboard/mcube/v2/exception"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
 	"github.com/infraboard/mcube/v2/types"
 	"github.com/infraboard/modules/iam/apps/label"
+	"gorm.io/gorm"
 )
 
 // CreateLabel implements label.Service.
@@ -46,13 +48,23 @@ func (i *LabelServiceImpl) QueryLabel(ctx context.Context, in *label.QueryLabelR
 	return set, nil
 }
 
-// DeleteLabel implements label.Service.
-func (i *LabelServiceImpl) DeleteLabel(ctx context.Context, in *label.DeleteLabelRequest) (*label.Label, error) {
-	panic("unimplemented")
-}
-
 // DescribeLabel implements label.Service.
 func (i *LabelServiceImpl) DescribeLabel(ctx context.Context, in *label.DescribeLabelRequest) (*label.Label, error) {
+	query := datasource.DBFromCtx(ctx)
+
+	ins := &label.Label{}
+	if err := query.Where("id = ?", in.Id).First(ins).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, exception.NewNotFound("label %s not found", in.Id)
+		}
+		return nil, err
+	}
+
+	return ins, nil
+}
+
+// DeleteLabel implements label.Service.
+func (i *LabelServiceImpl) DeleteLabel(ctx context.Context, in *label.DeleteLabelRequest) (*label.Label, error) {
 	panic("unimplemented")
 }
 
