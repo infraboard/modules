@@ -60,7 +60,6 @@ func (i *consumer) Init() error {
 	return nil
 }
 
-func (i *consumer) Close(ctx context.Context) error {
+func (i *consumer) Close(ctx context.Context) {
 	i.ctx.Done()
-	return nil
 }
