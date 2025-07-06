@@ -43,7 +43,7 @@ func (s *TaskServiceImpl) RemoveAsyncTask(t *task.Task) {
 func (i *TaskServiceImpl) Init() error {
 	i.log = log.Sub(i.Name())
 	if datasource.Get().AutoMigrate {
-		err := datasource.DB().AutoMigrate(&task.Task{}, &task.WebHook{})
+		err := datasource.DB().AutoMigrate(&task.Task{})
 		if err != nil {
 			return err
 		}

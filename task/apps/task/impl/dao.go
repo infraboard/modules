@@ -8,6 +8,7 @@ import (
 	"github.com/infraboard/mcube/v2/types"
 	"github.com/infraboard/modules/task/apps/event"
 	"github.com/infraboard/modules/task/apps/task"
+	"github.com/infraboard/modules/task/apps/webhook"
 )
 
 func (s *TaskServiceImpl) saveTask(ctx context.Context, ins *task.Task) {
@@ -24,18 +25,15 @@ func (s *TaskServiceImpl) saveTask(ctx context.Context, ins *task.Task) {
 func (s *TaskServiceImpl) runWebHook(ctx context.Context, ins *task.Task) {
 	for _, hook := range ins.WebHooks {
 		hook.RefTaskId = ins.Id
-		hook.Run(ctx)
+
+		// 运行WebHook
+		wh := webhook.GetService().Run(ctx, &hook.WebHookSpec)
+		hook.Status = wh.Status
 		switch hook.Status {
-		case task.STATUS_SUCCESS:
+		case webhook.STATUS_SUCCESS:
 			s.saveEvent(ctx, task.NewInfoEvent(fmt.Sprintf("web hook %s exec success", hook.TargetURL), ins.Id))
 		default:
 			s.saveEvent(ctx, task.NewErrorEvent(fmt.Sprintf("web hook %s exec failed", hook.TargetURL), ins.Id))
-		}
-
-		// 保存Hook执行记录
-		err := datasource.DBFromCtx(ctx).Save(hook).Error
-		if err != nil {
-			s.log.Error().Msgf("save hook resp error, %s", err)
 		}
 	}
 }

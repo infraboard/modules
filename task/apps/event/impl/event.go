@@ -8,6 +8,7 @@ import (
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
 	"github.com/infraboard/mcube/v2/types"
 	"github.com/infraboard/modules/task/apps/event"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -43,5 +44,26 @@ func (i *EventServiceImpl) AddEvent(ctx context.Context, in *types.Set[*event.Ev
 
 // QueryEvent implements event.Service.
 func (i *EventServiceImpl) QueryEvent(ctx context.Context, in *event.QueryEventRequest) (*types.Set[*event.Event], error) {
-	panic("unimplemented")
+	set := types.NewSet[*event.Event]()
+
+	query := datasource.DBFromCtx(ctx).Model(&event.Event{})
+	for key, value := range in.Label {
+		query = query.Where(datatypes.JSONQuery("label").Equals(value, key))
+	}
+
+	err := query.Count(&set.Total).Error
+	if err != nil {
+		return nil, err
+	}
+	err = query.
+		Order("created_at desc").
+		Offset(int(in.ComputeOffset())).
+		Limit(int(in.PageSize)).
+		Find(&set.Items).
+		Error
+	if err != nil {
+		return nil, err
+	}
+
+	return set, nil
 }

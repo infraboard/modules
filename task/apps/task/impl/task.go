@@ -2,6 +2,7 @@ package impl
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/infraboard/mcube/v2/types"
@@ -20,8 +21,9 @@ func (s *TaskServiceImpl) Run(ctx context.Context, in *task.TaskSpec) *task.Task
 		fn := in.GetFn()
 		if fn == nil {
 			// 需要保存事件
-			s.saveEvent(ctx, task.NewErrorEvent("fn not found", ins.Id))
-			return ins.Failed()
+			e := task.NewErrorEvent("fn not found", ins.Id)
+			s.saveEvent(ctx, e)
+			return ins.Failed(e.First().Message)
 		}
 		// 执行函数
 		if in.Async {
@@ -38,11 +40,13 @@ func (s *TaskServiceImpl) Run(ctx context.Context, in *task.TaskSpec) *task.Task
 		} else {
 			if err := fn(ctx, in.Params); err != nil {
 				s.saveEvent(ctx, task.NewErrorEvent(err.Error(), ins.Id))
-				return ins.Failed()
+				return ins.Failed(err.Error())
 			}
 		}
 
 		ins.Success()
+	default:
+		return ins.Failed(fmt.Sprintf("不支持的类型: %s", in.Type))
 	}
 	return ins
 }
