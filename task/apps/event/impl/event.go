@@ -47,6 +47,10 @@ func (i *EventServiceImpl) QueryEvent(ctx context.Context, in *event.QueryEventR
 	set := types.NewSet[*event.Event]()
 
 	query := datasource.DBFromCtx(ctx).Model(&event.Event{})
+	if in.OrderBy != "" {
+		query = query.Order(fmt.Sprintf("time %s", in.OrderBy))
+	}
+
 	for key, value := range in.Label {
 		query = query.Where(datatypes.JSONQuery("label").Equals(value, key))
 	}
@@ -55,8 +59,8 @@ func (i *EventServiceImpl) QueryEvent(ctx context.Context, in *event.QueryEventR
 	if err != nil {
 		return nil, err
 	}
+
 	err = query.
-		Order("created_at desc").
 		Offset(int(in.ComputeOffset())).
 		Limit(int(in.PageSize)).
 		Find(&set.Items).

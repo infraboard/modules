@@ -8,7 +8,9 @@ import (
 	"github.com/infraboard/mcube/v2/exception"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
 	"github.com/infraboard/mcube/v2/types"
+	"github.com/infraboard/modules/task/apps/event"
 	"github.com/infraboard/modules/task/apps/task"
+	"github.com/infraboard/modules/task/apps/webhook"
 	"gorm.io/gorm"
 )
 
@@ -67,8 +69,19 @@ func (i *TaskServiceImpl) DescribeTask(ctx context.Context, in *task.DescribeTas
 	}
 
 	// 补充Event数据
-
+	events, err := event.GetService().QueryEvent(ctx, event.NewQueryEventRequest().
+		SetLabel(task.EVENT_LABLE_TASK_ID, ins.Id).
+		SetOrderBy(event.ORDER_BY_ASC))
+	if err != nil {
+		return nil, err
+	}
+	ins.Events = events.Items
 	// 补充WebHook执行数据
+	webhooks, err := webhook.GetService().QueryWebHook(ctx, webhook.NewQueryWebHookRequest().SetRefTaskId(ins.Id))
+	if err != nil {
+		return nil, err
+	}
+	ins.WebHooks = webhooks.Items
 
 	return ins, nil
 }

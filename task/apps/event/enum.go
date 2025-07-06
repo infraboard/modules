@@ -12,3 +12,10 @@ const (
 )
 
 type LEVEL int
+
+const (
+	ORDER_BY_DESC = "DESC"
+	ORDER_BY_ASC  = "ASC"
+)
+
+type ORDER_BY string

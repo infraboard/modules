@@ -33,7 +33,7 @@ func TestRun(t *testing.T) {
 	})
 
 	fnTask.SetAsync(true)
-	fnTask.AddWebHook(*webhook.NewWebHook(webhook.WebHookSpec{
+	fnTask.AddWebHook(webhook.NewWebHook(webhook.WebHookSpec{
 		TargetURL:  "https://www.baidu.com/",
 		Method:     "GET",
 		Conditions: task.StatusCompleteString(),
@@ -51,7 +51,7 @@ func TestRun(t *testing.T) {
 }
 
 const (
-	TASK_ID = "f74f2d7e-1926-4f4e-bff3-f4766af34ddb"
+	TASK_ID = "8d49ec84-c6c4-469c-b11d-df32fe524ba6"
 )
 
 func TestDescribeTask(t *testing.T) {

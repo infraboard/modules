@@ -18,6 +18,10 @@ func NewWebHook(spec WebHookSpec) *WebHook {
 
 // 任务回调
 type WebHook struct {
+	// WebHook 的唯一标识
+	ID string `json:"id"`
+	// 创建时间
+	CreatedAt time.Time `json:"created_at" gorm:"column:created_at;type:timestamp;default:current_timestamp;not null;index;" description:"创建时间"`
 	// WebHook定义
 	WebHookSpec
 	// 状态与统计
@@ -61,9 +65,6 @@ func (h *WebHook) Run(ctx context.Context) {
 }
 
 type WebHookSpec struct {
-	// 基本信息
-	// WebHook 的唯一标识
-	ID string `json:"id"`
 	// WebHook 名称
 	Name string `json:"name"`
 	// 描述

@@ -21,6 +21,25 @@ func (i *WebHookServiceImpl) Run(ctx context.Context, in *webhook.WebHookSpec) *
 }
 
 // QueryWebHook implements webhook.Service.
-func (i *WebHookServiceImpl) QueryWebHook(context.Context, *webhook.QueryWebHookRequest) (*types.Set[*webhook.WebHook], error) {
-	return nil, nil
+func (i *WebHookServiceImpl) QueryWebHook(ctx context.Context, in *webhook.QueryWebHookRequest) (*types.Set[*webhook.WebHook], error) {
+	set := types.NewSet[*webhook.WebHook]()
+
+	query := datasource.DBFromCtx(ctx).Model(&webhook.WebHook{})
+	if in.RefTaskId != "" {
+		query = query.Where("ref_task_id = ?", in.RefTaskId)
+	}
+
+	err := query.Count(&set.Total).Error
+	if err != nil {
+		return nil, err
+	}
+	err = query.
+		Order("created_at desc").
+		Find(&set.Items).
+		Error
+	if err != nil {
+		return nil, err
+	}
+
+	return set, nil
 }

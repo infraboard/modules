@@ -63,7 +63,7 @@ func NewFnTask(fn TaskFunc, params any) *TaskSpec {
 		fn:       fn,
 		Params:   params,
 		Label:    map[string]string{},
-		WebHooks: []webhook.WebHook{},
+		WebHooks: []*webhook.WebHook{},
 	}
 }
 
@@ -80,7 +80,7 @@ type TaskSpec struct {
 	Label map[string]string `json:"label" bson:"label" gorm:"column:label;serializer:json;type:json" description:"任务标签" optional:"true"`
 
 	// 任务执行结束回调
-	WebHooks []webhook.WebHook `json:"web_hooks" bson:"web_hooks" gorm:"column:web_hooks;serializer:json;type:json" description:"任务执行结束回调" optional:"true"`
+	WebHooks []*webhook.WebHook `json:"web_hooks" bson:"web_hooks" gorm:"column:web_hooks;serializer:json;type:json" description:"任务执行结束回调" optional:"true"`
 
 	// 具体的函数
 	fn TaskFunc `json:"-" gorm:"-"`
@@ -93,7 +93,7 @@ func (t *TaskSpec) SetAsync(v bool) *TaskSpec {
 	return t
 }
 
-func (t *TaskSpec) AddWebHook(hs ...webhook.WebHook) *TaskSpec {
+func (t *TaskSpec) AddWebHook(hs ...*webhook.WebHook) *TaskSpec {
 	t.WebHooks = append(t.WebHooks, hs...)
 	return t
 }
@@ -133,7 +133,7 @@ type TaskFunc func(ctx context.Context, req any) error
 
 func NewTaskStatus() *TaskStatus {
 	return &TaskStatus{
-		Events: []event.Event{},
+		Events: []*event.Event{},
 	}
 }
 
@@ -150,7 +150,7 @@ type TaskStatus struct {
 	Message string `json:"message" gorm:"column:message;type:text;" description:"失败信息"`
 
 	// 执行过程中的事件, 执行日志
-	Events []event.Event `json:"events" gorm:"column:events;type:json;serializer:json;" description:"执行过程中的事件"`
+	Events []*event.Event `json:"events" gorm:"column:events;type:json;serializer:json;" description:"执行过程中的事件"`
 }
 
 func (s *TaskStatus) SetStartAt(t time.Time) {

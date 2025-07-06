@@ -22,7 +22,16 @@ type Service interface {
 	QueryWebHook(context.Context, *QueryWebHookRequest) (*types.Set[*WebHook], error)
 }
 
+func NewQueryWebHookRequest() *QueryWebHookRequest {
+	return &QueryWebHookRequest{}
+}
+
 type QueryWebHookRequest struct {
 	// 关联Task
 	RefTaskId string `json:"ref_task_id"`
+}
+
+func (r *QueryWebHookRequest) SetRefTaskId(taskId string) *QueryWebHookRequest {
+	r.RefTaskId = taskId
+	return r
 }
