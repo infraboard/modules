@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	AppName = "event"
+	AppName = "audit_events"
 )
 
 func GetService() Service {
