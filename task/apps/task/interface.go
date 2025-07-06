@@ -24,6 +24,12 @@ type Service interface {
 	DescribeTask(context.Context, *DescribeTaskRequest) (*Task, error)
 }
 
+func NewDescribeTaskRequest(taskId string) *DescribeTaskRequest {
+	return &DescribeTaskRequest{
+		TaskId: taskId,
+	}
+}
+
 type DescribeTaskRequest struct {
 	TaskId string `json:"task_id"`
 }

@@ -2,6 +2,7 @@ package webhook
 
 import (
 	"context"
+	"slices"
 	"time"
 
 	"github.com/google/uuid"
@@ -24,7 +25,7 @@ type WebHook struct {
 }
 
 func (h *WebHook) TableName() string {
-	return "task_webhooks"
+	return "webhooks"
 }
 
 func (h *WebHook) SetDefault() {
@@ -61,32 +62,55 @@ func (h *WebHook) Run(ctx context.Context) {
 
 type WebHookSpec struct {
 	// 基本信息
-	ID          string `json:"id"`          // WebHook 的唯一标识
-	Name        string `json:"name"`        // WebHook 名称
-	Description string `json:"description"` // 描述
+	// WebHook 的唯一标识
+	ID string `json:"id"`
+	// WebHook 名称
+	Name string `json:"name"`
+	// 描述
+	Description string `json:"description"`
 
-	RefTaskId string `json:"ref_task_id"` // 关联Task
+	// 关联Task
+	RefTaskId string `json:"ref_task_id"`
 
 	// 目标配置
-	TargetURL string            `json:"target_url"` // 接收 HTTP 请求的 URL
-	Method    string            `json:"method"`     // HTTP 方法，如 POST、GET 等
-	Headers   map[string]string `json:"headers"`    // 自定义请求头
-
-	// 触发条件
-	Events []string `json:"events"` // 触发的事件类型列表
-	Filter string   `json:"filter"` // 事件过滤条件（可选）
+	// 接收 HTTP 请求的 URL
+	TargetURL string `json:"target_url"`
+	// HTTP 方法，如 POST、GET 等
+	Method string `json:"method"`
+	// 自定义请求头
+	Headers map[string]string `json:"headers" gorm:"column:headers;type:json;serializer:json;"`
 
 	// 安全验证
-	Secret          string `json:"secret"`           // 用于签名验证的密钥（HMAC）
-	SignatureHeader string `json:"signature_header"` // 签名头的名称，如 "X-Hub-Signature"
+	// 用于签名验证的密钥（HMAC）
+	Secret string `json:"secret"`
+	// 签名头的名称，如 "X-Hub-Signature"
+	SignatureHeader string `json:"signature_header"`
+
+	// 哪些条件下触发
+	Conditions []string `json:"conditions" gorm:"column:conditions;type:json;serializer:json;"`
 
 	// 请求内容配置
-	ContentType string `json:"content_type"` // 请求体类型，如 "application/json"
-	Payload     string `json:"payload"`      // 自定义请求体模板（可选）
+	// 请求体类型，如 "application/json"
+	ContentType string `json:"content_type"`
+	// 自定义请求体模板（可选）
+	Payload string `json:"payload"`
 
 	// 重试与超时
-	RetryCount int `json:"retry_count"` // 失败重试次数
-	Timeout    int `json:"timeout"`     // 请求超时时间（毫秒）
+	// 失败重试次数
+	RetryCount int `json:"retry_count"`
+	// 请求超时时间（毫秒）
+	Timeout int `json:"timeout"`
+}
+
+func (s *WebHookSpec) AddCondtion(conditions ...string) {
+	if s.Conditions == nil {
+		s.Conditions = []string{}
+	}
+	s.Conditions = append(s.Conditions, conditions...)
+}
+
+func (s *WebHookSpec) IsCondtionOk(condition string) bool {
+	return slices.Contains(s.Conditions, condition)
 }
 
 func NewWebHookStatus() *WebHookStatus {

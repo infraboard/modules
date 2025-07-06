@@ -21,7 +21,7 @@ func NewTask(spec TaskSpec) *Task {
 
 type Task struct {
 	// 任务Id
-	Id string `json:"id" gorm:"column:id;type:uint;primary_key;" unique:"true" description:"Id"`
+	Id string `json:"id" gorm:"column:id;type:string;primary_key;" unique:"true" description:"Id"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at" gorm:"column:created_at;type:timestamp;default:current_timestamp;not null;index;" description:"创建时间"`
 	// 任务定义
@@ -38,6 +38,12 @@ func (t *Task) Failed(msg string) *Task {
 	t.Status = STATUS_FAILED
 	t.SetEndAt(time.Now())
 	t.Message = msg
+	return t
+}
+
+func (t *Task) Running() *Task {
+	t.Status = STATUS_RUNNING
+	t.SetEndAt(time.Now())
 	return t
 }
 
@@ -72,6 +78,7 @@ type TaskSpec struct {
 	Params any `json:"params" gorm:"column:params;serializer:json;type:json" description:"任务参数"`
 	// 任务标签
 	Label map[string]string `json:"label" bson:"label" gorm:"column:label;serializer:json;type:json" description:"任务标签" optional:"true"`
+
 	// 任务执行结束回调
 	WebHooks []webhook.WebHook `json:"web_hooks" bson:"web_hooks" gorm:"column:web_hooks;serializer:json;type:json" description:"任务执行结束回调" optional:"true"`
 
@@ -86,13 +93,20 @@ func (t *TaskSpec) SetAsync(v bool) *TaskSpec {
 	return t
 }
 
-func (t *TaskSpec) BuildTimeoutCtx() context.Context {
+func (t *TaskSpec) AddWebHook(hs ...webhook.WebHook) *TaskSpec {
+	t.WebHooks = append(t.WebHooks, hs...)
+	return t
+}
+
+// 注入上下文当中
+func (t *Task) BuildTimeoutCtx() context.Context {
 	timeout, err := time.ParseDuration(t.Timeout)
 	if err != nil {
 		timeout = DEFAULT_TIMEOUT
 	}
 
-	ctx, fn := context.WithTimeout(context.Background(), timeout)
+	ctx := context.WithValue(context.Background(), CONTEXT_TASK_KEY{}, t)
+	ctx, fn := context.WithTimeout(ctx, timeout)
 	t.cancelFn = fn
 	return ctx
 }
@@ -128,6 +142,8 @@ type TaskStatus struct {
 	StartAt *time.Time `json:"start_at" gorm:"column:start_at;type:timestamp;" description:"开始执行时间"`
 	// 执行结束的时间
 	EndAt *time.Time `json:"end_at" gorm:"column:end_at;type:timestamp;" description:"执行结束的时间"`
+	// 任务状态更新时间
+	UpdateAt *time.Time `json:"update_at" gorm:"column:update_at;type:timestamp;" description:"任务状态更新时间"`
 	// 任务执行状态
 	Status STATUS `json:"status" gorm:"column:status;type:tinyint(2);" description:"任务执行状态"`
 	// 失败信息
@@ -143,4 +159,8 @@ func (s *TaskStatus) SetStartAt(t time.Time) {
 
 func (s *TaskStatus) SetEndAt(t time.Time) {
 	s.EndAt = &t
+}
+
+func (s *TaskStatus) SetUpdateAt(t time.Time) {
+	s.UpdateAt = &t
 }
