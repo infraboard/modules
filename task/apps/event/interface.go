@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/infraboard/mcube/v2/http/request"
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/types"
@@ -40,6 +41,14 @@ type QueryEventRequest struct {
 type AddEventRequest struct {
 }
 
+func NewEvent(spec EventSpec) *Event {
+	return &Event{
+		Id:        uuid.NewString(),
+		CreatedAt: time.Now(),
+		EventSpec: spec,
+	}
+}
+
 type Event struct {
 	// 任务Id
 	Id string `json:"id" gorm:"column:id;type:uint;primary_key;" unique:"true" description:"Id"`
@@ -47,6 +56,10 @@ type Event struct {
 	CreatedAt time.Time `json:"created_at" gorm:"column:created_at;type:timestamp;default:current_timestamp;not null;index;" description:"创建时间"`
 	// 事件定义
 	EventSpec
+}
+
+func (e *Event) TableName() string {
+	return "task_events"
 }
 
 func NewEventSpec() *EventSpec {

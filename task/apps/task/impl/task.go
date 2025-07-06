@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/infraboard/mcube/v2/types"
-	"github.com/infraboard/modules/task/apps/event"
 	"github.com/infraboard/modules/task/apps/task"
 )
 
@@ -14,14 +13,14 @@ func (s *TaskServiceImpl) Run(ctx context.Context, in *task.TaskSpec) *task.Task
 	ins := task.NewTask(*in)
 	ins.SetStartAt(time.Now())
 	// 放数据库
-	defer s.save(ctx, ins)
+	defer s.saveTask(ctx, ins)
 
 	switch in.Type {
 	case task.TYPE_FUNCTION:
 		fn := in.GetFn()
 		if fn == nil {
 			// 需要保存事件
-			event.GetService().AddEvent(ctx, task.NewErrorEvent("fn not found", ins.Id))
+			s.saveEvent(ctx, task.NewErrorEvent("fn not found", ins.Id))
 			return ins.Failed()
 		}
 		// 执行函数
@@ -33,12 +32,12 @@ func (s *TaskServiceImpl) Run(ctx context.Context, in *task.TaskSpec) *task.Task
 				}()
 				s.AddAsyncTask(ins)
 				if err := fn(in.BuildTimeoutCtx(), ins.Params); err != nil {
-					event.GetService().AddEvent(ctx, task.NewErrorEvent(err.Error(), ins.Id))
+					s.saveEvent(ctx, task.NewErrorEvent(err.Error(), ins.Id))
 				}
 			}()
 		} else {
 			if err := fn(ctx, in.Params); err != nil {
-				event.GetService().AddEvent(ctx, task.NewErrorEvent(err.Error(), ins.Id))
+				s.saveEvent(ctx, task.NewErrorEvent(err.Error(), ins.Id))
 				return ins.Failed()
 			}
 		}

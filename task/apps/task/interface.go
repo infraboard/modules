@@ -9,6 +9,7 @@ import (
 	"github.com/infraboard/mcube/v2/tools/pretty"
 	"github.com/infraboard/mcube/v2/types"
 	"github.com/infraboard/modules/task/apps/event"
+	"resty.dev/v3"
 )
 
 const (
@@ -81,7 +82,7 @@ func NewFnTask(fn TaskFunc, params any) *TaskSpec {
 		fn:       fn,
 		Params:   params,
 		Label:    map[string]string{},
-		WebHooks: []WebHookSpec{},
+		WebHooks: []WebHook{},
 	}
 }
 
@@ -97,7 +98,7 @@ type TaskSpec struct {
 	// 任务标签
 	Label map[string]string `json:"label" bson:"label" gorm:"column:label;serializer:json;type:json" description:"任务标签" optional:"true"`
 	// 任务执行结束回调
-	WebHooks []WebHookSpec `json:"web_hooks" bson:"web_hooks" gorm:"column:web_hooks;serializer:json;type:json" description:"任务执行结束回调" optional:"true"`
+	WebHooks []WebHook `json:"web_hooks" bson:"web_hooks" gorm:"column:web_hooks;serializer:json;type:json" description:"任务执行结束回调" optional:"true"`
 
 	// 具体的函数
 	fn TaskFunc `json:"-" gorm:"-"`
@@ -168,11 +169,13 @@ func (s *TaskStatus) SetEndAt(t time.Time) {
 }
 
 // 任务回调
-type WebHookSpec struct {
+type WebHook struct {
 	// 基本信息
 	ID          string `json:"id"`          // WebHook 的唯一标识
 	Name        string `json:"name"`        // WebHook 名称
 	Description string `json:"description"` // 描述
+
+	RefTaskId string `json:"ref_task_id"` // 关联Task
 
 	// 目标配置
 	TargetURL string            `json:"target_url"` // 接收 HTTP 请求的 URL
@@ -194,4 +197,44 @@ type WebHookSpec struct {
 	// 重试与超时
 	RetryCount int `json:"retry_count"` // 失败重试次数
 	Timeout    int `json:"timeout"`     // 请求超时时间（毫秒）
+
+	// 状态与统计
+	Status  STATUS `json:"status"`
+	Message string `json:"message"`
+}
+
+func (h *WebHook) TableName() string {
+	return "task_webhooks"
+}
+
+func (h *WebHook) SetDefault() {
+	if h.ContentType == "" {
+		h.ContentType = "application/json"
+	}
+	if h.Timeout == 0 {
+		h.Timeout = 30
+	}
+	if h.ID == "" {
+		h.ID = uuid.NewString()
+	}
+}
+
+func (h *WebHook) Run(ctx context.Context) {
+	h.SetDefault()
+
+	resty.New()
+	resp, err := resty.New().R().WithContext(ctx).
+		SetAuthToken(h.Secret).
+		SetTimeout(time.Second*time.Duration(h.Timeout)).
+		SetHeaders(h.Headers).
+		SetContentType(h.ContentType).
+		SetBody(h.Payload).
+		SetRetryCount(h.RetryCount).Execute(h.Method, h.TargetURL)
+	if err != nil {
+		h.Status = STATUS_FAILED
+		h.Message = err.Error()
+	} else {
+		h.Status = STATUS_SUCCESS
+		h.Message = resp.String()
+	}
 }
