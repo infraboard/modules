@@ -14,7 +14,10 @@ import (
 )
 
 func init() {
-	ioc.Controller().Registry(&CronJobServiceImpl{})
+	ioc.Controller().Registry(&CronJobServiceImpl{
+		EnableUpdate: true,
+		UpdateTopic:  "cronjob_update_events",
+	})
 }
 
 var _ cronjob.Service = (*CronJobServiceImpl)(nil)
@@ -30,6 +33,8 @@ type CronJobServiceImpl struct {
 	// 允许时上下文
 	ctx context.Context
 
+	// 启用更新队列
+	EnableUpdate bool `toml:"enable_update" json:"enable_update" yaml:"enable_update"  env:"ENABLE_UPDATE"`
 	// 当前这个消费者 配置的topic
 	UpdateTopic string `toml:"update_topic" json:"update_topic" yaml:"update_topic"  env:"UPDATE_TOPIC"`
 }
@@ -58,7 +63,7 @@ func (i *CronJobServiceImpl) Init() error {
 	}
 	i.hostname, _ = os.Hostname()
 
-	if i.UpdateTopic != "" {
+	if i.EnableUpdate {
 		i.updater = ioc_kafka.ConsumerGroup(i.hostname, []string{i.UpdateTopic})
 
 		// 订阅更新事件
