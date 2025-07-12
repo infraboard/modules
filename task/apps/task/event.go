@@ -16,7 +16,9 @@ func NewInfoEvent(msg string, taskId string) *event.EventSpec {
 }
 
 func NewQueueEvent() *QueueEvent {
-	return &QueueEvent{}
+	return &QueueEvent{
+		Type: QUEUE_EVENT_TYPE_RUN,
+	}
 }
 
 type QueueEvent struct {

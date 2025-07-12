@@ -1,9 +1,17 @@
 [app]
-  name = "mcenter"
-  description = "mcenter"
+  name = "devcloud"
+  description = "devcloud"
   internal_address = "http://127.0.0.1:8020"
   internal_token = "vCYg52HNzFcMMHq7sVLoFxHU"
   debug = true
+
+[log]
+  # 日志的级别, 默认Debug
+  level = "debug"
+
+[log.file]
+  # 是否开启文件记录
+  enable = true
 
 [http]
   # 开启GRPC服务
@@ -17,11 +25,11 @@
   provider = "mysql"
   host = "127.0.0.1"
   port = 3306
-  database = "go17_mcenter"
+  database = "devcloud_go18"
   username = "root"
   password = "123456"
   debug = true
-  auto_migrate = false
+  auto_migrate = true
 
 [kafka]
   brokers = ["127.0.0.1:9092"]

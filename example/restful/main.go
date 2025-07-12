@@ -13,6 +13,7 @@ import (
 	// 引入模块
 	_ "github.com/infraboard/modules/iam/init"
 	permission "github.com/infraboard/modules/iam/permission/restful"
+	_ "github.com/infraboard/modules/task/apps"
 
 	// 非功能性模块
 	_ "github.com/infraboard/mcube/v2/ioc/apps/apidoc/restful"

@@ -97,11 +97,13 @@ func (i *TaskServiceImpl) Init() error {
 	}
 
 	// 处理取消事件
+	i.log.Info().Msgf("cancel topic: %s", i.CancelTopic)
 	i.cancel_reader = ioc_kafka.ConsumerGroup(i.node_name, []string{i.CancelTopic})
 	i.cancel_writer = ioc_kafka.Producer(i.CancelTopic)
 	go i.HandleCancelEvents(i.ctx)
 
 	// 处理运行事件
+	i.log.Info().Msgf("run topic: %s", i.RunTopic)
 	i.run_reader = ioc_kafka.ConsumerGroup(i.RunGroupName, []string{i.RunTopic})
 	i.run_writer = ioc_kafka.Producer(i.RunTopic)
 	go i.HandleRunEvents(i.ctx)

@@ -23,7 +23,9 @@ func (s *TaskServiceImpl) Run(ctx context.Context, in *task.TaskSpec) (*task.Tas
 		return nil, err
 	}
 
+	// 队列事件
 	e := task.NewQueueEvent()
+	e.Type = task.QUEUE_EVENT_TYPE_RUN
 	e.TaskId = ins.Id
 
 	// 放入运行队列
@@ -45,6 +47,7 @@ func (s *TaskServiceImpl) Cancel(ctx context.Context, in *task.CancelRequest) (*
 	}
 
 	e := task.NewQueueEvent()
+	e.Type = task.QUEUE_EVENT_TYPE_CANCEL
 	e.TaskId = in.TaskId
 
 	// 放入取消队列

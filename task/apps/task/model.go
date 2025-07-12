@@ -81,7 +81,7 @@ type TaskSpec struct {
 	// 异步执行时的超时时间
 	Timeout string `json:"timeout" gorm:"column:timeout;" description:"异步执行时的超时时间"`
 	// 任务类型
-	Type TYPE `json:"type" gorm:"column:id;type:varchar(60);" description:"任务类型"`
+	Type TYPE `json:"type" gorm:"column:type;type:varchar(60);" description:"任务类型"`
 	// 任务名称
 	Name string `json:"name" gorm:"column:name;type:varchar(200);" description:"任务名称"`
 	// 任务名称

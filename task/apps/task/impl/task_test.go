@@ -43,17 +43,10 @@ func TestRun(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Log(ins)
-
-	time.Sleep(10 * time.Second)
-	ins, err = svc.DescribeTask(t.Context(), task.NewDescribeTaskRequest(ins.Id))
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Log(ins)
 }
 
 const (
-	TASK_ID = "8d49ec84-c6c4-469c-b11d-df32fe524ba6"
+	TASK_ID = "11029dbd-22cd-4c14-9c09-249ff2d84212"
 )
 
 func TestDescribeTask(t *testing.T) {

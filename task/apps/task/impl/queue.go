@@ -11,8 +11,11 @@ import (
 
 // 处理任务运行队列
 func (c *TaskServiceImpl) HandleRunEvents(ctx context.Context) {
+	c.log.Info().Msgf("start handle task run events ...")
+	defer c.log.Info().Msgf("handle task run events done.")
+
 	for {
-		m, err := c.cancel_reader.ReadMessage(ctx)
+		m, err := c.run_reader.ReadMessage(ctx)
 		if err != nil {
 			if err == io.EOF {
 				c.log.Info().Msg("reader closed")
@@ -51,11 +54,13 @@ func (c *TaskServiceImpl) HandleRunEvents(ctx context.Context) {
 			continue
 		}
 
+		c.log.Info().Msgf("[开始]开始在节点[%s]上异步执行task: %s ...", c.node_name, taskIns.Id)
 		// 运行任务
 		c.runTask(taskIns)
-
 		// 更新任务状态
 		c.updateTaskStatus(ctx, taskIns)
+
+		c.log.Info().Msgf("[结束]在节点[%s]上异步执行task: %s", c.node_name, taskIns.Id)
 	}
 }
 
@@ -70,19 +75,16 @@ func (s *TaskServiceImpl) runTask(ins *task.Task) *task.Task {
 		}
 		// 执行函数
 		ins.Running()
-		go func() {
-			defer func() {
-				ins.Cancel()
-				s.RemoveAsyncTask(ins)
-			}()
-			s.AddAsyncTask(ins)
-			if err := fn(ins.BuildTimeoutCtx(), ins.Params); err != nil {
-				ins.Failed(err.Error())
-			} else {
-				ins.Success()
-			}
-			s.updateTaskStatus(context.Background(), ins)
+		defer func() {
+			ins.Cancel()
+			s.RemoveAsyncTask(ins)
 		}()
+		s.AddAsyncTask(ins)
+		if err := fn(ins.BuildTimeoutCtx(), ins.Params); err != nil {
+			ins.Failed(err.Error())
+		} else {
+			ins.Success()
+		}
 	default:
 		return ins.Failed(fmt.Sprintf("不支持的类型: %s", ins.Type))
 	}
@@ -92,6 +94,9 @@ func (s *TaskServiceImpl) runTask(ins *task.Task) *task.Task {
 
 // 处理任务取消队列
 func (c *TaskServiceImpl) HandleCancelEvents(ctx context.Context) {
+	c.log.Info().Msgf("start handle task cancel events ...")
+	defer c.log.Info().Msgf("handle task cancel events done.")
+
 	for {
 		m, err := c.cancel_reader.ReadMessage(ctx)
 		if err != nil {

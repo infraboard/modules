@@ -13,9 +13,10 @@ import (
 
 func (s *TaskServiceImpl) updateTaskStatus(ctx context.Context, ins *task.Task) {
 	ins.SetUpdateAt(time.Now())
-	err := datasource.DBFromCtx(ctx).Save(&ins.TaskStatus).Error
+	err := datasource.DBFromCtx(ctx).Where("id = ?", ins.Id).Updates(&ins.TaskStatus).Error
 	if err != nil {
 		s.log.Error().Msgf("save task error, %s", err)
+		return
 	}
 
 	// 执行WebHook
