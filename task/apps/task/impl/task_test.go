@@ -44,7 +44,7 @@ func TestRun(t *testing.T) {
 	}
 	t.Log(ins)
 
-	time.Sleep(5 * time.Second)
+	time.Sleep(10 * time.Second)
 	ins, err = svc.DescribeTask(t.Context(), task.NewDescribeTaskRequest(ins.Id))
 	if err != nil {
 		t.Fatal(err)
