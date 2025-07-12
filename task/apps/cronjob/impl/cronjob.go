@@ -13,7 +13,7 @@ import (
 )
 
 // AddCronJob implements cronjob.Service.
-func (i *CronServiceImpl) AddCronJob(ctx context.Context, in *cronjob.CronJobSpec) (*cronjob.CronJob, error) {
+func (i *CronJobServiceImpl) AddCronJob(ctx context.Context, in *cronjob.CronJobSpec) (*cronjob.CronJob, error) {
 	ins := cronjob.NewCronJob(*in)
 
 	// 才真正的创建cron 关联cron实例
@@ -36,7 +36,7 @@ func (i *CronServiceImpl) AddCronJob(ctx context.Context, in *cronjob.CronJobSpe
 }
 
 // QueryCronJob implements cronjob.Service.
-func (i *CronServiceImpl) QueryCronJob(ctx context.Context, in *cronjob.QueryCronJobRequest) (*types.Set[*cronjob.CronJob], error) {
+func (i *CronJobServiceImpl) QueryCronJob(ctx context.Context, in *cronjob.QueryCronJobRequest) (*types.Set[*cronjob.CronJob], error) {
 	set := types.New[*cronjob.CronJob]()
 
 	query := datasource.DBFromCtx(ctx).Model(&cronjob.CronJob{})
@@ -62,7 +62,7 @@ func (i *CronServiceImpl) QueryCronJob(ctx context.Context, in *cronjob.QueryCro
 }
 
 // DescribeCronJob implements cronjob.Service.
-func (i *CronServiceImpl) DescribeCronJob(ctx context.Context, in *cronjob.DescribeCronJobRequest) (*cronjob.CronJob, error) {
+func (i *CronJobServiceImpl) DescribeCronJob(ctx context.Context, in *cronjob.DescribeCronJobRequest) (*cronjob.CronJob, error) {
 	query := datasource.DBFromCtx(ctx)
 
 	ins := &cronjob.CronJob{}
@@ -76,11 +76,11 @@ func (i *CronServiceImpl) DescribeCronJob(ctx context.Context, in *cronjob.Descr
 }
 
 // DeleteCronJob implements cronjob.Service.
-func (i *CronServiceImpl) DeleteCronJob(ctx context.Context, in *cronjob.DeleteCronJobRequest) (*cronjob.CronJob, error) {
+func (i *CronJobServiceImpl) DeleteCronJob(ctx context.Context, in *cronjob.DeleteCronJobRequest) (*cronjob.CronJob, error) {
 	panic("unimplemented")
 }
 
 // UpdateCronJob implements cronjob.Service.
-func (i *CronServiceImpl) UpdateCronJob(ctx context.Context, in *cronjob.UpdateCronJobRequest) (*cronjob.CronJob, error) {
+func (i *CronJobServiceImpl) UpdateCronJob(ctx context.Context, in *cronjob.UpdateCronJobRequest) (*cronjob.CronJob, error) {
 	panic("unimplemented")
 }

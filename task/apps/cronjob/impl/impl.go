@@ -14,14 +14,12 @@ import (
 )
 
 func init() {
-	ioc.Controller().Registry(&CronServiceImpl{
-		// tasks: types.New[*task.Task](),
-	})
+	ioc.Controller().Registry(&CronJobServiceImpl{})
 }
 
-var _ cronjob.Service = (*CronServiceImpl)(nil)
+var _ cronjob.Service = (*CronJobServiceImpl)(nil)
 
-type CronServiceImpl struct {
+type CronJobServiceImpl struct {
 	ioc.ObjectImpl
 
 	log      *zerolog.Logger
@@ -50,7 +48,7 @@ type CronServiceImpl struct {
 // 	s.tasks = news
 // }
 
-func (i *CronServiceImpl) Init() error {
+func (i *CronJobServiceImpl) Init() error {
 	i.log = log.Sub(i.Name())
 	if datasource.Get().AutoMigrate {
 		err := datasource.DB().AutoMigrate(&cronjob.CronJob{})
@@ -66,10 +64,10 @@ func (i *CronServiceImpl) Init() error {
 	return nil
 }
 
-func (i *CronServiceImpl) Close(ctx context.Context) {
+func (i *CronJobServiceImpl) Close(ctx context.Context) {
 	i.ctx.Done()
 }
 
-func (i *CronServiceImpl) Name() string {
+func (i *CronJobServiceImpl) Name() string {
 	return cronjob.APP_NAME
 }

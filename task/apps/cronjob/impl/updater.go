@@ -9,7 +9,7 @@ import (
 )
 
 // 读取消息，处理消息
-func (c *CronServiceImpl) Run(ctx context.Context) error {
+func (c *CronJobServiceImpl) Run(ctx context.Context) error {
 	for {
 		m, err := c.updater.FetchMessage(ctx)
 		if err != nil {
