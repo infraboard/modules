@@ -6,7 +6,7 @@ const (
 	// 任务正在运行
 	STATUS_RUNNING
 	// 取消中
-	CANCELING
+	STATUS_CANCELING
 	// 任务已完成
 	STATUS_SUCCESS
 	// 任务失败

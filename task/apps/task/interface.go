@@ -19,10 +19,16 @@ func GetService() Service {
 type Service interface {
 	// 任务执行
 	Run(context.Context, *TaskSpec) (*Task, error)
+	// 任务取消
+	Cancel(context.Context, *CancelRequest) (*Task, error)
 	// 查询任务列表
 	QueryTask(context.Context, *QueryTaskRequest) (*types.Set[*Task], error)
 	// 查询任务详情
 	DescribeTask(context.Context, *DescribeTaskRequest) (*Task, error)
+}
+
+type CancelRequest struct {
+	DescribeTaskRequest
 }
 
 func NewDescribeTaskRequest(taskId string) *DescribeTaskRequest {

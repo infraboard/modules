@@ -55,7 +55,7 @@ func (c *TaskServiceImpl) HandleRunEvents(ctx context.Context) {
 		c.runTask(taskIns)
 
 		// 更新任务状态
-		c.updateTask(ctx, taskIns)
+		c.updateTaskStatus(ctx, taskIns)
 	}
 }
 
@@ -81,7 +81,7 @@ func (s *TaskServiceImpl) runTask(ins *task.Task) *task.Task {
 			} else {
 				ins.Success()
 			}
-			s.updateTask(context.Background(), ins)
+			s.updateTaskStatus(context.Background(), ins)
 		}()
 	default:
 		return ins.Failed(fmt.Sprintf("不支持的类型: %s", ins.Type))
@@ -136,6 +136,6 @@ func (c *TaskServiceImpl) HandleCancelEvents(ctx context.Context) {
 
 		// 更新数据裤状态
 		taskIns.Status = task.STATUS_CANCELED
-		c.updateTask(ctx, taskIns)
+		c.updateTaskStatus(ctx, taskIns)
 	}
 }

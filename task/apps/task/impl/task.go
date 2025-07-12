@@ -26,7 +26,7 @@ func (s *TaskServiceImpl) Run(ctx context.Context, in *task.TaskSpec) (*task.Tas
 	e := task.NewQueueEvent()
 	e.TaskId = ins.Id
 
-	// 放运行队列
+	// 放入运行队列
 	err = s.run_writer.WriteMessages(ctx, kafka.Message{
 		Value: []byte(e.String()),
 	})
@@ -34,6 +34,29 @@ func (s *TaskServiceImpl) Run(ctx context.Context, in *task.TaskSpec) (*task.Tas
 		return nil, err
 	}
 
+	return ins, nil
+}
+
+// 任务取消
+func (s *TaskServiceImpl) Cancel(ctx context.Context, in *task.CancelRequest) (*task.Task, error) {
+	ins, err := s.DescribeTask(ctx, task.NewDescribeTaskRequest(in.TaskId))
+	if err != nil {
+		return nil, err
+	}
+
+	e := task.NewQueueEvent()
+	e.TaskId = in.TaskId
+
+	// 放入取消队列
+	err = s.cancel_writer.WriteMessages(ctx, kafka.Message{
+		Value: []byte(e.String()),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	ins.Status = task.STATUS_CANCELING
+	s.updateTaskStatus(ctx, ins)
 	return ins, nil
 }
 

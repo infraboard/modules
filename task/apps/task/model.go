@@ -187,3 +187,7 @@ func (s *TaskStatus) SetEndAt(t time.Time) {
 func (s *TaskStatus) SetUpdateAt(t time.Time) {
 	s.UpdateAt = &t
 }
+
+func (s *TaskStatus) TableName() string {
+	return "tasks"
+}
