@@ -36,7 +36,10 @@ func NewQueryCronJobRequest() *QueryCronJobRequest {
 }
 
 type QueryCronJobRequest struct {
+	// 分页参数
 	*request.PageRequest
+	// 任务名称
+	Name string `json:"name"`
 }
 
 type UpdateCronJobRequest struct {

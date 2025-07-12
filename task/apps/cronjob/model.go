@@ -40,8 +40,18 @@ func NewCronJobSpec(cron string, spec task.TaskSpec) *CronJobSpec {
 type CronJobSpec struct {
 	// Cron表达式
 	Cron string `json:"cron" gorm:"column:cron;type:varchar(120)" description:"Cron表达式"`
+	// 是否启用改Cron
+	Enabled *bool `json:"enabled" gorm:"column:enabled;type:bool" description:"是否启用改Cron"`
 	// Task执行参数
 	task.TaskSpec
+}
+
+func (t *CronJobSpec) GetEnabled() bool {
+	if t.Enabled == nil {
+		return false
+	}
+
+	return *t.Enabled
 }
 
 func (t *CronJobSpec) SetName(name string) *CronJobSpec {

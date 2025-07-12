@@ -14,13 +14,16 @@ import (
 func (i *CronServiceImpl) AddCronJob(ctx context.Context, in *cronjob.CronJobSpec) (*cronjob.CronJob, error) {
 	ins := cronjob.NewCronJob(*in)
 
-	refId, err := mcron.RunAndAddFunc(in.Cron, func() {
-		task.GetService().Run(context.Background(), &ins.TaskSpec)
-	})
-	if err != nil {
-		return nil, err
+	// 才真正的创建cron 关联cron实例
+	if in.GetEnabled() {
+		refId, err := mcron.RunAndAddFunc(in.Cron, func() {
+			task.GetService().Run(context.Background(), &ins.TaskSpec)
+		})
+		if err != nil {
+			return nil, err
+		}
+		ins.RefInstanceId = int(refId)
 	}
-	ins.RefInstanceId = int(refId)
 
 	if err := datasource.DBFromCtx(ctx).Save(ins).Error; err != nil {
 		return nil, err
@@ -34,6 +37,10 @@ func (i *CronServiceImpl) QueryCronJob(ctx context.Context, in *cronjob.QueryCro
 	set := types.New[*cronjob.CronJob]()
 
 	query := datasource.DBFromCtx(ctx).Model(&cronjob.CronJob{})
+	if in.Name != "" {
+		query = query.Where("name = ?", in.Name)
+	}
+
 	err := query.Count(&set.Total).Error
 	if err != nil {
 		return nil, err
