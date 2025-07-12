@@ -17,6 +17,7 @@ func init() {
 	ioc.Controller().Registry(&CronJobServiceImpl{
 		EnableUpdate: true,
 		UpdateTopic:  "cronjob_update_events",
+		ctx:          context.Background(),
 	})
 }
 
@@ -38,20 +39,6 @@ type CronJobServiceImpl struct {
 	// 当前这个消费者 配置的topic
 	UpdateTopic string `toml:"update_topic" json:"update_topic" yaml:"update_topic"  env:"UPDATE_TOPIC"`
 }
-
-// func (s *TaskServiceImpl) AddAsyncTask(t *task.Task) {
-// 	s.tasks.Add(t)
-// }
-
-// func (s *TaskServiceImpl) RemoveAsyncTask(t *task.Task) {
-// 	news := types.New[*task.Task]()
-// 	s.tasks.ForEach(func(existT *task.Task) {
-// 		if t.Id != existT.Id {
-// 			news.Add(t)
-// 		}
-// 	})
-// 	s.tasks = news
-// }
 
 func (i *CronJobServiceImpl) Init() error {
 	i.log = log.Sub(i.Name())
