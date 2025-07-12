@@ -3,11 +3,13 @@ package impl
 import (
 	"context"
 
+	"github.com/infraboard/mcube/v2/exception"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
 	"github.com/infraboard/mcube/v2/ioc/config/mcron"
 	"github.com/infraboard/mcube/v2/types"
 	"github.com/infraboard/modules/task/apps/cronjob"
 	"github.com/infraboard/modules/task/apps/task"
+	"gorm.io/gorm"
 )
 
 // AddCronJob implements cronjob.Service.
@@ -23,6 +25,7 @@ func (i *CronServiceImpl) AddCronJob(ctx context.Context, in *cronjob.CronJobSpe
 			return nil, err
 		}
 		ins.RefInstanceId = int(refId)
+		ins.Node = i.hostname
 	}
 
 	if err := datasource.DBFromCtx(ctx).Save(ins).Error; err != nil {
@@ -58,13 +61,22 @@ func (i *CronServiceImpl) QueryCronJob(ctx context.Context, in *cronjob.QueryCro
 	return set, nil
 }
 
-// DeleteCronJob implements cronjob.Service.
-func (i *CronServiceImpl) DeleteCronJob(ctx context.Context, in *cronjob.DeleteCronJobRequest) (*cronjob.CronJob, error) {
-	panic("unimplemented")
-}
-
 // DescribeCronJob implements cronjob.Service.
 func (i *CronServiceImpl) DescribeCronJob(ctx context.Context, in *cronjob.DescribeCronJobRequest) (*cronjob.CronJob, error) {
+	query := datasource.DBFromCtx(ctx)
+
+	ins := &cronjob.CronJob{}
+	if err := query.Where("id = ?", in.Id).First(ins).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, exception.NewNotFound("cronjob %s not found", in.Id)
+		}
+		return nil, err
+	}
+	return ins, nil
+}
+
+// DeleteCronJob implements cronjob.Service.
+func (i *CronServiceImpl) DeleteCronJob(ctx context.Context, in *cronjob.DeleteCronJobRequest) (*cronjob.CronJob, error) {
 	panic("unimplemented")
 }
 

@@ -24,6 +24,8 @@ type CronJob struct {
 	RefInstanceId int `json:"ref_instance_id" gorm:"column:ref_instance_id;" description:"关联的cron实例Id"`
 	// Cronjob参数
 	CronJobSpec
+	// 状态
+	CronJobStatus
 }
 
 func (c *CronJob) TableName() string {
@@ -62,4 +64,9 @@ func (t *CronJobSpec) SetName(name string) *CronJobSpec {
 func (t *CronJobSpec) SetDescription(desc string) *CronJobSpec {
 	t.TaskSpec.SetDescription(desc)
 	return t
+}
+
+type CronJobStatus struct {
+	// CronJob执行的Node节点信息
+	Node string `json:"node"`
 }

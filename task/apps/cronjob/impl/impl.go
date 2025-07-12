@@ -1,11 +1,16 @@
 package impl
 
 import (
+	"context"
+	"os"
+
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
+	ioc_kafka "github.com/infraboard/mcube/v2/ioc/config/kafka"
 	"github.com/infraboard/mcube/v2/ioc/config/log"
 	"github.com/infraboard/modules/task/apps/cronjob"
 	"github.com/rs/zerolog"
+	"github.com/segmentio/kafka-go"
 )
 
 func init() {
@@ -19,10 +24,16 @@ var _ cronjob.Service = (*CronServiceImpl)(nil)
 type CronServiceImpl struct {
 	ioc.ObjectImpl
 
-	log *zerolog.Logger
+	log      *zerolog.Logger
+	hostname string
 
-	// 异步任务的状态, 运行中的
-	// tasks *types.Set[*task.Task]
+	// 更新队列(cron更新, 删除, 启用, 禁用)
+	updater *kafka.Reader
+	// 允许时上下文
+	ctx context.Context
+
+	// 当前这个消费者 配置的topic
+	UpdateTopic []string `toml:"update_topic" json:"update_topic" yaml:"update_topic"  env:"UPDATE_TOPIC"`
 }
 
 // func (s *TaskServiceImpl) AddAsyncTask(t *task.Task) {
@@ -47,7 +58,16 @@ func (i *CronServiceImpl) Init() error {
 			return err
 		}
 	}
+	i.hostname, _ = os.Hostname()
+	i.updater = ioc_kafka.ConsumerGroup(i.hostname, i.UpdateTopic)
+
+	// 订阅更新事件
+	go i.Run(i.ctx)
 	return nil
+}
+
+func (i *CronServiceImpl) Close(ctx context.Context) {
+	i.ctx.Done()
 }
 
 func (i *CronServiceImpl) Name() string {
