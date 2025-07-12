@@ -33,7 +33,7 @@ func (s *TaskServiceImpl) Run(ctx context.Context, in *task.TaskSpec) *task.Task
 			ins.Running()
 			go func() {
 				defer func() {
-					in.Cancel()
+					ins.Cancel()
 					s.RemoveAsyncTask(ins)
 				}()
 				s.AddAsyncTask(ins)
@@ -87,6 +87,23 @@ func (i *TaskServiceImpl) DescribeTask(ctx context.Context, in *task.DescribeTas
 }
 
 // QueryTask implements task.Service.
-func (i *TaskServiceImpl) QueryTask(context.Context, *task.QueryTaskRequest) (*types.Set[*task.Task], error) {
-	panic("unimplemented")
+func (i *TaskServiceImpl) QueryTask(ctx context.Context, in *task.QueryTaskRequest) (*types.Set[*task.Task], error) {
+	set := types.New[*task.Task]()
+
+	query := datasource.DBFromCtx(ctx).Model(&task.Task{})
+	err := query.Count(&set.Total).Error
+	if err != nil {
+		return nil, err
+	}
+
+	err = query.
+		Order("created_at desc").
+		Offset(int(in.ComputeOffset())).
+		Limit(int(in.PageSize)).
+		Find(&set.Items).
+		Error
+	if err != nil {
+		return nil, err
+	}
+	return set, nil
 }

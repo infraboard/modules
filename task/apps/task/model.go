@@ -74,6 +74,12 @@ type TaskSpec struct {
 	Timeout string `json:"timeout" gorm:"column:timeout;" description:"异步执行时的超时时间"`
 	// 任务类型
 	Type TYPE `json:"type" gorm:"column:id;type:varchar(60);" description:"任务类型"`
+	// 任务名称
+	Name string `json:"name" gorm:"column:name;type:varchar(200);" description:"任务名称"`
+	// 任务名称
+	Description string `json:"description" gorm:"column:description;type:text;" description:"任务描述"`
+	// 尝试执行,用于做执行前检查
+	DryRun bool `json:"dryrun" gorm:"column:dryrun;type:bool;" description:"尝试执行,用于做执行前检查"`
 	// 任务的参数
 	Params any `json:"params" gorm:"column:params;serializer:json;type:json" description:"任务参数"`
 	// 任务标签
@@ -84,8 +90,16 @@ type TaskSpec struct {
 
 	// 具体的函数
 	fn TaskFunc `json:"-" gorm:"-"`
-	// 异步任务取消函数
-	cancelFn context.CancelFunc `json:"-" gorm:"-"`
+}
+
+func (t *TaskSpec) SetName(name string) *TaskSpec {
+	t.Name = name
+	return t
+}
+
+func (t *TaskSpec) SetDescription(desc string) *TaskSpec {
+	t.Description = desc
+	return t
 }
 
 func (t *TaskSpec) SetAsync(v bool) *TaskSpec {
@@ -111,7 +125,7 @@ func (t *Task) BuildTimeoutCtx() context.Context {
 	return ctx
 }
 
-func (t *TaskSpec) Cancel() {
+func (t *Task) Cancel() {
 	if t.cancelFn != nil {
 		t.cancelFn()
 	}
@@ -151,6 +165,9 @@ type TaskStatus struct {
 
 	// 执行过程中的事件, 执行日志
 	Events []*event.Event `json:"events" gorm:"column:events;type:json;serializer:json;" description:"执行过程中的事件"`
+
+	// 异步任务取消函数
+	cancelFn context.CancelFunc `json:"-" gorm:"-"`
 }
 
 func (s *TaskStatus) SetStartAt(t time.Time) {

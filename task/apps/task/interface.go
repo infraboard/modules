@@ -3,6 +3,7 @@ package task
 import (
 	"context"
 
+	"github.com/infraboard/mcube/v2/http/request"
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/types"
 )
@@ -34,5 +35,12 @@ type DescribeTaskRequest struct {
 	TaskId string `json:"task_id"`
 }
 
+func NewQueryTaskRequest() *QueryTaskRequest {
+	return &QueryTaskRequest{
+		PageRequest: *request.NewDefaultPageRequest(),
+	}
+}
+
 type QueryTaskRequest struct {
+	request.PageRequest
 }

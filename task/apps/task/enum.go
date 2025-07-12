@@ -1,7 +1,7 @@
 package task
 
 const (
-	// 任务处于挂起
+	// 任务处于挂起, 队列中
 	STATUS_PENDING STATUS = iota
 	// 任务正在运行
 	STATUS_RUNNING

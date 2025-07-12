@@ -61,3 +61,11 @@ func TestDescribeTask(t *testing.T) {
 	}
 	t.Log(ins)
 }
+
+func TestQueryTask(t *testing.T) {
+	ins, err := svc.QueryTask(t.Context(), task.NewQueryTaskRequest())
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(ins)
+}
