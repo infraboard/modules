@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
-	"github.com/infraboard/mcube/v2/types"
 	"github.com/infraboard/modules/task/apps/event"
 	"github.com/infraboard/modules/task/apps/task"
 	"github.com/infraboard/modules/task/apps/webhook"
@@ -54,8 +53,8 @@ func (s *TaskServiceImpl) runWebHook(ctx context.Context, ins *task.Task) {
 	}
 }
 
-func (s *TaskServiceImpl) saveEvent(ctx context.Context, events *types.Set[*event.EventSpec]) {
-	_, err := event.GetService().AddEvent(ctx, events)
+func (s *TaskServiceImpl) saveEvent(ctx context.Context, e *event.EventSpec) {
+	_, err := event.GetService().AddEvent(ctx, e)
 	if err != nil {
 		s.log.Error().Msgf("save event error, %s", err)
 	}

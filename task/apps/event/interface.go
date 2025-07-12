@@ -18,7 +18,7 @@ func GetService() Service {
 
 type Service interface {
 	// 添加事件
-	AddEvent(context.Context, *types.Set[*EventSpec]) (*types.Set[*Event], error)
+	AddEvent(context.Context, *EventSpec) (*Event, error)
 	// 查询事件
 	QueryEvent(context.Context, *QueryEventRequest) (*types.Set[*Event], error)
 }

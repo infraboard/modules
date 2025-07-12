@@ -36,6 +36,8 @@ func NewEventSpec() *EventSpec {
 }
 
 type EventSpec struct {
+	// 事件所属资源
+	Resource string `json:"resource" gorm:"column:resource;type:varchar(120);" description:"事件所属资源"`
 	// 事件发生时间
 	Time time.Time `json:"time" gorm:"column:time;type:timestamp;" description:"事件发生时间"`
 	// 事件的级别
@@ -55,6 +57,11 @@ func (s *EventSpec) SetLevel(l LEVEL) *EventSpec {
 
 func (s *EventSpec) SetMessage(msg string) *EventSpec {
 	s.Message = msg
+	return s
+}
+
+func (s *EventSpec) SetDetail(detail string) *EventSpec {
+	s.Detail = detail
 	return s
 }
 
