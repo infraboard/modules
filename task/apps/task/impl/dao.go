@@ -3,6 +3,7 @@ package impl
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
 	"github.com/infraboard/modules/task/apps/event"
@@ -10,17 +11,8 @@ import (
 	"github.com/infraboard/modules/task/apps/webhook"
 )
 
-func (s *TaskServiceImpl) saveTask(ctx context.Context, ins *task.Task) {
-	err := datasource.DBFromCtx(ctx).Save(ins).Error
-	if err != nil {
-		s.log.Error().Msgf("save task error, %s", err)
-	}
-
-	// 执行WebHook
-	go s.runWebHook(ctx, ins)
-}
-
 func (s *TaskServiceImpl) updateTask(ctx context.Context, ins *task.Task) {
+	ins.SetUpdateAt(time.Now())
 	err := datasource.DBFromCtx(ctx).Save(ins).Error
 	if err != nil {
 		s.log.Error().Msgf("save task error, %s", err)

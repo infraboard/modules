@@ -31,7 +31,6 @@ func TestAddCronJob(t *testing.T) {
 	}, map[string]string{
 		"param01": "01",
 	})
-	fnTask.SetAsync(true)
 
 	ins, err := svc.AddCronJob(t.Context(), cronjob.NewCronJobSpec("@every 3s", *fnTask).SetName("cronjob测试"))
 	if err != nil {

@@ -9,6 +9,7 @@ import (
 	"github.com/infraboard/mcube/v2/types"
 	"github.com/infraboard/modules/task/apps/cronjob"
 	"github.com/infraboard/modules/task/apps/task"
+	"github.com/segmentio/kafka-go"
 	"gorm.io/gorm"
 )
 
@@ -25,7 +26,7 @@ func (i *CronJobServiceImpl) AddCronJob(ctx context.Context, in *cronjob.CronJob
 			return nil, err
 		}
 		ins.RefInstanceId = int(refId)
-		ins.Node = i.hostname
+		ins.Node = i.node_name
 	}
 
 	if err := datasource.DBFromCtx(ctx).Save(ins).Error; err != nil {
@@ -77,10 +78,55 @@ func (i *CronJobServiceImpl) DescribeCronJob(ctx context.Context, in *cronjob.De
 
 // DeleteCronJob implements cronjob.Service.
 func (i *CronJobServiceImpl) DeleteCronJob(ctx context.Context, in *cronjob.DeleteCronJobRequest) (*cronjob.CronJob, error) {
-	panic("unimplemented")
+	ins, err := i.DescribeCronJob(ctx, cronjob.NewDescribeCronJobRequest(in.Id))
+	if err != nil {
+		return nil, err
+	}
+
+	// 删除事件
+	err = datasource.DBFromCtx(ctx).Transaction(func(tx *gorm.DB) error {
+		ins.Status = cronjob.STATUS_DELETING
+
+		e := cronjob.NewQueueEvent()
+		e.CronJobId = ins.Id
+		err := i.updater_writer.WriteMessages(ctx, kafka.Message{
+			Value: []byte(e.String()),
+		})
+		if err != nil {
+			return err
+		}
+
+		return datasource.DBFromCtx(ctx).Where("id = ?", in.Id).Updates(ins.CronJobStatus).Error
+	})
+	if err != nil {
+		return nil, err
+	}
+	return ins, nil
 }
 
 // UpdateCronJob implements cronjob.Service.
 func (i *CronJobServiceImpl) UpdateCronJob(ctx context.Context, in *cronjob.UpdateCronJobRequest) (*cronjob.CronJob, error) {
-	panic("unimplemented")
+	ins, err := i.DescribeCronJob(ctx, cronjob.NewDescribeCronJobRequest(in.Id))
+	if err != nil {
+		return nil, err
+	}
+
+	// 更新事件
+	err = datasource.DBFromCtx(ctx).Transaction(func(tx *gorm.DB) error {
+		ins.Status = cronjob.STATUS_UPDATING
+		e := cronjob.NewQueueEvent()
+		e.CronJobId = ins.Id
+		err := i.updater_writer.WriteMessages(ctx, kafka.Message{
+			Value: []byte(e.String()),
+		})
+		if err != nil {
+			return err
+		}
+
+		return datasource.DBFromCtx(ctx).Where("id = ?", in.Id).Updates(ins.CronJobStatus).Error
+	})
+	if err != nil {
+		return nil, err
+	}
+	return ins, nil
 }

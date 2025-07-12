@@ -2,20 +2,24 @@ package task
 
 const (
 	// 任务处于挂起, 队列中
-	STATUS_PENDING STATUS = iota
+	STATUS_QUEUED STATUS = iota
 	// 任务正在运行
 	STATUS_RUNNING
+	// 取消中
+	CANCELING
 	// 任务已完成
 	STATUS_SUCCESS
 	// 任务失败
 	STATUS_FAILED
 	// 任务已取消
 	STATUS_CANCELED
+	// 忽略执行
+	STATUS_SKIPPED
 )
 
 var (
 	STATUS_MAP = map[STATUS]string{
-		STATUS_PENDING:  "PENDDING",
+		STATUS_QUEUED:   "QUEUED",
 		STATUS_RUNNING:  "RUNNING",
 		STATUS_SUCCESS:  "SUCCESS",
 		STATUS_FAILED:   "FAILED",
@@ -48,3 +52,12 @@ const (
 )
 
 type TYPE string
+
+const (
+	// 任务运行事件
+	QUEUE_EVENT_TYPE_RUN QUEUE_EVENT_TYPE = "run"
+	// 任务取消事件
+	QUEUE_EVENT_TYPE_CANCEL QUEUE_EVENT_TYPE = "cancel"
+)
+
+type QUEUE_EVENT_TYPE string

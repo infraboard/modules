@@ -1,0 +1,21 @@
+package cronjob
+
+const (
+	QUEUE_EVENT_TYPE_UPDATE QUEUE_EVENT_TYPE = "update"
+	QUEUE_EVENT_TYPE_DELETE QUEUE_EVENT_TYPE = "delete"
+)
+
+type QUEUE_EVENT_TYPE string
+
+const (
+	// 更新中
+	STATUS_UPDATING STATUS = "UPDATING"
+	// 删除中
+	STATUS_DELETING STATUS = "DELETING"
+	// 运行中
+	STATUS_RUNNING STATUS = "RUNNING"
+	// 已停止
+	STATUS_STOPPED STATUS = "STOPPED"
+)
+
+type STATUS string

@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/infraboard/modules/task/apps/task"
+	cron "github.com/robfig/cron/v3"
 )
 
 func NewCronJob(spec CronJobSpec) *CronJob {
@@ -20,12 +21,15 @@ type CronJob struct {
 	Id string `json:"id" gorm:"column:id;type:string;primary_key;" unique:"true" description:"Id"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at" gorm:"column:created_at;type:timestamp;default:current_timestamp;not null;index;" description:"创建时间"`
-	// 关联的cron实例Id
-	RefInstanceId int `json:"ref_instance_id" gorm:"column:ref_instance_id;" description:"关联的cron实例Id"`
+
 	// Cronjob参数
 	CronJobSpec
 	// 状态
 	CronJobStatus
+}
+
+func (c *CronJob) CronEntryID() cron.EntryID {
+	return cron.EntryID(c.RefInstanceId)
 }
 
 func (c *CronJob) TableName() string {
@@ -67,6 +71,20 @@ func (t *CronJobSpec) SetDescription(desc string) *CronJobSpec {
 }
 
 type CronJobStatus struct {
+	// 关联的cron实例Id
+	RefInstanceId int `json:"ref_instance_id" gorm:"column:ref_instance_id;" description:"关联的cron实例Id"`
 	// CronJob执行的Node节点信息
-	Node string `json:"node"`
+	Node string `json:"node" gorm:"column:node;" description:"CronJob执行的Node节点信息"`
+	// 状态更新时间
+	UpdateAt *time.Time `json:"update_at" gorm:"column:update_at;type:timestamp;;" description:"状态更新时间"`
+	// 状态
+	Status STATUS `json:"statsu" gorm:"column:statsu;" description:"CronJob状态"`
+}
+
+func (s *CronJobStatus) SetUpdateAt(v time.Time) {
+	s.UpdateAt = &v
+}
+
+func (s *CronJobStatus) TableName() string {
+	return "cronjobs"
 }

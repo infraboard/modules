@@ -2,8 +2,6 @@ package impl
 
 import (
 	"context"
-	"fmt"
-	"time"
 
 	"github.com/infraboard/mcube/v2/exception"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
@@ -11,49 +9,32 @@ import (
 	"github.com/infraboard/modules/task/apps/event"
 	"github.com/infraboard/modules/task/apps/task"
 	"github.com/infraboard/modules/task/apps/webhook"
+	"github.com/segmentio/kafka-go"
 	"gorm.io/gorm"
 )
 
 // Run implements task.Service.
-func (s *TaskServiceImpl) Run(ctx context.Context, in *task.TaskSpec) *task.Task {
+func (s *TaskServiceImpl) Run(ctx context.Context, in *task.TaskSpec) (*task.Task, error) {
 	ins := task.NewTask(*in)
-	ins.SetStartAt(time.Now())
 
-	// 放数据库
-	defer s.saveTask(ctx, ins)
-
-	switch in.Type {
-	case task.TYPE_FUNCTION:
-		fn := in.GetFn()
-		if fn == nil {
-			return ins.Failed(fmt.Sprintf("%s fn not found", ins.Id))
-		}
-		// 执行函数
-		if ins.Async {
-			ins.Running()
-			go func() {
-				defer func() {
-					ins.Cancel()
-					s.RemoveAsyncTask(ins)
-				}()
-				s.AddAsyncTask(ins)
-				if err := fn(ins.BuildTimeoutCtx(), ins.Params); err != nil {
-					ins.Failed(err.Error())
-				} else {
-					ins.Success()
-				}
-				s.updateTask(context.Background(), ins)
-			}()
-		} else {
-			if err := fn(ctx, ins.Params); err != nil {
-				return ins.Failed(err.Error())
-			}
-			ins.Success()
-		}
-	default:
-		return ins.Failed(fmt.Sprintf("不支持的类型: %s", in.Type))
+	// 保存记录
+	err := datasource.DBFromCtx(ctx).Save(ins).Error
+	if err != nil {
+		return nil, err
 	}
-	return ins
+
+	e := task.NewQueueEvent()
+	e.TaskId = ins.Id
+
+	// 放运行队列
+	err = s.run_writer.WriteMessages(ctx, kafka.Message{
+		Value: []byte(e.String()),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return ins, nil
 }
 
 // DescribeTask implements task.Service.

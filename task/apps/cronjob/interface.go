@@ -43,6 +43,14 @@ type QueryCronJobRequest struct {
 }
 
 type UpdateCronJobRequest struct {
+	DescribeCronJobRequest
+	CronJobSpec
+}
+
+func NewDescribeCronJobRequest(id string) *DescribeCronJobRequest {
+	return &DescribeCronJobRequest{
+		Id: id,
+	}
 }
 
 type DescribeCronJobRequest struct {

@@ -18,7 +18,7 @@ func GetService() Service {
 
 type Service interface {
 	// 任务执行
-	Run(context.Context, *TaskSpec) *Task
+	Run(context.Context, *TaskSpec) (*Task, error)
 	// 查询任务列表
 	QueryTask(context.Context, *QueryTaskRequest) (*types.Set[*Task], error)
 	// 查询任务详情

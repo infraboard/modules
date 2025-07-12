@@ -32,18 +32,20 @@ func TestRun(t *testing.T) {
 		"param01": "01",
 	})
 
-	fnTask.SetAsync(true)
 	fnTask.AddWebHook(webhook.NewWebHook(webhook.WebHookSpec{
 		TargetURL:  "https://www.baidu.com/",
 		Method:     "GET",
 		Conditions: task.StatusCompleteString(),
 	}))
 
-	ins := svc.Run(t.Context(), fnTask)
+	ins, err := svc.Run(t.Context(), fnTask)
+	if err != nil {
+		t.Fatal(err)
+	}
 	t.Log(ins)
 
 	time.Sleep(5 * time.Second)
-	ins, err := svc.DescribeTask(t.Context(), task.NewDescribeTaskRequest(ins.Id))
+	ins, err = svc.DescribeTask(t.Context(), task.NewDescribeTaskRequest(ins.Id))
 	if err != nil {
 		t.Fatal(err)
 	}

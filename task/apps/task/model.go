@@ -2,6 +2,7 @@ package task
 
 import (
 	"context"
+	"slices"
 	"time"
 
 	"github.com/google/uuid"
@@ -32,6 +33,15 @@ type Task struct {
 
 func (t *Task) TableName() string {
 	return "tasks"
+}
+
+func (t *Task) IsCompleted() bool {
+	return slices.Contains([]STATUS{
+		STATUS_SUCCESS,
+		STATUS_FAILED,
+		STATUS_CANCELED,
+		STATUS_SKIPPED,
+	}, t.Status)
 }
 
 func (t *Task) Failed(msg string) *Task {
@@ -68,8 +78,6 @@ func NewFnTask(fn TaskFunc, params any) *TaskSpec {
 }
 
 type TaskSpec struct {
-	// 是否异步执行
-	Async bool `json:"async" gorm:"column:async;" description:"是否异步执行"`
 	// 异步执行时的超时时间
 	Timeout string `json:"timeout" gorm:"column:timeout;" description:"异步执行时的超时时间"`
 	// 任务类型
@@ -82,6 +90,8 @@ type TaskSpec struct {
 	DryRun bool `json:"dryrun" gorm:"column:dryrun;type:bool;" description:"尝试执行,用于做执行前检查"`
 	// 任务的参数
 	Params any `json:"params" gorm:"column:params;serializer:json;type:json" description:"任务参数"`
+	// 事件所属资源
+	Resource string `json:"resource" gorm:"column:resource;type:varchar(120);" description:"事件所属资源"`
 	// 任务标签
 	Label map[string]string `json:"label" bson:"label" gorm:"column:label;serializer:json;type:json" description:"任务标签" optional:"true"`
 
@@ -99,11 +109,6 @@ func (t *TaskSpec) SetName(name string) *TaskSpec {
 
 func (t *TaskSpec) SetDescription(desc string) *TaskSpec {
 	t.Description = desc
-	return t
-}
-
-func (t *TaskSpec) SetAsync(v bool) *TaskSpec {
-	t.Async = v
 	return t
 }
 
@@ -147,6 +152,7 @@ type TaskFunc func(ctx context.Context, req any) error
 
 func NewTaskStatus() *TaskStatus {
 	return &TaskStatus{
+		Status: STATUS_QUEUED,
 		Events: []*event.Event{},
 	}
 }
