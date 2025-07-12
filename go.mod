@@ -9,7 +9,7 @@ require (
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-ldap/ldap/v3 v3.4.11
 	github.com/google/uuid v1.6.0
-	github.com/infraboard/mcube/v2 v2.0.58
+	github.com/infraboard/mcube/v2 v2.0.63
 	github.com/rs/xid v1.6.0
 	github.com/rs/zerolog v1.34.0
 	github.com/segmentio/kafka-go v0.4.47
