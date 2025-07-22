@@ -9,7 +9,7 @@ require (
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-ldap/ldap/v3 v3.4.11
 	github.com/google/uuid v1.6.0
-	github.com/infraboard/mcube/v2 v2.0.63
+	github.com/infraboard/mcube/v2 v2.0.65
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/xid v1.6.0
 	github.com/rs/zerolog v1.34.0
@@ -19,7 +19,7 @@ require (
 	golang.org/x/crypto v0.38.0
 	gorm.io/datatypes v1.2.5
 	gorm.io/gorm v1.26.0
-	resty.dev/v3 v3.0.0-beta.2
+	resty.dev/v3 v3.0.0-beta.3
 )
 
 require (

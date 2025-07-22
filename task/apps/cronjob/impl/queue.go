@@ -2,9 +2,9 @@ package impl
 
 import (
 	"context"
-	"io"
 	"time"
 
+	"github.com/infraboard/mcube/v2/ioc/config/bus"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
 	"github.com/infraboard/mcube/v2/ioc/config/mcron"
 	"github.com/infraboard/modules/task/apps/cronjob"
@@ -16,44 +16,36 @@ func (c *CronJobServiceImpl) HandleUpdateEvents(ctx context.Context) {
 	c.log.Info().Msgf("start handle cronjob update events ...")
 	defer c.log.Info().Msgf("handle cronjob update events done.")
 
-	for {
-		m, err := c.updater_reader.ReadMessage(ctx)
-		if err != nil {
-			if err == io.EOF {
-				c.log.Info().Msg("reader closed")
-				return
-			}
-			c.log.Error().Msgf("featch message error, %s", err)
-			continue
-		}
-
+	err := bus.GetService().Subscribe(ctx, c.UpdateTopic, func(e *bus.Event) {
 		// 处理消息
-		e := cronjob.NewQueueEvent()
-		c.log.Debug().Msgf("message at topic/partition/offset %v/%v/%v", m.Topic, m.Partition, m.Offset)
+		te := cronjob.NewQueueEvent()
 
 		// 发送的数据时Json格式, 接收用的JSON, 发送也需要使用JSON
-		err = e.Load(m.Value)
+		err := te.Load(e.Data)
 		if err != nil {
 			c.log.Error().Msgf("parse event error, %s", err)
-			continue
+			return
 		}
 
 		// 查询
-		job, err := c.DescribeCronJob(ctx, cronjob.NewDescribeCronJobRequest(e.CronJobId))
+		job, err := c.DescribeCronJob(ctx, cronjob.NewDescribeCronJobRequest(te.CronJobId))
 		if err != nil {
 			c.log.Error().Msgf("decribe cronjob error, %s", err)
-			continue
+			return
 		}
 
 		// 处理事件
-		switch e.Type {
+		switch te.Type {
 		case cronjob.QUEUE_EVENT_TYPE_DELETE:
 			c.deleteCronJob(ctx, job)
 		case cronjob.QUEUE_EVENT_TYPE_UPDATE:
 			c.updateCronjob(ctx, job)
 		default:
-			c.log.Error().Msgf("unknown event type %s", e.Type)
+			c.log.Error().Msgf("unknown event type %s", te.Type)
 		}
+	})
+	if err != nil {
+		c.log.Error().Msgf("subscribe update event error, %s", err)
 	}
 }
 

@@ -3,9 +3,9 @@ package impl
 import (
 	"context"
 	"fmt"
-	"io"
 	"time"
 
+	"github.com/infraboard/mcube/v2/ioc/config/bus"
 	"github.com/infraboard/modules/task/apps/task"
 )
 
@@ -14,44 +14,33 @@ func (c *TaskServiceImpl) HandleRunEvents(ctx context.Context) {
 	c.log.Info().Msgf("start handle task run events ...")
 	defer c.log.Info().Msgf("handle task run events done.")
 
-	for {
-		m, err := c.run_reader.ReadMessage(ctx)
-		if err != nil {
-			if err == io.EOF {
-				c.log.Info().Msg("reader closed")
-				return
-			}
-			c.log.Error().Msgf("featch message error, %s", err)
-			continue
-		}
-
+	err := bus.GetService().Subscribe(ctx, c.RunTopic, func(e *bus.Event) {
 		// 处理消息
-		e := task.NewQueueEvent()
-		c.log.Debug().Msgf("message at topic/partition/offset %v/%v/%v", m.Topic, m.Partition, m.Offset)
+		te := task.NewQueueEvent()
 
 		// 发送的数据时Json格式, 接收用的JSON, 发送也需要使用JSON
-		err = e.Load(m.Value)
+		err := te.Load(e.Data)
 		if err != nil {
 			c.log.Error().Msgf("parse event error, %s", err)
-			continue
+			return
 		}
 
-		if e.Type != task.QUEUE_EVENT_TYPE_RUN {
-			c.log.Error().Msgf("unknown event type %s", e.Type)
-			continue
+		if te.Type != task.QUEUE_EVENT_TYPE_RUN {
+			c.log.Error().Msgf("unknown event type %s", te.Type)
+			return
 		}
 
 		// 查询Task实例
-		taskIns, err := c.DescribeTask(ctx, task.NewDescribeTaskRequest(e.TaskId))
+		taskIns, err := c.DescribeTask(ctx, task.NewDescribeTaskRequest(te.TaskId))
 		if err != nil {
 			c.log.Error().Msgf("decribe task error, %s", err)
-			continue
+			return
 		}
 
 		// 处理过的任务不再运行
 		if taskIns.Status != task.STATUS_QUEUED {
 			c.log.Error().Msgf("任务已经处理: %s", taskIns.Status)
-			continue
+			return
 		}
 
 		c.log.Info().Msgf("[开始]开始在节点[%s]上异步执行task: %s ...", c.node_name, taskIns.Id)
@@ -61,6 +50,9 @@ func (c *TaskServiceImpl) HandleRunEvents(ctx context.Context) {
 		c.updateTaskStatus(ctx, taskIns)
 
 		c.log.Info().Msgf("[结束]在节点[%s]上异步执行task: %s", c.node_name, taskIns.Id)
+	})
+	if err != nil {
+		c.log.Error().Msgf("subscribe run event error, %s", err)
 	}
 }
 
@@ -69,6 +61,13 @@ func (s *TaskServiceImpl) runTask(ins *task.Task) *task.Task {
 
 	switch ins.Type {
 	case task.TYPE_FUNCTION:
+		// 获取函数
+		refTask := s.GetAsyncTask(ins.Id)
+		if refTask == nil {
+			s.log.Info().Msgf("task %s not found in async task list", ins.Id)
+			return ins
+		}
+
 		fn := ins.GetFn()
 		if fn == nil {
 			return ins.Failed(fmt.Sprintf("%s fn not found", ins.Id))
@@ -97,43 +96,32 @@ func (c *TaskServiceImpl) HandleCancelEvents(ctx context.Context) {
 	c.log.Info().Msgf("start handle task cancel events ...")
 	defer c.log.Info().Msgf("handle task cancel events done.")
 
-	for {
-		m, err := c.cancel_reader.ReadMessage(ctx)
-		if err != nil {
-			if err == io.EOF {
-				c.log.Info().Msg("reader closed")
-				return
-			}
-			c.log.Error().Msgf("featch message error, %s", err)
-			continue
-		}
-
+	err := bus.GetService().Subscribe(ctx, c.CancelTopic, func(e *bus.Event) {
 		// 处理消息
-		e := task.NewQueueEvent()
-		c.log.Debug().Msgf("message at topic/partition/offset %v/%v/%v", m.Topic, m.Partition, m.Offset)
+		te := task.NewQueueEvent()
 
 		// 发送的数据时Json格式, 接收用的JSON, 发送也需要使用JSON
-		err = e.Load(m.Value)
+		err := te.Load(e.Data)
 		if err != nil {
 			c.log.Error().Msgf("parse event error, %s", err)
-			continue
+			return
 		}
 
 		// 查询任务信息
-		taskIns, err := c.DescribeTask(ctx, task.NewDescribeTaskRequest(e.TaskId))
+		taskIns, err := c.DescribeTask(ctx, task.NewDescribeTaskRequest(te.TaskId))
 		if err != nil {
 			c.log.Error().Msgf("decribe cronjob error, %s", err)
-			continue
+			return
 		}
 
 		// 找出任务实例
 		taskIns = c.GetAsyncTask(taskIns.Id)
 		if taskIns == nil {
-			c.log.Info().Msgf("实例[%s]在当前节点[%s]上不存在", e.TaskId, c.node_name)
-			continue
+			c.log.Info().Msgf("实例[%s]在当前节点[%s]上不存在", te.TaskId, c.node_name)
+			return
 		}
 
-		c.log.Info().Msgf("实例[%s]在当前节点[%s]上存在, 正在进行取消处理 ...", e.TaskId, c.node_name)
+		c.log.Info().Msgf("实例[%s]在当前节点[%s]上存在, 正在进行取消处理 ...", te.TaskId, c.node_name)
 
 		// 取消任务, 并移除
 		taskIns.Cancel()
@@ -142,5 +130,8 @@ func (c *TaskServiceImpl) HandleCancelEvents(ctx context.Context) {
 		// 更新数据裤状态
 		taskIns.Status = task.STATUS_CANCELED
 		c.updateTaskStatus(ctx, taskIns)
+	})
+	if err != nil {
+		c.log.Error().Msgf("subscribe cancel event error, %s", err)
 	}
 }

@@ -7,11 +7,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
-	ioc_kafka "github.com/infraboard/mcube/v2/ioc/config/kafka"
 	"github.com/infraboard/mcube/v2/ioc/config/log"
 	"github.com/infraboard/modules/task/apps/cronjob"
 	"github.com/rs/zerolog"
-	"github.com/segmentio/kafka-go"
 )
 
 func init() {
@@ -32,10 +30,7 @@ type CronJobServiceImpl struct {
 	log *zerolog.Logger
 	// 节点名称
 	node_name string
-	// 更新队列(cron更新, 删除, 启用, 禁用) 读
-	updater_reader *kafka.Reader
-	// 更新队列(cron更新, 删除, 启用, 禁用) 写
-	updater_writer *kafka.Writer
+
 	// 允许时上下文
 	ctx context.Context
 
@@ -64,9 +59,6 @@ func (i *CronJobServiceImpl) Init() error {
 	}
 
 	if i.EnableUpdate {
-		i.updater_reader = ioc_kafka.ConsumerGroup(i.node_name, []string{i.UpdateTopic})
-		i.updater_writer = ioc_kafka.Producer(i.UpdateTopic)
-
 		// 订阅更新事件
 		go i.HandleUpdateEvents(i.ctx)
 	}

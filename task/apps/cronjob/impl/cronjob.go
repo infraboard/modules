@@ -4,12 +4,12 @@ import (
 	"context"
 
 	"github.com/infraboard/mcube/v2/exception"
+	"github.com/infraboard/mcube/v2/ioc/config/bus"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
 	"github.com/infraboard/mcube/v2/ioc/config/mcron"
 	"github.com/infraboard/mcube/v2/types"
 	"github.com/infraboard/modules/task/apps/cronjob"
 	"github.com/infraboard/modules/task/apps/task"
-	"github.com/segmentio/kafka-go"
 	"gorm.io/gorm"
 )
 
@@ -89,8 +89,10 @@ func (i *CronJobServiceImpl) DeleteCronJob(ctx context.Context, in *cronjob.Dele
 
 		e := cronjob.NewQueueEvent()
 		e.CronJobId = ins.Id
-		err := i.updater_writer.WriteMessages(ctx, kafka.Message{
-			Value: []byte(e.String()),
+
+		err := bus.GetService().Publish(ctx, &bus.Event{
+			Subject: i.UpdateTopic,
+			Data:    []byte(e.String()),
 		})
 		if err != nil {
 			return err
@@ -116,8 +118,9 @@ func (i *CronJobServiceImpl) UpdateCronJob(ctx context.Context, in *cronjob.Upda
 		ins.Status = cronjob.STATUS_UPDATING
 		e := cronjob.NewQueueEvent()
 		e.CronJobId = ins.Id
-		err := i.updater_writer.WriteMessages(ctx, kafka.Message{
-			Value: []byte(e.String()),
+		err := bus.GetService().Publish(ctx, &bus.Event{
+			Subject: i.UpdateTopic,
+			Data:    []byte(e.String()),
 		})
 		if err != nil {
 			return err

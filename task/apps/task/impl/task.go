@@ -4,12 +4,12 @@ import (
 	"context"
 
 	"github.com/infraboard/mcube/v2/exception"
+	"github.com/infraboard/mcube/v2/ioc/config/bus"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
 	"github.com/infraboard/mcube/v2/types"
 	"github.com/infraboard/modules/task/apps/event"
 	"github.com/infraboard/modules/task/apps/task"
 	"github.com/infraboard/modules/task/apps/webhook"
-	"github.com/segmentio/kafka-go"
 	"gorm.io/gorm"
 )
 
@@ -23,14 +23,18 @@ func (s *TaskServiceImpl) Run(ctx context.Context, in *task.TaskSpec) (*task.Tas
 		return nil, err
 	}
 
+	// 添加任务
+	s.AddAsyncTask(ins)
+
 	// 队列事件
 	e := task.NewQueueEvent()
 	e.Type = task.QUEUE_EVENT_TYPE_RUN
 	e.TaskId = ins.Id
 
 	// 放入运行队列
-	err = s.run_writer.WriteMessages(ctx, kafka.Message{
-		Value: []byte(e.String()),
+	err = bus.GetService().Publish(ctx, &bus.Event{
+		Subject: s.RunTopic,
+		Data:    []byte(e.String()),
 	})
 	if err != nil {
 		return nil, err
@@ -51,8 +55,9 @@ func (s *TaskServiceImpl) Cancel(ctx context.Context, in *task.CancelRequest) (*
 	e.TaskId = in.TaskId
 
 	// 放入取消队列
-	err = s.cancel_writer.WriteMessages(ctx, kafka.Message{
-		Value: []byte(e.String()),
+	err = bus.GetService().Publish(ctx, &bus.Event{
+		Subject: s.CancelTopic,
+		Data:    []byte(e.String()),
 	})
 	if err != nil {
 		return nil, err
