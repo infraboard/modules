@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/infraboard/mcube/v2/ioc/config/bus"
 	"github.com/infraboard/mcube/v2/tools/pretty"
 	"github.com/rs/xid"
-	"github.com/segmentio/kafka-go"
 )
 
 func NewEventSet() *EventSet {
@@ -89,9 +89,10 @@ func (e *Event) Load(data []byte) error {
 	return json.Unmarshal(data, e)
 }
 
-func (e *Event) ToKafkaMessage() kafka.Message {
+func (e *Event) ToBusEvent(topic string) *bus.Event {
 	data, _ := json.Marshal(e)
-	return kafka.Message{
-		Value: data,
+	return &bus.Event{
+		Subject: topic,
+		Data:    data,
 	}
 }

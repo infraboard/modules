@@ -6,15 +6,14 @@ import (
 	"github.com/emicklei/go-restful/v3"
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/application"
+	"github.com/infraboard/mcube/v2/ioc/config/bus"
 	"github.com/infraboard/mcube/v2/ioc/config/gorestful"
-	ioc_kafka "github.com/infraboard/mcube/v2/ioc/config/kafka"
 	"github.com/infraboard/mcube/v2/ioc/config/log"
 	"github.com/infraboard/modules/iam/apps/endpoint"
 	"github.com/infraboard/modules/iam/apps/token"
 	"github.com/infraboard/modules/iam/permission"
 	"github.com/infraboard/modules/maudit/apps/event"
 	"github.com/rs/zerolog"
-	"github.com/segmentio/kafka-go"
 )
 
 func init() {
@@ -34,8 +33,6 @@ type auditor struct {
 
 	// 当前这个消费者 配置的topic
 	Topic string `toml:"topic" json:"topic" yaml:"topic"  env:"TOPIC"`
-	//
-	wirter *kafka.Writer
 }
 
 func (a *auditor) Name() string {
@@ -49,7 +46,6 @@ func (i *auditor) Priority() int {
 func (a *auditor) Init() error {
 	a.log = log.Sub("mauditor")
 	a.log.Debug().Msgf("maduit topic name: %s", a.Topic)
-	a.wirter = ioc_kafka.Producer(a.Topic)
 
 	// 添加到中间件, 加到Root Router里面
 	ws := gorestful.RootRouter()
@@ -91,7 +87,7 @@ func (a *auditor) Audit() restful.FilterFunction {
 			// 补充处理后的数据
 			e.StatusCode = r2.StatusCode()
 			// 发送给topic, 使用这个中间件的使用者，需要配置kafka
-			err := a.wirter.WriteMessages(context.Background(), e.ToKafkaMessage())
+			err := bus.GetService().Publish(context.Background(), e.ToBusEvent(a.Topic))
 			if err != nil {
 				a.log.Error().Msgf("send message error, %s", err)
 			} else {

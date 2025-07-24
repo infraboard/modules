@@ -1,9 +1,11 @@
 package event
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/infraboard/mcube/v2/ioc/config/bus"
 )
 
 func NewEvent(spec EventSpec) *Event {
@@ -25,6 +27,14 @@ type Event struct {
 
 func (e *Event) TableName() string {
 	return "task_events"
+}
+
+func (e *Event) ToBusEvent(topic string) *bus.Event {
+	data, _ := json.Marshal(e)
+	return &bus.Event{
+		Subject: topic,
+		Data:    data,
+	}
 }
 
 func NewEventSpec() *EventSpec {

@@ -8,16 +8,14 @@ import (
 	"github.com/infraboard/modules/maudit/apps/event"
 	"github.com/rs/zerolog"
 
-	ioc_kafka "github.com/infraboard/mcube/v2/ioc/config/kafka"
 	ioc_mongo "github.com/infraboard/mcube/v2/ioc/config/mongo"
-	kafka "github.com/segmentio/kafka-go"
 )
 
 func init() {
 	ioc.Controller().Registry(&consumer{
-		GroupId: "maudit",
-		Topics:  []string{"maudit"},
-		ctx:     context.Background(),
+		GroupId:    "maudit",
+		AuditTopic: "maudit",
+		ctx:        context.Background(),
 	})
 }
 
@@ -29,15 +27,13 @@ type consumer struct {
 	// 模块子Logger
 	log *zerolog.Logger
 
-	//
-	reader *kafka.Reader
 	// 允许时上下文
 	ctx context.Context
 
 	// 消费组Id
 	GroupId string `toml:"group_id" json:"group_id" yaml:"group_id"  env:"GROUP_ID"`
 	// 当前这个消费者 配置的topic
-	Topics []string `toml:"topic" json:"topic" yaml:"topic"  env:"TOPIC"`
+	AuditTopic string `toml:"topic" json:"topic" yaml:"topic"  env:"TOPIC"`
 }
 
 // 对象名称
@@ -54,8 +50,6 @@ func (i *consumer) Init() error {
 	// 对象
 	i.log = log.Sub(i.Name())
 	i.log.Debug().Msgf("database: %s", ioc_mongo.Get().Database)
-	i.reader = ioc_kafka.ConsumerGroup(i.GroupId, i.Topics)
-
 	go i.Run(i.ctx)
 	return nil
 }
