@@ -1,6 +1,8 @@
 package impl
 
 import (
+	"context"
+
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
 	"github.com/infraboard/mcube/v2/ioc/config/log"
@@ -19,8 +21,8 @@ var _ event.Service = (*EventServiceImpl)(nil)
 
 type EventServiceImpl struct {
 	ioc.ObjectImpl
-
-	log *zerolog.Logger
+	log      *zerolog.Logger
+	cancelFn context.CancelFunc
 
 	// 当前这个消费者 配置的topic
 	EventTopic string `toml:"event_topic" json:"event_topic" yaml:"event_topic"  env:"EVENT_TOPIC"`
@@ -36,9 +38,20 @@ func (i *EventServiceImpl) Init() error {
 			return err
 		}
 	}
-	return nil
+
+	ctx, cancelFn := context.WithCancel(context.Background())
+	i.cancelFn = cancelFn
+
+	// 启动消费者
+	return i.SaveEvent(ctx)
 }
 
 func (i *EventServiceImpl) Name() string {
 	return event.APP_NAME
+}
+
+func (i *EventServiceImpl) Close(ctx context.Context) {
+	if i.cancelFn != nil {
+		i.cancelFn()
+	}
 }

@@ -21,18 +21,6 @@ func (i *EventServiceImpl) AddEvent(ctx context.Context, in *event.EventSpec) (*
 	return ins, nil
 }
 
-func (i *EventServiceImpl) SaveEvent(ctx context.Context, ins *event.Event) error {
-	err := bus.GetService().Queue(ctx, i.EventTopic, func(e *bus.Event) {
-		if err := datasource.DBFromCtx(ctx).Save(ins).Error; err != nil {
-			i.log.Error().Msgf("save event error, %s", err)
-		}
-	})
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 // QueryEvent implements event.Service.
 func (i *EventServiceImpl) QueryEvent(ctx context.Context, in *event.QueryEventRequest) (*types.Set[*event.Event], error) {
 	set := types.NewSet[*event.Event]()

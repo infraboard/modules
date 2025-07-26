@@ -9,7 +9,7 @@ import (
 
 // 读取消息，处理消息
 func (c *consumer) Run(ctx context.Context) error {
-	bus.GetService().Queue(ctx, c.AuditTopic, func(e *bus.Event) {
+	bus.GetService().QueueSubscribe(ctx, c.AuditTopic, func(e *bus.Event) {
 		ae := event.NewEvent()
 		// 发送的数据时Json格式, 接收用的JSON, 发送也需要使用JSON
 		err := ae.Load(e.Data)

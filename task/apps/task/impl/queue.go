@@ -14,7 +14,7 @@ func (c *TaskServiceImpl) HandleRunEvents(ctx context.Context) {
 	c.log.Info().Msgf("start handle task run events ...")
 	defer c.log.Info().Msgf("handle task run events done.")
 
-	err := bus.GetService().Subscribe(ctx, c.RunTopic, func(e *bus.Event) {
+	err := bus.GetService().TopicSubscribe(ctx, c.RunTopic, func(e *bus.Event) {
 		// 处理消息
 		te := task.NewQueueEvent()
 
@@ -96,7 +96,7 @@ func (c *TaskServiceImpl) HandleCancelEvents(ctx context.Context) {
 	c.log.Info().Msgf("start handle task cancel events ...")
 	defer c.log.Info().Msgf("handle task cancel events done.")
 
-	err := bus.GetService().Subscribe(ctx, c.CancelTopic, func(e *bus.Event) {
+	err := bus.GetService().TopicSubscribe(ctx, c.CancelTopic, func(e *bus.Event) {
 		// 处理消息
 		te := task.NewQueueEvent()
 

@@ -37,6 +37,10 @@ func (e *Event) ToBusEvent(topic string) *bus.Event {
 	}
 }
 
+func (e *Event) LoadFromEvent(event *bus.Event) error {
+	return json.Unmarshal(event.Data, e)
+}
+
 func NewEventSpec() *EventSpec {
 	return &EventSpec{
 		Time:  time.Now(),
@@ -48,6 +52,8 @@ func NewEventSpec() *EventSpec {
 type EventSpec struct {
 	// 事件所属资源
 	Resource string `json:"resource" gorm:"column:resource;type:varchar(120);" description:"事件所属资源"`
+	// 事件类型, created ...
+	Type string `json:"type" gorm:"column:type;type:varchar(120);" description:"事件类型"`
 	// 事件发生时间
 	Time time.Time `json:"time" gorm:"column:time;type:timestamp;" description:"事件发生时间"`
 	// 事件的级别
