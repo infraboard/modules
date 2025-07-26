@@ -22,7 +22,7 @@ func (i *EventServiceImpl) AddEvent(ctx context.Context, in *event.EventSpec) (*
 }
 
 func (i *EventServiceImpl) SaveEvent(ctx context.Context, ins *event.Event) error {
-	err := bus.GetService().Queue(ctx, i.EventTopic, i.GroupId, func(e *bus.Event) {
+	err := bus.GetService().Queue(ctx, i.EventTopic, func(e *bus.Event) {
 		if err := datasource.DBFromCtx(ctx).Save(ins).Error; err != nil {
 			i.log.Error().Msgf("save event error, %s", err)
 		}
