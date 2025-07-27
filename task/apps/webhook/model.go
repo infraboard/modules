@@ -70,6 +70,13 @@ func (h *WebHook) Run(ctx context.Context) {
 	}
 }
 
+func NewWebHookSpec() *WebHookSpec {
+	return &WebHookSpec{
+		Headers:    map[string]string{},
+		Conditions: []string{},
+	}
+}
+
 type WebHookSpec struct {
 	// WebHook 名称
 	Name string `json:"name"`
