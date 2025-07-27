@@ -50,7 +50,7 @@ func (i *consumer) Init() error {
 	// 对象
 	i.log = log.Sub(i.Name())
 	i.log.Debug().Msgf("database: %s", ioc_mongo.Get().Database)
-	go i.Run(i.ctx)
+	i.Run(i.ctx)
 	return nil
 }
 

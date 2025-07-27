@@ -8,7 +8,7 @@ import (
 	"github.com/infraboard/modules/task/apps/event"
 )
 
-func (i *EventServiceImpl) SaveEvent(ctx context.Context) error {
+func (i *EventServiceImpl) RunSaveEventConsumer(ctx context.Context) error {
 	err := bus.GetService().QueueSubscribe(ctx, i.EventTopic, func(e *bus.Event) {
 		ins := &event.Event{}
 		if err := ins.LoadFromEvent(e); err != nil {

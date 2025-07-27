@@ -13,7 +13,6 @@ import (
 func init() {
 	ioc.Controller().Registry(&EventServiceImpl{
 		EventTopic: "events",
-		GroupId:    "event_queue_workers",
 	})
 }
 
@@ -26,8 +25,6 @@ type EventServiceImpl struct {
 
 	// 当前这个消费者 配置的topic
 	EventTopic string `toml:"event_topic" json:"event_topic" yaml:"event_topic"  env:"EVENT_TOPIC"`
-	// 消费组Id
-	GroupId string `toml:"group_id" json:"group_id" yaml:"group_id"  env:"GROUP_ID"`
 }
 
 func (i *EventServiceImpl) Init() error {
@@ -43,7 +40,7 @@ func (i *EventServiceImpl) Init() error {
 	i.cancelFn = cancelFn
 
 	// 启动消费者
-	return i.SaveEvent(ctx)
+	return i.RunSaveEventConsumer(ctx)
 }
 
 func (i *EventServiceImpl) Name() string {

@@ -12,7 +12,6 @@ import (
 // 处理任务运行队列
 func (c *TaskServiceImpl) HandleRunEvents(ctx context.Context) {
 	c.log.Info().Msgf("start handle task run events ...")
-	defer c.log.Info().Msgf("handle task run events done.")
 
 	err := bus.GetService().TopicSubscribe(ctx, c.RunTopic, func(e *bus.Event) {
 		// 处理消息
@@ -94,8 +93,6 @@ func (s *TaskServiceImpl) runTask(ins *task.Task) *task.Task {
 // 处理任务取消队列
 func (c *TaskServiceImpl) HandleCancelEvents(ctx context.Context) {
 	c.log.Info().Msgf("start handle task cancel events ...")
-	defer c.log.Info().Msgf("handle task cancel events done.")
-
 	err := bus.GetService().TopicSubscribe(ctx, c.CancelTopic, func(e *bus.Event) {
 		// 处理消息
 		te := task.NewQueueEvent()

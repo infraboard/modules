@@ -85,11 +85,11 @@ func (i *TaskServiceImpl) Init() error {
 
 	// 处理取消事件
 	i.log.Info().Msgf("cancel topic: %s", i.CancelTopic)
-	go i.HandleCancelEvents(i.ctx)
+	i.HandleCancelEvents(i.ctx)
 
 	// 处理运行事件
 	i.log.Info().Msgf("run topic: %s", i.RunTopic)
-	go i.HandleRunEvents(i.ctx)
+	i.HandleRunEvents(i.ctx)
 	return nil
 }
 

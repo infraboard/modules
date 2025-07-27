@@ -60,7 +60,7 @@ func (i *CronJobServiceImpl) Init() error {
 
 	if i.EnableUpdate {
 		// 订阅更新事件
-		go i.HandleUpdateEvents(i.ctx)
+		i.HandleUpdateEvents(i.ctx)
 	}
 
 	return nil

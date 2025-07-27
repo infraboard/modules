@@ -14,8 +14,6 @@ import (
 // 处理CronJob更新队列
 func (c *CronJobServiceImpl) HandleUpdateEvents(ctx context.Context) {
 	c.log.Info().Msgf("start handle cronjob update events ...")
-	defer c.log.Info().Msgf("handle cronjob update events done.")
-
 	err := bus.GetService().TopicSubscribe(ctx, c.UpdateTopic, func(e *bus.Event) {
 		// 处理消息
 		te := cronjob.NewQueueEvent()

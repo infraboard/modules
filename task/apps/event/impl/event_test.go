@@ -17,7 +17,7 @@ func TestAddEvent(t *testing.T) {
 	t.Log(ins)
 
 	// 等待消费者处理
-	time.Sleep(5 * time.Second)
+	time.Sleep(60 * time.Second)
 }
 
 func TestQueryEvent(t *testing.T) {
