@@ -2,10 +2,12 @@ package webhook
 
 import (
 	"context"
+	"encoding/json"
 	"slices"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/infraboard/mcube/v2/ioc/config/bus"
 	"resty.dev/v3"
 )
 
@@ -19,7 +21,7 @@ func NewWebHook(spec WebHookSpec) *WebHook {
 // 任务回调
 type WebHook struct {
 	// WebHook 的唯一标识
-	ID string `json:"id"`
+	Id string `json:"id"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at" gorm:"column:created_at;type:timestamp;default:current_timestamp;not null;index;" description:"创建时间"`
 	// WebHook定义
@@ -32,6 +34,10 @@ func (h *WebHook) TableName() string {
 	return "webhooks"
 }
 
+func (e *WebHook) LoadFromEvent(event *bus.Event) error {
+	return json.Unmarshal(event.Data, e)
+}
+
 func (h *WebHook) SetDefault() {
 	if h.ContentType == "" {
 		h.ContentType = "application/json"
@@ -39,14 +45,14 @@ func (h *WebHook) SetDefault() {
 	if h.Timeout == 0 {
 		h.Timeout = 30
 	}
-	if h.ID == "" {
-		h.ID = uuid.NewString()
+	if h.Id == "" {
+		h.Id = uuid.NewString()
 	}
 }
 
 func (h *WebHook) Run(ctx context.Context) {
 	h.SetDefault()
-
+	h.SetUpdateAt(time.Now())
 	resty.New()
 	resp, err := resty.New().R().WithContext(ctx).
 		SetAuthToken(h.Secret).
@@ -119,10 +125,21 @@ func NewWebHookStatus() *WebHookStatus {
 }
 
 type WebHookStatus struct {
+	// 更新时间
+	UpdateAt *time.Time `json:"update_at" gorm:"column:update_at;type:timestamp;default:current_timestamp;not null;index;" description:"更新时间"`
 	// 状态与统计
-	Status STATUS `json:"status"`
+	Status STATUS `json:"status" gorm:"column:status;type:varchar(32);not null;" description:"状态"`
 	// 失败信息
-	Message string `json:"message"`
+	Message string `json:"message" gorm:"column:message;type:text;" description:"失败信息"`
+}
+
+func (w WebHookStatus) TableName() string {
+	return "webhooks"
+}
+
+func (w *WebHookStatus) SetUpdateAt(v time.Time) *WebHookStatus {
+	w.UpdateAt = &v
+	return w
 }
 
 func (w *WebHook) Failed(err error) *WebHook {

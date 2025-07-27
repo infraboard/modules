@@ -3,21 +3,37 @@ package impl
 import (
 	"context"
 
+	"github.com/infraboard/mcube/v2/exception"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
 	"github.com/infraboard/mcube/v2/types"
 	"github.com/infraboard/modules/task/apps/webhook"
+	"gorm.io/gorm"
 )
 
 // Run implements webhook.Service.
-func (i *WebHookServiceImpl) Run(ctx context.Context, in *webhook.WebHookSpec) *webhook.WebHook {
+func (i *WebHookServiceImpl) Run(ctx context.Context, in *webhook.WebHookSpec) (*webhook.WebHook, error) {
 	hook := webhook.NewWebHook(*in)
-	hook.Run(ctx)
 	// 保存Hook执行记录
 	err := datasource.DBFromCtx(ctx).Save(hook).Error
 	if err != nil {
-		return hook.Failed(err)
+		return nil, err
 	}
-	return hook.Success()
+	return hook, nil
+}
+
+// 查询WebHook具体执行状态
+func (i *WebHookServiceImpl) DescribeWebHook(ctx context.Context, in *webhook.DescribeWebHookRequest) (*webhook.WebHook, error) {
+	query := datasource.DBFromCtx(ctx)
+
+	ins := &webhook.WebHook{}
+	if err := query.Where("id = ?", in.Id).First(ins).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, exception.NewNotFound("task %s not found", in.Id)
+		}
+		return nil, err
+	}
+
+	return ins, nil
 }
 
 // QueryWebHook implements webhook.Service.

@@ -1,6 +1,8 @@
 package impl
 
 import (
+	"context"
+
 	"github.com/infraboard/mcube/v2/ioc"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
 	"github.com/infraboard/mcube/v2/ioc/config/log"
@@ -9,7 +11,9 @@ import (
 )
 
 func init() {
-	ioc.Controller().Registry(&WebHookServiceImpl{})
+	ioc.Controller().Registry(&WebHookServiceImpl{
+		WebhookTopic: "webhooks_run_queue",
+	})
 }
 
 var _ webhook.Service = (*WebHookServiceImpl)(nil)
@@ -17,7 +21,11 @@ var _ webhook.Service = (*WebHookServiceImpl)(nil)
 type WebHookServiceImpl struct {
 	ioc.ObjectImpl
 
-	log *zerolog.Logger
+	// 当前这个消费者 配置的topic
+	WebhookTopic string `toml:"webhook_topic" json:"webhook_topic" yaml:"webhook_topic"  env:"WEBHOOK_TOPIC"`
+
+	cancelFn context.CancelFunc
+	log      *zerolog.Logger
 }
 
 func (i *WebHookServiceImpl) Init() error {
@@ -28,7 +36,10 @@ func (i *WebHookServiceImpl) Init() error {
 			return err
 		}
 	}
-	return nil
+
+	ctx, cancelFn := context.WithCancel(context.Background())
+	i.cancelFn = cancelFn
+	return i.RunWebHookConsumer(ctx)
 }
 
 func (i *WebHookServiceImpl) Name() string {

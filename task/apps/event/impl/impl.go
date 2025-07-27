@@ -12,7 +12,7 @@ import (
 
 func init() {
 	ioc.Controller().Registry(&EventServiceImpl{
-		EventTopic: "events",
+		EventTopic: "events_save_queue",
 	})
 }
 

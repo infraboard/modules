@@ -16,10 +16,16 @@ func GetService() Service {
 }
 
 type Service interface {
-	// 执行WebHook
-	Run(context.Context, *WebHookSpec) *WebHook
-	// 查询WebHook执行记录
+	// 执行WebHook, 触发执行, 执行状态通过HookId查询
+	Run(context.Context, *WebHookSpec) (*WebHook, error)
+	// 查询WebHook具体执行状态
+	DescribeWebHook(context.Context, *DescribeWebHookRequest) (*WebHook, error)
+	// 查询WebHook执行记录列表
 	QueryWebHook(context.Context, *QueryWebHookRequest) (*types.Set[*WebHook], error)
+}
+
+type DescribeWebHookRequest struct {
+	Id string
 }
 
 func NewQueryWebHookRequest() *QueryWebHookRequest {

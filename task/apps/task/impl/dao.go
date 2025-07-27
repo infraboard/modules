@@ -2,11 +2,9 @@ package impl
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
-	"github.com/infraboard/modules/task/apps/event"
 	"github.com/infraboard/modules/task/apps/task"
 	"github.com/infraboard/modules/task/apps/webhook"
 )
@@ -34,21 +32,11 @@ func (s *TaskServiceImpl) runWebHook(ctx context.Context, ins *task.Task) {
 			continue
 		}
 
-		// 运行WebHook
-		wh := webhook.GetService().Run(ctx, &hook.WebHookSpec)
-		hook.Status = wh.Status
-		switch hook.Status {
-		case webhook.STATUS_SUCCESS:
-			s.saveEvent(ctx, task.NewInfoEvent(fmt.Sprintf("web hook %s exec success", hook.TargetURL), ins.Id))
-		default:
-			s.saveEvent(ctx, task.NewErrorEvent(fmt.Sprintf("web hook %s exec failed", hook.TargetURL), ins.Id))
+		// 运行触发WebHook, 异步执行
+		_, err := webhook.GetService().Run(ctx, &hook.WebHookSpec)
+		if err != nil {
+			s.log.Error().Msgf("hook %s run error, %s", hook.TargetURL, err)
+			continue
 		}
-	}
-}
-
-func (s *TaskServiceImpl) saveEvent(ctx context.Context, e *event.EventSpec) {
-	_, err := event.GetService().AddEvent(ctx, e)
-	if err != nil {
-		s.log.Error().Msgf("save event error, %s", err)
 	}
 }
