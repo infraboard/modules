@@ -1,4 +1,4 @@
-package aduit
+package permission
 
 import (
 	"context"
@@ -9,10 +9,10 @@ import (
 	"github.com/infraboard/mcube/v2/ioc/config/bus"
 	"github.com/infraboard/mcube/v2/ioc/config/gorestful"
 	"github.com/infraboard/mcube/v2/ioc/config/log"
+	"github.com/infraboard/modules/iam/apps/audit"
 	"github.com/infraboard/modules/iam/apps/endpoint"
 	"github.com/infraboard/modules/iam/apps/token"
 	"github.com/infraboard/modules/iam/permission"
-	"github.com/infraboard/modules/maudit/apps/event"
 	"github.com/rs/zerolog"
 )
 
@@ -23,7 +23,7 @@ func init() {
 }
 
 func Audit(v bool) (string, bool) {
-	return event.META_AUDIT_KEY, v
+	return audit.META_AUDIT_KEY, v
 }
 
 type auditor struct {
@@ -44,8 +44,8 @@ func (i *auditor) Priority() int {
 }
 
 func (a *auditor) Init() error {
-	a.log = log.Sub("mauditor")
-	a.log.Debug().Msgf("maduit topic name: %s", a.Topic)
+	a.log = log.Sub("auditor")
+	a.log.Debug().Msgf("aduit topic name: %s", a.Topic)
 
 	// 添加到中间件, 加到Root Router里面
 	ws := gorestful.RootRouter()
@@ -60,10 +60,10 @@ func (a *auditor) Audit() restful.FilterFunction {
 		md := NewMetaData(sr.Metadata())
 
 		// 开关打开，则开启审计
-		if md.GetBool(event.META_AUDIT_KEY) {
+		if md.GetBool(audit.META_AUDIT_KEY) {
 
 			// 获取当前是否需要审计
-			e := event.NewEvent()
+			e := audit.NewAuditLog()
 
 			// 用户信息
 			tk := token.GetTokenFromCtx(r1.Request.Context())
