@@ -4,11 +4,12 @@ import (
 	"testing"
 
 	"github.com/infraboard/modules/task/apps/task"
+	"github.com/infraboard/modules/task/apps/task/runners"
 	"github.com/infraboard/modules/task/apps/webhook"
 )
 
 func TestRun(t *testing.T) {
-	req := task.NewTaskSpec(task.DEBUG_RUNNER, task.NewJsonRunParam("test"))
+	req := task.NewTaskSpec(runners.DEBUG_RUNNER, task.NewJsonRunParam("test"))
 
 	req.AddWebHook(webhook.NewWebHook(webhook.WebHookSpec{
 		TargetURL:  "https://www.baidu.com/",

@@ -3,9 +3,6 @@ package task
 import (
 	"context"
 	"fmt"
-	"time"
-
-	"github.com/infraboard/modules/task/apps/event"
 )
 
 var (
@@ -48,34 +45,4 @@ func NewJsonRunParam(jsonStr string) *RunParam {
 type RunParam struct {
 	Type  RUN_PARAM_TYPE `json:"type"`
 	Value any            `json:"value"`
-}
-
-// 注册DebugRunner 用于调试
-func init() {
-	RegistryRunner(DEBUG_RUNNER, &DebugRunner{})
-}
-
-const (
-	DEBUG_RUNNER = "Debug"
-)
-
-type DebugRunner struct{}
-
-func (r *DebugRunner) Run(ctx context.Context, req *RunParam) (fmt.Stringer, error) {
-	fmt.Println(req.Value)
-
-	ins := GetTaskFromCtx(ctx)
-
-	_, err := event.GetService().AddEvent(ctx, NewInfoEvent("开始执行", ins.Id))
-	if err != nil {
-		return nil, err
-	}
-	time.Sleep(3 * time.Second)
-	_, err = event.GetService().AddEvent(ctx, NewInfoEvent("执行结束", ins.Id))
-	if err != nil {
-		return nil, err
-	}
-
-	// secrt同步
-	return nil, nil
 }
