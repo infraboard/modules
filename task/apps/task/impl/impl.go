@@ -3,6 +3,7 @@ package impl
 import (
 	"context"
 	"os"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/infraboard/mcube/v2/ioc"
@@ -45,6 +46,7 @@ type TaskServiceImpl struct {
 }
 
 func (s *TaskServiceImpl) AddAsyncTask(t *task.Task) {
+	t.Running()
 	s.tasks.Add(t)
 }
 
@@ -75,6 +77,9 @@ func (i *TaskServiceImpl) Init() error {
 			return err
 		}
 	}
+
+	// 打印注册的Runner
+	i.log.Info().Msgf("registry runners: %s", strings.Join(task.ListRunner(), ","))
 
 	// 设置节点名称
 	if i.RandomNodeName {

@@ -47,13 +47,6 @@ func (s STATUS) String() string {
 }
 
 const (
-	// 任务是一个函数
-	TYPE_FUNCTION TYPE = "function"
-)
-
-type TYPE string
-
-const (
 	// 任务运行事件
 	QUEUE_EVENT_TYPE_RUN QUEUE_EVENT_TYPE = "run"
 	// 任务取消事件

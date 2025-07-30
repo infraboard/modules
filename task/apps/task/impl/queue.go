@@ -58,35 +58,21 @@ func (c *TaskServiceImpl) HandleRunEvents(ctx context.Context) {
 func (s *TaskServiceImpl) runTask(ins *task.Task) *task.Task {
 	ins.SetStartAt(time.Now())
 
-	switch ins.Type {
-	case task.TYPE_FUNCTION:
-		// 获取函数
-		refTask := s.GetAsyncTask(ins.Id)
-		if refTask == nil {
-			s.log.Info().Msgf("task %s not found in async task list", ins.Id)
-			return ins
-		}
-
-		fn := ins.GetFn()
-		if fn == nil {
-			return ins.Failed(fmt.Sprintf("%s fn not found", ins.Id))
-		}
-		// 执行函数
-		ins.Running()
-		defer func() {
-			ins.Cancel()
-			s.RemoveAsyncTask(ins)
-		}()
-		s.AddAsyncTask(ins)
-		if err := fn(ins.BuildTimeoutCtx(), ins.Params); err != nil {
-			ins.Failed(err.Error())
-		} else {
-			ins.Success()
-		}
-	default:
-		return ins.Failed(fmt.Sprintf("不支持的类型: %s", ins.Type))
+	runner := task.GetRunner(ins.Runner)
+	if runner == nil {
+		return ins.Failed(fmt.Sprintf("runner %s not found", ins.Runner))
 	}
 
+	// 执行函数
+	s.AddAsyncTask(ins)
+	defer s.RemoveAsyncTask(ins)
+
+	resp, err := runner.Run(ins.BuildTimeoutCtx(), ins.Params)
+	if err != nil {
+		return ins.Failed(fmt.Sprintf("run %s error, %s", ins.Runner, err))
+	}
+	ins.Detail = resp.String()
+	ins.Success()
 	return ins
 }
 

@@ -67,11 +67,10 @@ func (t *Task) String() string {
 	return pretty.ToJSON(t)
 }
 
-func NewFnTask(fn TaskFunc, params any) *TaskSpec {
+func NewTaskSpec(runner string, param *RunParam) *TaskSpec {
 	return &TaskSpec{
-		Type:     TYPE_FUNCTION,
-		fn:       fn,
-		Params:   params,
+		Runner:   runner,
+		Params:   param,
 		Label:    map[string]string{},
 		WebHooks: []*webhook.WebHook{},
 	}
@@ -80,16 +79,16 @@ func NewFnTask(fn TaskFunc, params any) *TaskSpec {
 type TaskSpec struct {
 	// 异步执行时的超时时间
 	Timeout string `json:"timeout" gorm:"column:timeout;" description:"异步执行时的超时时间"`
-	// 任务类型
-	Type TYPE `json:"type" gorm:"column:type;type:varchar(60);" description:"任务类型"`
+	// 执行器名称
+	Runner string `json:"runner" gorm:"column:type;type:varchar(60);" description:"执行器名称"`
+	// 执行器参数
+	Params *RunParam `json:"params" gorm:"column:params;serializer:json;type:json" description:"任务参数"`
 	// 任务名称
 	Name string `json:"name" gorm:"column:name;type:varchar(200);" description:"任务名称"`
 	// 任务名称
 	Description string `json:"description" gorm:"column:description;type:text;" description:"任务描述"`
 	// 尝试执行,用于做执行前检查
 	DryRun bool `json:"dryrun" gorm:"column:dryrun;type:bool;" description:"尝试执行,用于做执行前检查"`
-	// 任务的参数
-	Params any `json:"params" gorm:"column:params;serializer:json;type:json" description:"任务参数"`
 	// 事件所属资源
 	Resource string `json:"resource" gorm:"column:resource;type:varchar(120);" description:"事件所属资源"`
 	// 任务标签
@@ -97,9 +96,6 @@ type TaskSpec struct {
 
 	// 任务执行结束回调
 	WebHooks []*webhook.WebHook `json:"web_hooks" bson:"web_hooks" gorm:"column:web_hooks;serializer:json;type:json" description:"任务执行结束回调" optional:"true"`
-
-	// 具体的函数
-	fn TaskFunc `json:"-" gorm:"-"`
 }
 
 func (t *TaskSpec) SetName(name string) *TaskSpec {
@@ -136,10 +132,6 @@ func (t *Task) Cancel() {
 	}
 }
 
-func (t *TaskSpec) GetFn() TaskFunc {
-	return t.fn
-}
-
 func (t *TaskSpec) SetLabel(key, value string) *TaskSpec {
 	if t.Label == nil {
 		t.Label = map[string]string{}
@@ -168,6 +160,8 @@ type TaskStatus struct {
 	Status STATUS `json:"status" gorm:"column:status;type:tinyint(2);" description:"任务执行状态"`
 	// 失败信息
 	Message string `json:"message" gorm:"column:message;type:text;" description:"失败信息"`
+	// 失败信息
+	Detail string `json:"detail" gorm:"column:detail;type:text;" description:"详情内容"`
 
 	// 执行过程中的事件, 执行日志
 	Events []*event.Event `json:"events" gorm:"column:events;type:json;serializer:json;" description:"执行过程中的事件"`
