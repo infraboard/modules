@@ -12,7 +12,7 @@ import (
 
 func init() {
 	ioc.Controller().Registry(&WebHookServiceImpl{
-		WebhookTopic: "webhooks_run_queue",
+		WebhookQueue: "webhooks_run_queue",
 	})
 }
 
@@ -22,7 +22,7 @@ type WebHookServiceImpl struct {
 	ioc.ObjectImpl
 
 	// 当前这个消费者 配置的topic
-	WebhookTopic string `toml:"webhook_topic" json:"webhook_topic" yaml:"webhook_topic"  env:"WEBHOOK_TOPIC"`
+	WebhookQueue string `toml:"webhook_topic" json:"webhook_topic" yaml:"webhook_topic"  env:"WEBHOOK_TOPIC"`
 
 	cancelFn context.CancelFunc
 	log      *zerolog.Logger

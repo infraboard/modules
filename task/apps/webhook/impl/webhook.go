@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/infraboard/mcube/v2/exception"
+	"github.com/infraboard/mcube/v2/ioc/config/bus"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
 	"github.com/infraboard/mcube/v2/types"
 	"github.com/infraboard/modules/task/apps/webhook"
@@ -15,6 +16,12 @@ func (i *WebHookServiceImpl) Run(ctx context.Context, in *webhook.WebHookSpec) (
 	hook := webhook.NewWebHook(*in)
 	// 保存Hook执行记录
 	err := datasource.DBFromCtx(ctx).Save(hook).Error
+	if err != nil {
+		return nil, err
+	}
+
+	// 发送到队列, 只发送HookId
+	err = bus.GetService().Publish(ctx, hook.ToBusEvent(i.WebhookQueue))
 	if err != nil {
 		return nil, err
 	}

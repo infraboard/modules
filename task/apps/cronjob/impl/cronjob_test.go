@@ -11,7 +11,7 @@ import (
 )
 
 func TestAddCronJob(t *testing.T) {
-	req := task.NewTaskSpec(runners.DEBUG_RUNNER, task.NewJsonRunParam("test"))
+	req := task.NewTaskSpec(runners.DEBUG, task.NewJsonRunParam("test"))
 
 	req.AddWebHook(webhook.NewWebHook(webhook.WebHookSpec{
 		TargetURL:  "https://www.baidu.com/",

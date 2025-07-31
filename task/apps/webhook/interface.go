@@ -24,6 +24,12 @@ type Service interface {
 	QueryWebHook(context.Context, *QueryWebHookRequest) (*types.Set[*WebHook], error)
 }
 
+func NewDescribeWebHookRequest(id string) *DescribeWebHookRequest {
+	return &DescribeWebHookRequest{
+		Id: id,
+	}
+}
+
 type DescribeWebHookRequest struct {
 	Id string
 }

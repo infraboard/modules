@@ -11,11 +11,11 @@ import (
 
 // 注册DebugRunner 用于调试
 func init() {
-	task.RegistryRunner(DEBUG_RUNNER, &DebugRunner{})
+	task.RegistryRunner(DEBUG, &DebugRunner{})
 }
 
 const (
-	DEBUG_RUNNER = "Debug"
+	DEBUG = "Debug"
 )
 
 type DebugRunner struct{}
@@ -35,6 +35,5 @@ func (r *DebugRunner) Run(ctx context.Context, req *task.RunParam) (fmt.Stringer
 		return nil, err
 	}
 
-	// secrt同步
 	return nil, nil
 }

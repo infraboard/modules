@@ -82,7 +82,7 @@ type TaskSpec struct {
 	// 执行器名称
 	Runner string `json:"runner" gorm:"column:type;type:varchar(60);" description:"执行器名称"`
 	// 执行器参数
-	Params *RunParam `json:"params" gorm:"column:params;serializer:json;type:json" description:"任务参数"`
+	Params *RunParam `json:"params" gorm:"embedded" description:"任务参数"`
 	// 任务名称
 	Name string `json:"name" gorm:"column:name;type:varchar(200);" description:"任务名称"`
 	// 任务名称

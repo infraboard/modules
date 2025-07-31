@@ -9,6 +9,8 @@ import (
 
 func TestRunWebHook(t *testing.T) {
 	spec := webhook.NewWebHookSpec()
+	spec.TargetURL = "https://www.baidu.com"
+	spec.Method = "GET"
 	ins, err := svc.Run(t.Context(), spec)
 	if err != nil {
 		t.Fatal(err)

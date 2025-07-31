@@ -2,6 +2,7 @@ package task
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 )
 
@@ -43,6 +44,12 @@ func NewJsonRunParam(jsonStr string) *RunParam {
 }
 
 type RunParam struct {
-	Type  RUN_PARAM_TYPE `json:"type"`
-	Value any            `json:"value"`
+	// 参数类型
+	Type RUN_PARAM_TYPE `json:"type" gorm:"column:run_param_type;type:varchar(60)" description:"参数类型"`
+	// 参数值
+	Value string `json:"value" gorm:"column:run_param_value;type:text" description:"参数值"`
+}
+
+func (r *RunParam) Load(v any) error {
+	return json.Unmarshal([]byte(r.Value), v)
 }

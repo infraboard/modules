@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/infraboard/mcube/v2/ioc/config/bus"
+	"github.com/infraboard/mcube/v2/tools/pretty"
 	"resty.dev/v3"
 )
 
@@ -36,6 +37,13 @@ func (h *WebHook) TableName() string {
 
 func (e *WebHook) LoadFromEvent(event *bus.Event) error {
 	return json.Unmarshal(event.Data, e)
+}
+
+func (e *WebHook) ToBusEvent(topic string) *bus.Event {
+	return &bus.Event{
+		Subject: topic,
+		Data:    []byte(e.Id),
+	}
 }
 
 func (h *WebHook) SetDefault() {
@@ -142,6 +150,10 @@ type WebHookStatus struct {
 
 func (w WebHookStatus) TableName() string {
 	return "webhooks"
+}
+
+func (w WebHookStatus) String() string {
+	return pretty.ToJSON(w)
 }
 
 func (w *WebHookStatus) SetUpdateAt(v time.Time) *WebHookStatus {
