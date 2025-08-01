@@ -2,7 +2,6 @@ package runners
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/infraboard/modules/task/apps/task"
 	"github.com/infraboard/modules/task/apps/webhook"
@@ -17,16 +16,26 @@ const (
 	HTTP_CALL = "http_call"
 )
 
-type HttpCall struct{}
+type HttpCall struct {
+	task.RunnerUnimplemented
+}
 
-func (r *HttpCall) Run(ctx context.Context, req *task.RunParam) (fmt.Stringer, error) {
+func (r *HttpCall) Run(ctx context.Context, ins *task.Task) {
 	spec := webhook.NewWebHookSpec()
 
-	if err := req.Load(spec); err != nil {
-		return nil, err
+	if err := ins.Params.Load(spec); err != nil {
+		ins.Failed(err.Error())
+		return
 	}
 
 	hook := webhook.NewWebHook(*spec)
 	hook.Run(ctx)
-	return hook.WebHookStatus, nil
+	ins.Detail = hook.WebHookStatus.String()
+
+	switch hook.Status {
+	case webhook.STATUS_FAILED:
+		ins.Status = task.STATUS_FAILED
+	case webhook.STATUS_SUCCESS:
+		ins.Status = task.STATUS_SUCCESS
+	}
 }

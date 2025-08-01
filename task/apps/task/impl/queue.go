@@ -67,12 +67,7 @@ func (s *TaskServiceImpl) runTask(ins *task.Task) *task.Task {
 	s.AddAsyncTask(ins)
 	defer s.RemoveAsyncTask(ins)
 
-	resp, err := runner.Run(ins.BuildTimeoutCtx(), ins.Params)
-	if err != nil {
-		return ins.Failed(fmt.Sprintf("run %s error, %s", ins.Runner, err))
-	}
-	ins.Detail = resp.String()
-	ins.Success()
+	runner.Run(ins.BuildTimeoutCtx(), ins)
 	return ins
 }
 

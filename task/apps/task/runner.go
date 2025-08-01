@@ -3,7 +3,6 @@ package task
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 )
 
 var (
@@ -27,8 +26,20 @@ func ListRunner() (ns []string) {
 
 // 执行器接口
 type Runner interface {
-	Run(context.Context, *RunParam) (fmt.Stringer, error)
+	// 同步模式下: 运行任务，通过ctx取消
+	// 异步模式下: 触发任务执行, 任务的状态更新和取消 需要runner单独实现Sync和Cancle
+	Run(context.Context, *Task)
+	// 异步任务状态同步
+	Sync(context.Context, *Task)
+	// 异步任务取消
+	Cancel(context.Context, *Task)
 }
+
+type RunnerUnimplemented struct{}
+
+func (r *RunnerUnimplemented) Run(context.Context, *Task)    {}
+func (r *RunnerUnimplemented) Sync(context.Context, *Task)   {}
+func (r *RunnerUnimplemented) Cancel(context.Context, *Task) {}
 
 const (
 	RUN_PARAM_TYPE_JSON = "json"

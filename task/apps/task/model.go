@@ -120,8 +120,7 @@ func (t *Task) BuildTimeoutCtx() context.Context {
 		timeout = DEFAULT_TIMEOUT
 	}
 
-	ctx := context.WithValue(context.Background(), CONTEXT_TASK_KEY{}, t)
-	ctx, fn := context.WithTimeout(ctx, timeout)
+	ctx, fn := context.WithTimeout(context.Background(), timeout)
 	t.cancelFn = fn
 	return ctx
 }

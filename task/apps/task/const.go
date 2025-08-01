@@ -1,7 +1,6 @@
 package task
 
 import (
-	"context"
 	"time"
 )
 
@@ -12,14 +11,3 @@ const (
 var (
 	DEFAULT_TIMEOUT = time.Second * 30
 )
-
-type CONTEXT_TASK_KEY struct{}
-
-func GetTaskFromCtx(ctx context.Context) *Task {
-	v := ctx.Value(CONTEXT_TASK_KEY{})
-	if v == nil {
-		return nil
-	}
-
-	return v.(*Task)
-}
