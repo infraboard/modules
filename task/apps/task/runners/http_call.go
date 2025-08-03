@@ -9,7 +9,7 @@ import (
 
 // 注册Http 调用
 func init() {
-	task.RegistryRunner(HTTP_CALL, &HttpCall{})
+	task.RegistrySyncRunner(HTTP_CALL, &HttpCall{})
 }
 
 const (
@@ -17,15 +17,13 @@ const (
 )
 
 type HttpCall struct {
-	task.RunnerUnimplemented
 }
 
-func (r *HttpCall) Run(ctx context.Context, ins *task.Task) {
+func (r *HttpCall) Run(ctx context.Context, ins *task.Task) error {
 	spec := webhook.NewWebHookSpec()
 
 	if err := ins.Params.Load(spec); err != nil {
-		ins.Failed(err.Error())
-		return
+		return err
 	}
 
 	hook := webhook.NewWebHook(*spec)
@@ -38,4 +36,6 @@ func (r *HttpCall) Run(ctx context.Context, ins *task.Task) {
 	case webhook.STATUS_SUCCESS:
 		ins.Status = task.STATUS_SUCCESS
 	}
+
+	return nil
 }

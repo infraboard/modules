@@ -79,7 +79,8 @@ func (i *TaskServiceImpl) Init() error {
 	}
 
 	// 打印注册的Runner
-	i.log.Info().Msgf("registry runners: %s", strings.Join(task.ListRunner(), ","))
+	i.log.Info().Msgf("registry sync runners: %s", strings.Join(task.ListSyncRunner(), ","))
+	i.log.Info().Msgf("registry async runners: %s", strings.Join(task.ListAsyncRunner(), ","))
 
 	// 设置节点名称
 	if i.RandomNodeName {

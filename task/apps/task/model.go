@@ -79,6 +79,8 @@ func NewTaskSpec(runner string, param *RunParam) *TaskSpec {
 type TaskSpec struct {
 	// 异步执行时的超时时间
 	Timeout string `json:"timeout" gorm:"column:timeout;" description:"异步执行时的超时时间"`
+	// 尝试执行,用于做执行前检查
+	Async bool `json:"async" gorm:"column:async;type:bool;" description:"是否是异步任务"`
 	// 执行器名称
 	Runner string `json:"runner" gorm:"column:type;type:varchar(60);" description:"执行器名称"`
 	// 执行器参数

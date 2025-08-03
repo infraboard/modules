@@ -58,16 +58,25 @@ func (c *TaskServiceImpl) HandleRunEvents(ctx context.Context) {
 func (s *TaskServiceImpl) runTask(ins *task.Task) *task.Task {
 	ins.SetStartAt(time.Now())
 
-	runner := task.GetRunner(ins.Runner)
-	if runner == nil {
-		return ins.Failed(fmt.Sprintf("runner %s not found", ins.Runner))
+	if ins.Async {
+		// 异步执行
+		runner := task.GetAsyncRunner(ins.Runner)
+		if runner == nil {
+			return ins.Failed(fmt.Sprintf("runner %s not found", ins.Runner))
+		}
+	} else {
+		// 同步执行
+		runner := task.GetSyncRunner(ins.Runner)
+		if runner == nil {
+			return ins.Failed(fmt.Sprintf("runner %s not found", ins.Runner))
+		}
+
+		// 执行函数
+		s.AddAsyncTask(ins)
+		defer s.RemoveAsyncTask(ins)
+
+		runner.Run(ins.BuildTimeoutCtx(), ins)
 	}
-
-	// 执行函数
-	s.AddAsyncTask(ins)
-	defer s.RemoveAsyncTask(ins)
-
-	runner.Run(ins.BuildTimeoutCtx(), ins)
 	return ins
 }
 
