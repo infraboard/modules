@@ -3,6 +3,7 @@ package impl
 import (
 	"context"
 	"os"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/infraboard/mcube/v2/ioc"
@@ -17,6 +18,7 @@ func init() {
 		EnableUpdate:   true,
 		RandomNodeName: false,
 		UpdateTopic:    "cronjob_update_events",
+		TaskLockTTL:    "5m",
 		ctx:            context.Background(),
 	})
 }
@@ -40,9 +42,18 @@ type CronJobServiceImpl struct {
 	EnableUpdate bool `toml:"enable_update" json:"enable_update" yaml:"enable_update"  env:"ENABLE_UPDATE"`
 	// 当前这个消费者 配置的topic
 	UpdateTopic string `toml:"update_topic" json:"update_topic" yaml:"update_topic"  env:"UPDATE_TOPIC"`
+	// 执行时锁的TTL
+	TaskLockTTL string `toml:"task_lock_ttl" json:"task_lock_ttl" yaml:"task_lock_ttl"  env:"TASK_LOCK_TTL"`
+
+	taskLockTTL time.Duration
+}
+
+func (i *CronJobServiceImpl) Priority() int {
+	return cronjob.PRIORITY
 }
 
 func (i *CronJobServiceImpl) Init() error {
+
 	i.log = log.Sub(i.Name())
 	if datasource.Get().AutoMigrate {
 		err := datasource.DB().AutoMigrate(&cronjob.CronJob{})
@@ -50,6 +61,12 @@ func (i *CronJobServiceImpl) Init() error {
 			return err
 		}
 	}
+
+	lttl, err := time.ParseDuration(i.TaskLockTTL)
+	if err != nil {
+		return err
+	}
+	i.taskLockTTL = lttl
 
 	// 设置节点名称
 	if i.RandomNodeName {

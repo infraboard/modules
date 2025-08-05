@@ -45,6 +45,10 @@ type TaskServiceImpl struct {
 	CancelTopic string `toml:"cancel_topic" json:"cancel_topic" yaml:"cancel_topic"  env:"CANCEL_TOPIC"`
 }
 
+func (i *TaskServiceImpl) Priority() int {
+	return task.PRIORITY
+}
+
 func (s *TaskServiceImpl) AddAsyncTask(t *task.Task) {
 	t.Running()
 	s.tasks.Add(t)

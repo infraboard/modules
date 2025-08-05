@@ -23,9 +23,6 @@ func (s *TaskServiceImpl) Run(ctx context.Context, in *task.TaskSpec) (*task.Tas
 		return nil, err
 	}
 
-	// 添加任务
-	s.AddAsyncTask(ins)
-
 	// 队列事件
 	e := task.NewQueueEvent()
 	e.Type = task.QUEUE_EVENT_TYPE_RUN

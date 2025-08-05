@@ -44,6 +44,10 @@ func NewCronJobSpec(cron string, spec task.TaskSpec) *CronJobSpec {
 }
 
 type CronJobSpec struct {
+	// 定时任务名称
+	Name string `json:"name" gorm:"column:name;type:varchar(120)" description:"定时任务名称"`
+	// 定时任务名称
+	Description string `json:"description" gorm:"column:description;type:text" description:"定时任务描述"`
 	// Cron表达式
 	Cron string `json:"cron" gorm:"column:cron;type:varchar(120)" description:"Cron表达式"`
 	// 是否启用改Cron
@@ -77,8 +81,14 @@ type CronJobStatus struct {
 	Node string `json:"node" gorm:"column:node;" description:"CronJob执行的Node节点信息"`
 	// 状态更新时间
 	UpdateAt *time.Time `json:"update_at" gorm:"column:update_at;type:timestamp;;" description:"状态更新时间"`
+	// 最新一次允许时间
+	LatestRunAt *time.Time `json:"latest_run_at" gorm:"column:latest_run_at;type:timestamp;;" description:"最新一次允许时间"`
+	// 最新一次执行的任务
+	LatestTaskId string `json:"latest_task_id" gorm:"column:latest_task_id;" description:"最新一次执行的任务"`
 	// 状态
 	Status STATUS `json:"statsu" gorm:"column:statsu;" description:"CronJob状态"`
+	// 状态
+	Message string `json:"message" gorm:"column:message;" description:"状态的消息"`
 }
 
 func (s *CronJobStatus) SetUpdateAt(v time.Time) {
@@ -87,4 +97,9 @@ func (s *CronJobStatus) SetUpdateAt(v time.Time) {
 
 func (s *CronJobStatus) TableName() string {
 	return "cronjobs"
+}
+
+func (t *CronJobStatus) Failed(msg string) {
+	t.Status = STATUS_FAILED
+	t.Message = msg
 }

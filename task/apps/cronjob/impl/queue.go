@@ -6,6 +6,7 @@ import (
 
 	"github.com/infraboard/mcube/v2/ioc/config/bus"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
+	"github.com/infraboard/mcube/v2/ioc/config/lock"
 	"github.com/infraboard/mcube/v2/ioc/config/mcron"
 	"github.com/infraboard/modules/task/apps/cronjob"
 	"github.com/infraboard/modules/task/apps/task"
@@ -34,6 +35,8 @@ func (c *CronJobServiceImpl) HandleUpdateEvents(ctx context.Context) {
 
 		// 处理事件
 		switch te.Type {
+		case cronjob.QUEUE_EVENT_TYPE_ADD:
+			c.addCronjob(job)
 		case cronjob.QUEUE_EVENT_TYPE_DELETE:
 			c.deleteCronJob(ctx, job)
 		case cronjob.QUEUE_EVENT_TYPE_UPDATE:
@@ -96,4 +99,41 @@ func (c *CronJobServiceImpl) updateCronjob(ctx context.Context, job *cronjob.Cro
 		c.log.Error().Msgf("重新添加更新后的cron失败: %s", err)
 		return
 	}
+}
+
+func (c *CronJobServiceImpl) addCronjob(job *cronjob.CronJob) {
+	refId, err := mcron.Get().AddFunc(job.Cron, func() {
+		// 需要加锁执行，并且判断时间间隔
+		m := lock.L().New(job.Id, c.taskLockTTL)
+		if err := m.TryLock(c.ctx); err != nil {
+			c.log.Error().Msg(err.Error())
+			return
+		}
+		defer m.UnLock(c.ctx)
+
+		// 查询Job最新一次执行时间
+		jobIns, err := c.DescribeCronJob(c.ctx, cronjob.NewDescribeCronJobRequest(job.Id))
+		if err != nil {
+			c.log.Error().Msg(err.Error())
+			return
+		}
+
+		// 执行间隔判断
+		// jobIns.LatestRunAt
+
+		t, err := task.GetService().Run(context.Background(), &jobIns.TaskSpec)
+		if err != nil {
+			c.log.Error().Msg(err.Error())
+			return
+		}
+
+		c.log.Debug().Msg(t.String())
+		// 执行完成 需要更新cron最新一次执行时间
+	})
+	if err != nil {
+		job.Failed(err.Error())
+		return
+	}
+	job.RefInstanceId = int(refId)
+	job.Node = c.node_name
 }

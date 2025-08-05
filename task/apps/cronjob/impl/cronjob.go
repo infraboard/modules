@@ -6,33 +6,35 @@ import (
 	"github.com/infraboard/mcube/v2/exception"
 	"github.com/infraboard/mcube/v2/ioc/config/bus"
 	"github.com/infraboard/mcube/v2/ioc/config/datasource"
-	"github.com/infraboard/mcube/v2/ioc/config/mcron"
 	"github.com/infraboard/mcube/v2/types"
 	"github.com/infraboard/modules/task/apps/cronjob"
-	"github.com/infraboard/modules/task/apps/task"
 	"gorm.io/gorm"
 )
 
 // AddCronJob implements cronjob.Service.
-func (i *CronJobServiceImpl) AddCronJob(ctx context.Context, in *cronjob.CronJobSpec) (*cronjob.CronJob, error) {
+func (c *CronJobServiceImpl) AddCronJob(ctx context.Context, in *cronjob.CronJobSpec) (*cronjob.CronJob, error) {
 	ins := cronjob.NewCronJob(*in)
 
-	// 才真正的创建cron 关联cron实例
-	if in.GetEnabled() {
-		refId, err := mcron.RunAndAddFunc(in.Cron, func() {
-			task.GetService().Run(context.Background(), &ins.TaskSpec)
-		})
-		if err != nil {
-			return nil, err
-		}
-		ins.RefInstanceId = int(refId)
-		ins.Node = i.node_name
-	}
-
+	// 保存起来
 	if err := datasource.DBFromCtx(ctx).Save(ins).Error; err != nil {
 		return nil, err
 	}
 
+	// 放入运行队列, 广播给所有节点
+	if ins.GetEnabled() {
+		// 添加事件
+		e := cronjob.NewQueueEvent()
+		e.CronJobId = ins.Id
+		e.Type = cronjob.QUEUE_EVENT_TYPE_ADD
+
+		err := bus.GetService().Publish(ctx, &bus.Event{
+			Subject: c.UpdateTopic,
+			Data:    []byte(e.String()),
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
 	return ins, nil
 }
 

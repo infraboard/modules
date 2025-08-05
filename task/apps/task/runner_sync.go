@@ -29,6 +29,10 @@ type SyncRunner interface {
 	Run(ctx context.Context, task *Task) error
 }
 
+type UnimplementedSyncRunner struct{}
+
+func (r *UnimplementedSyncRunner) Start(context.Context, *Task) {}
+
 const (
 	RUN_PARAM_TYPE_JSON = "json"
 )

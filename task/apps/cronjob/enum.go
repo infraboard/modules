@@ -1,6 +1,7 @@
 package cronjob
 
 const (
+	QUEUE_EVENT_TYPE_ADD    QUEUE_EVENT_TYPE = "add"
 	QUEUE_EVENT_TYPE_UPDATE QUEUE_EVENT_TYPE = "update"
 	QUEUE_EVENT_TYPE_DELETE QUEUE_EVENT_TYPE = "delete"
 )
@@ -8,6 +9,8 @@ const (
 type QUEUE_EVENT_TYPE string
 
 const (
+	// 队列中
+	STATUS_PENDDING STATUS = "PENDDING"
 	// 更新中
 	STATUS_UPDATING STATUS = "UPDATING"
 	// 删除中
@@ -16,6 +19,8 @@ const (
 	STATUS_RUNNING STATUS = "RUNNING"
 	// 已停止
 	STATUS_STOPPED STATUS = "STOPPED"
+	// 添加失败
+	STATUS_FAILED STATUS = "FAILED"
 )
 
 type STATUS string

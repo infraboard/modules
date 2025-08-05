@@ -35,6 +35,10 @@ func (t *Task) TableName() string {
 	return "tasks"
 }
 
+func (t *Task) String() string {
+	return pretty.ToJSON(t)
+}
+
 func (t *Task) IsCompleted() bool {
 	return slices.Contains([]STATUS{
 		STATUS_SUCCESS,
@@ -61,10 +65,6 @@ func (t *Task) Success() *Task {
 	t.Status = STATUS_SUCCESS
 	t.SetEndAt(time.Now())
 	return t
-}
-
-func (t *Task) String() string {
-	return pretty.ToJSON(t)
 }
 
 func NewTaskSpec(runner string, param *RunParam) *TaskSpec {
