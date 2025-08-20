@@ -77,6 +77,8 @@ func NewTaskSpec(runner string, param *RunParam) *TaskSpec {
 }
 
 type TaskSpec struct {
+	// 任务Id
+	TaskId string `json:"task_id" gorm:"-" description:"任务Id, 如果是任务Id,则查询任务执行"`
 	// 异步执行时的超时时间
 	Timeout string `json:"timeout" gorm:"column:timeout;" description:"异步执行时的超时时间"`
 	// 尝试执行,用于做执行前检查

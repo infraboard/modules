@@ -17,6 +17,8 @@ func GetService() Service {
 }
 
 type Service interface {
+	// 创建任务
+	CreateTask(context.Context, *TaskSpec) (*Task, error)
 	// 任务执行
 	Run(context.Context, *TaskSpec) (*Task, error)
 	// 任务取消

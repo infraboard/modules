@@ -13,14 +13,34 @@ import (
 	"gorm.io/gorm"
 )
 
-// Run implements task.Service.
-func (s *TaskServiceImpl) Run(ctx context.Context, in *task.TaskSpec) (*task.Task, error) {
+// 创建任务
+func (s *TaskServiceImpl) CreateTask(ctx context.Context, in *task.TaskSpec) (*task.Task, error) {
 	ins := task.NewTask(*in)
 
-	// 保存记录
 	err := datasource.DBFromCtx(ctx).Save(ins).Error
 	if err != nil {
 		return nil, err
+	}
+
+	return ins, nil
+}
+
+// Run implements task.Service.
+func (s *TaskServiceImpl) Run(ctx context.Context, in *task.TaskSpec) (*task.Task, error) {
+	var ins *task.Task
+	if in.TaskId != "" {
+		oldTask, err := s.DescribeTask(ctx, task.NewDescribeTaskRequest(in.TaskId))
+		if err != nil {
+			return nil, err
+		}
+		ins = oldTask
+	} else {
+		ins := task.NewTask(*in)
+		// 保存记录
+		err := datasource.DBFromCtx(ctx).Save(ins).Error
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// 队列事件
@@ -29,13 +49,15 @@ func (s *TaskServiceImpl) Run(ctx context.Context, in *task.TaskSpec) (*task.Tas
 	e.TaskId = ins.Id
 
 	// 放入运行队列
-	err = bus.GetService().Publish(ctx, &bus.Event{
+	err := bus.GetService().Publish(ctx, &bus.Event{
 		Subject: s.RunTopic,
 		Data:    []byte(e.String()),
 	})
 	if err != nil {
 		return nil, err
 	}
+
+	// 更新状态队列中
 
 	return ins, nil
 }
