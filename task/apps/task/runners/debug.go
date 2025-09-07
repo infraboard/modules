@@ -23,12 +23,12 @@ type DebugRunner struct {
 
 func (r *DebugRunner) Run(ctx context.Context, ins *task.Task) error {
 	fmt.Println("执行参数:", ins.Params)
-	_, err := event.GetService().AddEvent(ctx, task.NewInfoEvent("开始执行", ins.Id))
+	_, err := event.GetService().AddEvent(ctx, task.NewInfoEvent(ins.Id, "开始执行"))
 	if err != nil {
 		return err
 	}
 	time.Sleep(3 * time.Second)
-	_, err = event.GetService().AddEvent(ctx, task.NewInfoEvent("执行结束", ins.Id))
+	_, err = event.GetService().AddEvent(ctx, task.NewInfoEvent(ins.Id, "执行结束"))
 	if err != nil {
 		return err
 	}
