@@ -17,6 +17,7 @@ func NewTask(spec TaskSpec) *Task {
 		CreatedAt:  time.Now(),
 		TaskSpec:   spec,
 		TaskStatus: *NewTaskStatus(),
+		Events:     []*event.Event{},
 	}
 }
 
@@ -29,6 +30,9 @@ type Task struct {
 	TaskSpec
 	// 任务状态
 	TaskStatus
+
+	// 执行过程中的事件, 执行日志
+	Events []*event.Event `json:"events" gorm:"-" description:"执行过程中的事件"`
 }
 
 func (t *Task) TableName() string {
@@ -45,6 +49,13 @@ func (t *Task) IsCompleted() bool {
 		STATUS_FAILED,
 		STATUS_CANCELED,
 		STATUS_SKIPPED,
+	}, t.Status)
+}
+
+func (t *Task) IsRunning() bool {
+	return slices.Contains([]STATUS{
+		STATUS_QUEUED,
+		STATUS_RUNNING,
 	}, t.Status)
 }
 
@@ -67,10 +78,16 @@ func (t *Task) Success() *Task {
 	return t
 }
 
+func (t *Task) SetMessage(msg string) *Task {
+	t.Message = msg
+	return t
+}
+
 func NewTaskSpec(runner string, param *RunParam) *TaskSpec {
 	return &TaskSpec{
 		Runner:   runner,
 		Params:   param,
+		Async:    false,
 		Label:    map[string]string{},
 		WebHooks: []*webhook.WebHook{},
 	}
@@ -147,8 +164,7 @@ type TaskFunc func(ctx context.Context, req any) error
 
 func NewTaskStatus() *TaskStatus {
 	return &TaskStatus{
-		Status: STATUS_QUEUED,
-		Events: []*event.Event{},
+		Status: STATUS_PENDDING,
 	}
 }
 
@@ -165,9 +181,6 @@ type TaskStatus struct {
 	Message string `json:"message" gorm:"column:message;type:text;" description:"失败信息"`
 	// 失败信息
 	Detail string `json:"detail" gorm:"column:detail;type:text;" description:"详情内容"`
-
-	// 执行过程中的事件, 执行日志
-	Events []*event.Event `json:"events" gorm:"column:events;type:json;serializer:json;" description:"执行过程中的事件"`
 
 	// 异步任务取消函数
 	cancelFn context.CancelFunc `json:"-" gorm:"-"`

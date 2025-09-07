@@ -2,6 +2,7 @@ package impl_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/infraboard/modules/task/apps/task"
 	"github.com/infraboard/modules/task/apps/task/runners"
@@ -9,7 +10,7 @@ import (
 )
 
 func TestRun(t *testing.T) {
-	req := task.NewTaskSpec(runners.DEBUG, task.NewJsonRunParam("test"))
+	req := task.NewTaskSpec(runners.DEBUG, task.NewJsonRunParam("test")).SetLabel("deploy_id", "dpl-01")
 
 	req.AddWebHook(webhook.NewWebHook(webhook.WebHookSpec{
 		TargetURL:  "https://www.baidu.com/",
@@ -22,10 +23,12 @@ func TestRun(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Log(ins)
+
+	time.Sleep(time.Second * 10)
 }
 
 const (
-	TASK_ID = "11029dbd-22cd-4c14-9c09-249ff2d84212"
+	TASK_ID = "f15976a8-42ec-42d6-89cb-73b149f72ac9"
 )
 
 func TestDescribeTask(t *testing.T) {
@@ -37,7 +40,8 @@ func TestDescribeTask(t *testing.T) {
 }
 
 func TestQueryTask(t *testing.T) {
-	ins, err := svc.QueryTask(t.Context(), task.NewQueryTaskRequest())
+	req := task.NewQueryTaskRequest().SetLabel("deploy_id", "dpl-01")
+	ins, err := svc.QueryTask(t.Context(), req)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -2,6 +2,7 @@ package impl
 
 import (
 	"context"
+	"time"
 
 	"github.com/infraboard/mcube/v2/exception"
 	"github.com/infraboard/mcube/v2/ioc/config/bus"
@@ -10,13 +11,13 @@ import (
 	"github.com/infraboard/modules/task/apps/event"
 	"github.com/infraboard/modules/task/apps/task"
 	"github.com/infraboard/modules/task/apps/webhook"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
 // 创建任务
 func (s *TaskServiceImpl) CreateTask(ctx context.Context, in *task.TaskSpec) (*task.Task, error) {
 	ins := task.NewTask(*in)
-
 	err := datasource.DBFromCtx(ctx).Save(ins).Error
 	if err != nil {
 		return nil, err
@@ -33,14 +34,21 @@ func (s *TaskServiceImpl) Run(ctx context.Context, in *task.TaskSpec) (*task.Tas
 		if err != nil {
 			return nil, err
 		}
+		if oldTask.IsRunning() {
+			return nil, exception.NewConflict("任务[%s]正在运行中", oldTask.Id)
+		}
+
+		// 判断任务是否已经运行
+		if oldTask.IsCompleted() {
+			return nil, exception.NewConflict("任务[%s]运行结束", oldTask.Id)
+		}
 		ins = oldTask
 	} else {
-		ins := task.NewTask(*in)
-		// 保存记录
-		err := datasource.DBFromCtx(ctx).Save(ins).Error
+		newTask, err := s.CreateTask(ctx, in)
 		if err != nil {
 			return nil, err
 		}
+		ins = newTask
 	}
 
 	// 队列事件
@@ -57,8 +65,13 @@ func (s *TaskServiceImpl) Run(ctx context.Context, in *task.TaskSpec) (*task.Tas
 		return nil, err
 	}
 
-	// 更新状态队列中
-
+	// 状态更新
+	ins.Status = task.STATUS_QUEUED
+	ins.SetUpdateAt(time.Now())
+	ins.Message = "任务已加入队列"
+	if err := datasource.DBFromCtx(ctx).Where("id = ?", ins.Id).Updates(ins.TaskStatus).Error; err != nil {
+		return nil, err
+	}
 	return ins, nil
 }
 
@@ -122,6 +135,10 @@ func (i *TaskServiceImpl) QueryTask(ctx context.Context, in *task.QueryTaskReque
 	set := types.New[*task.Task]()
 
 	query := datasource.DBFromCtx(ctx).Model(&task.Task{})
+	for k, v := range in.Label {
+		query = query.Where(datatypes.JSONQuery("label").Equals(v, k))
+	}
+
 	err := query.Count(&set.Total).Error
 	if err != nil {
 		return nil, err

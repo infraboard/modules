@@ -22,7 +22,7 @@ type DebugRunner struct {
 }
 
 func (r *DebugRunner) Run(ctx context.Context, ins *task.Task) error {
-	fmt.Println(ins.Params)
+	fmt.Println("执行参数:", ins.Params)
 	_, err := event.GetService().AddEvent(ctx, task.NewInfoEvent("开始执行", ins.Id))
 	if err != nil {
 		return err

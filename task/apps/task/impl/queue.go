@@ -36,9 +36,9 @@ func (c *TaskServiceImpl) HandleRunEvents(ctx context.Context) {
 			return
 		}
 
-		// 处理过的任务不再运行
-		if taskIns.Status != task.STATUS_QUEUED {
-			c.log.Error().Msgf("任务已经处理: %s", taskIns.Status)
+		// 判断任务是否在排队的过程中取消了
+		if taskIns.Status == task.STATUS_CANCELED {
+			c.log.Error().Msgf("任务已经取消: %s", taskIns.Status)
 			return
 		}
 
@@ -57,6 +57,7 @@ func (c *TaskServiceImpl) HandleRunEvents(ctx context.Context) {
 
 func (s *TaskServiceImpl) runTask(ins *task.Task) *task.Task {
 	ins.SetStartAt(time.Now())
+	ins.Status = task.STATUS_RUNNING
 
 	if ins.Async {
 		// 异步执行
@@ -64,8 +65,14 @@ func (s *TaskServiceImpl) runTask(ins *task.Task) *task.Task {
 		if runner == nil {
 			return ins.Failed(fmt.Sprintf("runner %s not found", ins.Runner))
 		}
+
+		// 只是触发成功, 任务状态还是运行中
+		err := runner.Start(ins.BuildTimeoutCtx(), ins)
+		if err != nil {
+			return ins.Failed(err.Error())
+		}
 	} else {
-		// 同步执行
+		// 同步执行, 是一个对象，在内存中持续运行
 		runner := task.GetSyncRunner(ins.Runner)
 		if runner == nil {
 			return ins.Failed(fmt.Sprintf("runner %s not found", ins.Runner))
@@ -75,7 +82,11 @@ func (s *TaskServiceImpl) runTask(ins *task.Task) *task.Task {
 		s.AddAsyncTask(ins)
 		defer s.RemoveAsyncTask(ins)
 
-		runner.Run(ins.BuildTimeoutCtx(), ins)
+		err := runner.Run(ins.BuildTimeoutCtx(), ins)
+		if err != nil {
+			return ins.Failed(err.Error())
+		}
+		ins.Success().SetMessage("任务运行成功")
 	}
 	return ins
 }

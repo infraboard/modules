@@ -46,9 +46,21 @@ type DescribeTaskRequest struct {
 func NewQueryTaskRequest() *QueryTaskRequest {
 	return &QueryTaskRequest{
 		PageRequest: *request.NewDefaultPageRequest(),
+		Label:       map[string]string{},
 	}
 }
 
 type QueryTaskRequest struct {
 	request.PageRequest
+
+	Label map[string]string `json:"label"`
+}
+
+func (r *QueryTaskRequest) SetLabel(key, value string) *QueryTaskRequest {
+	if r.Label == nil {
+		r.Label = map[string]string{}
+	}
+
+	r.Label[key] = value
+	return r
 }
