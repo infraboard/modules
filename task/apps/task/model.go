@@ -160,6 +160,13 @@ func (t *TaskSpec) SetLabel(key, value string) *TaskSpec {
 	return t
 }
 
+func (t *TaskSpec) GetLabel(key string) string {
+	if t.Label == nil {
+		return ""
+	}
+	return t.Label[key]
+}
+
 type TaskFunc func(ctx context.Context, req any) error
 
 func NewTaskStatus() *TaskStatus {
