@@ -2,10 +2,13 @@ package task
 
 import (
 	"context"
+	"maps"
 	"slices"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/infraboard/mcube/v2/exception"
+	"github.com/infraboard/mcube/v2/ioc/config/log"
 	"github.com/infraboard/mcube/v2/tools/pretty"
 	"github.com/infraboard/modules/task/apps/event"
 	"github.com/infraboard/modules/task/apps/webhook"
@@ -83,6 +86,31 @@ func (t *Task) SetMessage(msg string) *Task {
 	return t
 }
 
+func (t *Task) WaitComplete(ctx context.Context, scanInterval time.Duration, maxScanCount int) error {
+	count := 0
+	for {
+		if count > maxScanCount {
+			return exception.NewInternalServerError("task %s wait complete timeout", t.Id)
+		}
+
+		ins, err := GetService().DescribeTask(ctx, NewDescribeTaskRequest(t.Id))
+		if err != nil {
+			return err
+		}
+		*t = *ins
+
+		if t.IsCompleted() {
+			break
+		}
+
+		count++
+		log.L().Debug().Msgf("task %s status: %s, retry[%d] next scan after %s", t.Id, t.Status.String(), count, scanInterval)
+		time.Sleep(scanInterval)
+	}
+
+	return nil
+}
+
 func NewTaskSpec(runner string, param *RunParam) *TaskSpec {
 	return &TaskSpec{
 		Runner:   runner,
@@ -157,6 +185,14 @@ func (t *TaskSpec) SetLabel(key, value string) *TaskSpec {
 		t.Label = map[string]string{}
 	}
 	t.Label[key] = value
+	return t
+}
+
+func (t *TaskSpec) SetLabelByMap(m map[string]string) *TaskSpec {
+	if t.Label == nil {
+		t.Label = map[string]string{}
+	}
+	maps.Copy(t.Label, m)
 	return t
 }
 
