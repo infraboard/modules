@@ -51,7 +51,7 @@ func (c *TaskServiceImpl) HandleRunEvents(ctx context.Context) {
 		c.log.Info().Msgf("[结束]在节点[%s]上异步执行task: %s", c.node_name, taskIns.Id)
 	})
 	if err != nil {
-		c.log.Error().Msgf("subscribe run event error, %s", err)
+		c.log.Error().Msgf("subscribe task run event error, %s", err)
 	}
 }
 
@@ -132,4 +132,72 @@ func (c *TaskServiceImpl) HandleCancelEvents(ctx context.Context) {
 	if err != nil {
 		c.log.Error().Msgf("subscribe cancel event error, %s", err)
 	}
+}
+
+// 处理任务更新事件
+func (c *TaskServiceImpl) HandleUpdateEvents(ctx context.Context) {
+	c.log.Info().Msgf("start handle task update events ...")
+	err := bus.GetService().TopicSubscribe(ctx, c.UpdateTopic, func(e *bus.Event) {
+		// 处理消息
+		te := task.NewQueueEvent()
+
+		// 发送的数据时Json格式, 接收用的JSON, 发送也需要使用JSON
+		err := te.Load(e.Data)
+		if err != nil {
+			c.log.Error().Msgf("parse event error, %s", err)
+			return
+		}
+
+		if te.Type != task.QUEUE_EVENT_TYPE_UPDATE {
+			c.log.Error().Msgf("unknown event type %s", te.Type)
+			return
+		}
+
+		// 查询Task实例
+		taskIns, err := c.DescribeTask(ctx, task.NewDescribeTaskRequest(te.TaskId))
+		if err != nil {
+			c.log.Error().Msgf("decribe task error, %s", err)
+			return
+		}
+
+		// 判断任务是否在排队的过程中取消了
+		if taskIns.Status == task.STATUS_CANCELED {
+			c.log.Error().Msgf("任务已经取消: %s", taskIns.Status)
+			return
+		}
+
+		c.log.Info().Msgf("[开始]开始在节点[%s]上更新taskg: %s ...", c.node_name, taskIns.Id)
+		// 更新任务调用
+		c.updateTask(taskIns)
+		// 更新任务状态
+		c.updateTaskStatus(ctx, taskIns)
+
+		c.log.Info().Msgf("[结束]在节点[%s]上更新task: %s", c.node_name, taskIns.Id)
+	})
+	if err != nil {
+		c.log.Error().Msgf("subscribe task update event error, %s", err)
+	}
+}
+
+func (s *TaskServiceImpl) updateTask(ins *task.Task) *task.Task {
+	ins.SetUpdateAt(time.Now())
+	ins.Status = task.STATUS_RUNNING
+
+	if !ins.Async {
+		return ins.Failed("暂不支持同步任务更新")
+	}
+
+	// 异步执行
+	runner := task.GetAsyncRunner(ins.Runner)
+	if runner == nil {
+		return ins.Failed(fmt.Sprintf("runner %s not found", ins.Runner))
+	}
+
+	// 只是触发成功, 任务状态还是运行中
+	status, err := runner.GetStatus(ins.BuildTimeoutCtx(), ins.Id)
+	if err != nil {
+		return ins.Failed(err.Error())
+	}
+	ins.TaskStatus = *status
+	return ins
 }

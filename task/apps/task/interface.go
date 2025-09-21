@@ -19,14 +19,26 @@ func GetService() Service {
 type Service interface {
 	// 创建任务
 	CreateTask(context.Context, *TaskSpec) (*Task, error)
-	// 任务执行
+	// 任务执行, 包含同步和异步
 	Run(context.Context, *TaskSpec) (*Task, error)
+	// 触发任务状态更新, 异步任务时需要使用
+	UpdateTaskStatus(context.Context, *UpdateTaskStatusRequest) (*Task, error)
 	// 任务取消
 	Cancel(context.Context, *CancelRequest) (*Task, error)
 	// 查询任务列表
 	QueryTask(context.Context, *QueryTaskRequest) (*types.Set[*Task], error)
 	// 查询任务详情
 	DescribeTask(context.Context, *DescribeTaskRequest) (*Task, error)
+}
+
+func NewUpdateTaskStatusRequest(taskId string) *UpdateTaskStatusRequest {
+	return &UpdateTaskStatusRequest{
+		DescribeTaskRequest: *NewDescribeTaskRequest(taskId),
+	}
+}
+
+type UpdateTaskStatusRequest struct {
+	DescribeTaskRequest
 }
 
 type CancelRequest struct {

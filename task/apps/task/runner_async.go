@@ -35,10 +35,12 @@ type AsyncRunner interface {
 
 type UnimplementedAsyncRunner struct{}
 
-func (r *UnimplementedAsyncRunner) Start(context.Context, *Task) {}
+func (r *UnimplementedAsyncRunner) Start(context.Context, *Task) error {
+	return fmt.Errorf("Unimplemented")
+}
 func (r *UnimplementedAsyncRunner) GetStatus(ctx context.Context, taskID string) (*TaskStatus, error) {
 	return nil, fmt.Errorf("Unimplemented")
 }
 func (r *UnimplementedAsyncRunner) Cancel(ctx context.Context, taskID string) error {
-	return nil
+	return fmt.Errorf("Unimplemented")
 }

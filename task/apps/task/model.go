@@ -208,6 +208,7 @@ type TaskFunc func(ctx context.Context, req any) error
 func NewTaskStatus() *TaskStatus {
 	return &TaskStatus{
 		Status: STATUS_PENDDING,
+		Extras: map[string]string{},
 	}
 }
 
@@ -224,6 +225,12 @@ type TaskStatus struct {
 	Message string `json:"message" gorm:"column:message;type:text;" description:"失败信息"`
 	// 失败信息
 	Detail string `json:"detail" gorm:"column:detail;type:text;" description:"详情内容"`
+	// 任务关联对象
+	ReferenceId string `json:"reference_id" gorm:"column:reference_id;type:varchar(200);" description:"关联任务ID"`
+	// 管理任务URL
+	ReferenceURL string `json:"reference_url" gorm:"column:reference_url;type:varchar(200);" description:"关联任务"`
+	// 其他数据
+	Extras map[string]string `json:"extras" gorm:"column:extras;serializer:json;type:json" description:"任务执行结果" optional:"true"`
 
 	// 异步任务取消函数
 	cancelFn context.CancelFunc `json:"-" gorm:"-"`

@@ -19,6 +19,7 @@ func init() {
 		ctx:         context.Background(),
 		tasks:       types.New[*task.Task](),
 		RunTopic:    "task_run_events",
+		UpdateTopic: "task_update_events",
 		CancelTopic: "task_cancel_events",
 	})
 }
@@ -41,6 +42,8 @@ type TaskServiceImpl struct {
 	RandomNodeName bool `toml:"random_node_name" json:"random_node_name" yaml:"random_node_name"  env:"RANDOM_NODE_NAME"`
 	// 运行队列名称
 	RunTopic string `toml:"run_topic" json:"run_topic" yaml:"run_topic"  env:"RUN_TOPIC"`
+	// 更新队列名称
+	UpdateTopic string `toml:"update_topic" json:"update_topic" yaml:"update_topic"  env:"UPDATE_TOPIC"`
 	// 取消队列名称
 	CancelTopic string `toml:"cancel_topic" json:"cancel_topic" yaml:"cancel_topic"  env:"CANCEL_TOPIC"`
 }
@@ -100,6 +103,10 @@ func (i *TaskServiceImpl) Init() error {
 	// 处理运行事件
 	i.log.Info().Msgf("run topic: %s", i.RunTopic)
 	i.HandleRunEvents(i.ctx)
+
+	// 处理更新事件
+	i.log.Info().Msgf("update topic: %s", i.UpdateTopic)
+	i.HandleUpdateEvents(i.ctx)
 	return nil
 }
 

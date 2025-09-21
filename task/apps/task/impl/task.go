@@ -68,7 +68,39 @@ func (s *TaskServiceImpl) Run(ctx context.Context, in *task.TaskSpec) (*task.Tas
 	// 状态更新
 	ins.Status = task.STATUS_QUEUED
 	ins.SetUpdateAt(time.Now())
-	ins.Message = "任务已加入队列"
+	ins.Message = "任务已加入运行队列"
+	if err := datasource.DBFromCtx(ctx).Where("id = ?", ins.Id).Updates(ins.TaskStatus).Error; err != nil {
+		return nil, err
+	}
+	return ins, nil
+}
+
+// 触发任务同步
+func (s *TaskServiceImpl) UpdateTaskStatus(ctx context.Context, in *task.UpdateTaskStatusRequest) (*task.Task, error) {
+	// 获取任务
+	ins, err := s.DescribeTask(ctx, &in.DescribeTaskRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	// 放入更新队列
+	e := task.NewQueueEvent()
+	e.Type = task.QUEUE_EVENT_TYPE_UPDATE
+	e.TaskId = ins.Id
+
+	// 放入运行队列
+	err = bus.GetService().Publish(ctx, &bus.Event{
+		Subject: s.RunTopic,
+		Data:    []byte(e.String()),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// 状态更新
+	ins.Status = task.STATUS_UPDATING
+	ins.SetUpdateAt(time.Now())
+	ins.Message = "任务已加入更新队列"
 	if err := datasource.DBFromCtx(ctx).Where("id = ?", ins.Id).Updates(ins.TaskStatus).Error; err != nil {
 		return nil, err
 	}
@@ -126,7 +158,6 @@ func (i *TaskServiceImpl) DescribeTask(ctx context.Context, in *task.DescribeTas
 		return nil, err
 	}
 	ins.WebHooks = webhooks.Items
-
 	return ins, nil
 }
 

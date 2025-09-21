@@ -47,3 +47,11 @@ func TestQueryTask(t *testing.T) {
 	}
 	t.Log(ins)
 }
+
+func TestUpdateTaskStatus(t *testing.T) {
+	ins, err := svc.UpdateTaskStatus(t.Context(), task.NewUpdateTaskStatusRequest(TASK_ID))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(ins)
+}

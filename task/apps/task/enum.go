@@ -7,6 +7,8 @@ const (
 	STATUS_QUEUED
 	// 任务正在运行
 	STATUS_RUNNING
+	// 任务正在更新
+	STATUS_UPDATING
 	// 取消中
 	STATUS_CANCELING
 	// 任务已完成
@@ -24,6 +26,7 @@ var (
 		STATUS_PENDDING: "PENDDING",
 		STATUS_QUEUED:   "QUEUED",
 		STATUS_RUNNING:  "RUNNING",
+		STATUS_UPDATING: "UPDATING",
 		STATUS_SUCCESS:  "SUCCESS",
 		STATUS_FAILED:   "FAILED",
 		STATUS_CANCELED: "CANCELED",
@@ -52,6 +55,8 @@ func (s STATUS) String() string {
 const (
 	// 任务运行事件
 	QUEUE_EVENT_TYPE_RUN QUEUE_EVENT_TYPE = "run"
+	// 任务更新事件
+	QUEUE_EVENT_TYPE_UPDATE QUEUE_EVENT_TYPE = "update"
 	// 任务取消事件
 	QUEUE_EVENT_TYPE_CANCEL QUEUE_EVENT_TYPE = "cancel"
 )

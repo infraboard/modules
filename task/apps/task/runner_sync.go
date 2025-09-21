@@ -3,6 +3,8 @@ package task
 import (
 	"context"
 	"encoding/json"
+
+	"github.com/infraboard/mcube/v2/tools/pretty"
 )
 
 var (
@@ -51,6 +53,10 @@ type RunParam struct {
 	Type RUN_PARAM_TYPE `json:"type" gorm:"column:run_param_type;type:varchar(60)" description:"参数类型"`
 	// 参数值
 	Value string `json:"value" gorm:"column:run_param_value;type:text" description:"参数值"`
+}
+
+func (r *RunParam) String() string {
+	return pretty.ToJSON(r)
 }
 
 func (r *RunParam) Load(v any) error {
