@@ -221,6 +221,8 @@ type TaskStatus struct {
 	UpdateAt *time.Time `json:"update_at" gorm:"column:update_at;type:timestamp;" description:"任务状态更新时间"`
 	// 任务执行状态
 	Status STATUS `json:"status" gorm:"column:status;type:tinyint(2);" description:"任务执行状态"`
+	// 任务状态是否有变更
+	StatusChanged bool `json:"status_changed" gorm:"column:status_changed;type:bool;" description:"任务状态是否有变更"`
 	// 失败信息
 	Message string `json:"message" gorm:"column:message;type:text;" description:"失败信息"`
 	// 失败信息
@@ -246,6 +248,10 @@ func (s *TaskStatus) SetEndAt(t time.Time) {
 
 func (s *TaskStatus) SetUpdateAt(t time.Time) {
 	s.UpdateAt = &t
+}
+
+func (s *TaskStatus) ComputedIsChanged(status STATUS) {
+	s.StatusChanged = s.Status == status
 }
 
 func (s *TaskStatus) TableName() string {

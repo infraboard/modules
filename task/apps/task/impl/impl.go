@@ -16,11 +16,12 @@ import (
 
 func init() {
 	ioc.Controller().Registry(&TaskServiceImpl{
-		ctx:         context.Background(),
-		tasks:       types.New[*task.Task](),
-		RunTopic:    "task_run_events",
-		UpdateTopic: "task_update_events",
-		CancelTopic: "task_cancel_events",
+		ctx:          context.Background(),
+		tasks:        types.New[*task.Task](),
+		RunTopic:     "task_run_events",
+		UpdateTopic:  "task_update_events",
+		CancelTopic:  "task_cancel_events",
+		ChangedTopic: "task_status_changed",
 	})
 }
 
@@ -46,6 +47,8 @@ type TaskServiceImpl struct {
 	UpdateTopic string `toml:"update_topic" json:"update_topic" yaml:"update_topic"  env:"UPDATE_TOPIC"`
 	// 取消队列名称
 	CancelTopic string `toml:"cancel_topic" json:"cancel_topic" yaml:"cancel_topic"  env:"CANCEL_TOPIC"`
+	// 任务事件状态变更队列, 通知其他服务任务状态有更新
+	ChangedTopic string `toml:"changed_topic" json:"changed_topic" yaml:"changed_topic"  env:"CHANGED_TOPIC"`
 }
 
 func (i *TaskServiceImpl) Priority() int {

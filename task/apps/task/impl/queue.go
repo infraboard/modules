@@ -12,8 +12,7 @@ import (
 // 处理任务运行队列
 func (c *TaskServiceImpl) HandleRunEvents(ctx context.Context) {
 	c.log.Info().Msgf("start handle task run events ...")
-
-	err := bus.GetService().TopicSubscribe(ctx, c.RunTopic, func(e *bus.Event) {
+	err := bus.GetService().QueueSubscribe(ctx, c.RunTopic, func(e *bus.Event) {
 		// 处理消息
 		te := task.NewQueueEvent()
 
