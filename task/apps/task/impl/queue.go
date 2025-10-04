@@ -58,11 +58,11 @@ func (s *TaskServiceImpl) runTask(ins *task.Task) *task.Task {
 	ins.SetStartAt(time.Now())
 	ins.Status = task.STATUS_RUNNING
 
-	if ins.Async {
+	if ins.IsAsync() {
 		// 异步执行
 		runner := task.GetAsyncRunner(ins.Runner)
 		if runner == nil {
-			return ins.Failed(fmt.Sprintf("runner %s not found", ins.Runner))
+			return ins.Failed(fmt.Sprintf("async runner %s not found", ins.Runner))
 		}
 
 		// 只是触发成功, 任务状态还是运行中
@@ -74,7 +74,7 @@ func (s *TaskServiceImpl) runTask(ins *task.Task) *task.Task {
 		// 同步执行, 是一个对象，在内存中持续运行
 		runner := task.GetSyncRunner(ins.Runner)
 		if runner == nil {
-			return ins.Failed(fmt.Sprintf("runner %s not found", ins.Runner))
+			return ins.Failed(fmt.Sprintf("sync runner %s not found", ins.Runner))
 		}
 
 		// 执行函数
@@ -165,7 +165,7 @@ func (c *TaskServiceImpl) HandleUpdateEvents(ctx context.Context) {
 			return
 		}
 
-		c.log.Info().Msgf("[开始]开始在节点[%s]上更新taskg: %s ...", c.node_name, taskIns.Id)
+		c.log.Info().Msgf("[开始]开始在节点[%s]上更新task: %s ...", c.node_name, taskIns.Id)
 		// 更新任务调用
 		c.updateTask(taskIns)
 		// 更新任务状态
@@ -182,14 +182,14 @@ func (s *TaskServiceImpl) updateTask(ins *task.Task) *task.Task {
 	ins.SetUpdateAt(time.Now())
 	ins.Status = task.STATUS_RUNNING
 
-	if !ins.Async {
+	if !ins.IsAsync() {
 		return ins.Failed("暂不支持同步任务更新")
 	}
 
 	// 异步执行
 	runner := task.GetAsyncRunner(ins.Runner)
 	if runner == nil {
-		return ins.Failed(fmt.Sprintf("runner %s not found", ins.Runner))
+		return ins.Failed(fmt.Sprintf("async runner %s not found", ins.Runner))
 	}
 
 	// 只是触发成功, 任务状态还是运行中

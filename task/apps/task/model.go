@@ -10,6 +10,7 @@ import (
 	"github.com/infraboard/mcube/v2/exception"
 	"github.com/infraboard/mcube/v2/ioc/config/log"
 	"github.com/infraboard/mcube/v2/tools/pretty"
+	"github.com/infraboard/mcube/v2/tools/ptr"
 	"github.com/infraboard/modules/task/apps/event"
 	"github.com/infraboard/modules/task/apps/webhook"
 )
@@ -115,7 +116,7 @@ func NewTaskSpec(runner string, param *RunParam) *TaskSpec {
 	return &TaskSpec{
 		Runner:   runner,
 		Params:   param,
-		Async:    false,
+		Async:    ptr.GetPtr(false),
 		Label:    map[string]string{},
 		WebHooks: []*webhook.WebHook{},
 	}
@@ -127,7 +128,7 @@ type TaskSpec struct {
 	// 异步执行时的超时时间
 	Timeout string `json:"timeout" gorm:"column:timeout;" description:"异步执行时的超时时间"`
 	// 尝试执行,用于做执行前检查
-	Async bool `json:"async" gorm:"column:async;type:bool;" description:"是否是异步任务"`
+	Async *bool `json:"async" gorm:"column:async;type:bool;" description:"是否是异步任务"`
 	// 执行器名称
 	Runner string `json:"runner" gorm:"column:type;type:varchar(60);" description:"执行器名称"`
 	// 执行器参数
@@ -145,6 +146,13 @@ type TaskSpec struct {
 
 	// 任务执行结束回调
 	WebHooks []*webhook.WebHook `json:"web_hooks" bson:"web_hooks" gorm:"column:web_hooks;serializer:json;type:json" description:"任务执行结束回调" optional:"true"`
+}
+
+func (t *TaskSpec) IsAsync() bool {
+	if t.Async == nil {
+		return false
+	}
+	return *t.Async
 }
 
 func (t *TaskSpec) SetName(name string) *TaskSpec {
@@ -193,6 +201,11 @@ func (t *TaskSpec) SetLabelByMap(m map[string]string) *TaskSpec {
 		t.Label = map[string]string{}
 	}
 	maps.Copy(t.Label, m)
+	return t
+}
+
+func (t *TaskSpec) SetAsync(async bool) *TaskSpec {
+	t.Async = &async
 	return t
 }
 

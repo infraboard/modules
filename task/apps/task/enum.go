@@ -1,5 +1,7 @@
 package task
 
+import "bytes"
+
 const (
 	// 任务处于挂起, 等待排队
 	STATUS_PENDDING STATUS = iota
@@ -50,6 +52,13 @@ type STATUS int
 
 func (s STATUS) String() string {
 	return STATUS_MAP[s]
+}
+
+func (s STATUS) MarshalJSON() ([]byte, error) {
+	b := bytes.NewBufferString(`"`)
+	b.WriteString(s.String())
+	b.WriteString(`"`)
+	return b.Bytes(), nil
 }
 
 const (
