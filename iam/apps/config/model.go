@@ -3,7 +3,6 @@ package config
 import (
 	"encoding/json"
 
-	"github.com/infraboard/mcube/v2/crypto/cbc"
 	"github.com/infraboard/mcube/v2/exception"
 	"github.com/infraboard/mcube/v2/ioc/config/application"
 	"github.com/infraboard/mcube/v2/tools/pretty"
@@ -34,7 +33,7 @@ func (c *ConfigItem) String() string {
 
 func (c *ConfigItem) Encrypt() error {
 	if c.IsEncrypted {
-		cihperText, err := cbc.MustNewAESCBCCihper(application.Get().GenCBCEncryptKey()).EncryptFromString(c.Value)
+		cihperText, err := application.Get().EncryptString(c.Value)
 		if err != nil {
 			return err
 		}
@@ -45,7 +44,7 @@ func (c *ConfigItem) Encrypt() error {
 
 func (c *ConfigItem) Decrypt() error {
 	if c.IsEncrypted {
-		plainText, err := cbc.MustNewAESCBCCihper(application.Get().GenCBCEncryptKey()).DecryptFromCipherText(c.Value)
+		plainText, err := application.Get().DecryptString(c.Value)
 		if err != nil {
 			return err
 		}

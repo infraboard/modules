@@ -41,6 +41,12 @@ type UpdateTaskStatusRequest struct {
 	DescribeTaskRequest
 }
 
+func NewCancelRequest(taskId string) *CancelRequest {
+	return &CancelRequest{
+		DescribeTaskRequest: *NewDescribeTaskRequest(taskId),
+	}
+}
+
 type CancelRequest struct {
 	DescribeTaskRequest
 }
